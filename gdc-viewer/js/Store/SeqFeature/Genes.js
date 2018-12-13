@@ -89,6 +89,10 @@ function(
             // Create full url
             var url = searchBaseUrl + 'genes';
 
+            // Add filters to query
+            url += '?filters=' + thisB.getLocationFilters(ref, start, end);
+            console.log(url);
+
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
 
             // Retrieve all mutations in the given chromosome range
@@ -128,6 +132,11 @@ function(
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
             });
+        },
+
+        getLocationFilters: function(chr, start, end) {
+            var locationFilter = '{ "op": "and", "content": [ { "op": ">=", "content": { "field": "gene_start", "value": "' + start + '" } }, { "op": "<=", "content": { "field": "gene_end", "value": "' + end + '" } }, { "op": "=", "content": { "field":"gene_chromosome", "value":[ "' + chr + '" ] } } ] }';
+            return(encodeURI(locationFilter));
         }
     });
 });

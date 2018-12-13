@@ -70,6 +70,9 @@ function(
             // Create full url
             var url = searchBaseUrl + 'ssms';
 
+            // Add filters to query
+            url += '?filters=' + thisB.getLocationFilters(ref, start, end);
+
             // Retrieve all mutations in the given chromosome range
             return request(url, {
                 method: 'get',
@@ -77,26 +80,24 @@ function(
                 handleAs: 'json'
             }).then(function(results) {
                 array.forEach(results.data.hits, function(variant) {
-                    if (variant.start_position >= start && variant.end_position <= end && variant.chromosome.replace(/chr/, '') === ref) {
-                        variantFeature = {
-                            id: variant.id,
-                            data: {
-                                start: variant.start_position,
-                                end: variant.end_position,
-                                name: variant.id,
-                                type: variant.mutation_type,
-                                subtype: variant.mutation_subtype,
-                                'Genomic DNA Change': variant.genomic_dna_change,
-                                cosmic: variant.cosmic_id,
-                                referenceAllele: variant.reference_allele,
-                                tumourAllele: variant.tumor_allele,
-                                ncbiBuild: variant.ncbi_build,
-                                chromosome: variant.chromosome,
-                                geneAAChange: variant.gene_aa_change // array of strings
-                            }
+                    variantFeature = {
+                        id: variant.id,
+                        data: {
+                            start: variant.start_position,
+                            end: variant.end_position,
+                            name: variant.id,
+                            type: variant.mutation_type,
+                            subtype: variant.mutation_subtype,
+                            'Genomic DNA Change': variant.genomic_dna_change,
+                            cosmic: variant.cosmic_id,
+                            referenceAllele: variant.reference_allele,
+                            tumourAllele: variant.tumor_allele,
+                            ncbiBuild: variant.ncbi_build,
+                            chromosome: variant.chromosome,
+                            geneAAChange: variant.gene_aa_change // array of strings
                         }
-                        featureCallback(new SimpleFeature(variantFeature));
                     }
+                    featureCallback(new SimpleFeature(variantFeature));
                 });
 
                 finishCallback();
@@ -104,6 +105,11 @@ function(
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
             });
+        },
+
+        getLocationFilters: function(chr, start, end) {
+            var locationFilter = '{ "op": "and", "content": [ { "op": ">=", "content": { "field": "start_position", "value": "' + start + '" } }, { "op": "<=", "content": { "field": "end_position", "value": "' + end + '" } }, { "op": "=", "content": { "field":"chromosome", "value":[ "chr' + chr + '" ] } } ] }';
+            return(encodeURI(locationFilter));
         }
     });
 });
