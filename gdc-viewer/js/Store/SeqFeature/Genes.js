@@ -17,6 +17,24 @@ function(
         constructor: function (args) {
         },
 
+         /**
+         * Creates a link to a given ID
+         * @param {string} link Base URL for link
+         * @param {string} id ID to apped to base URL
+         */
+        createLinkWithId: function(link, id) {
+            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
+        },
+
+        /**
+         * Creates a link to a given ID and name
+         * @param {string} link Base URL for link
+         * @param {string} id ID to apped to base URL
+         */
+        createLinkWithIdAndName: function(link, id, name) {
+            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
+        },
+
         /**
          * Returns the end value to be used for querying GDC
          * @param {string} chr Chromosome number (ex. 1)
@@ -69,7 +87,9 @@ function(
             var searchBaseUrl = 'https://api.gdc.cancer.gov/';
 
             // Create full url
-            var url = searchBaseUrl + 'genes'
+            var url = searchBaseUrl + 'genes';
+
+            const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
 
             // Retrieve all mutations in the given chromosome range
             return request(url, {
@@ -79,7 +99,6 @@ function(
             }).then(function(results) {
                 array.forEach(results.data.hits, function(gene) {
                     if (gene.gene_start >= start && gene.gene_end <= end && gene.gene_chromosome.replace(/chr/, '') === ref) {
-                        console.log(gene);
                         geneFeature = {
                             id: gene.id,
                             data: {
@@ -89,10 +108,10 @@ function(
                                 description: gene.description,
                                 name: gene.name,
                                 symbol: gene.symbol,
-                                id: gene.gene_id,
+                                ensembl: thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
                                 biotype: gene.biotype,
                                 synonyms: gene.synonyms,
-                                canonical_transcript_id: gene.canonical_transcript_id,
+                                canonical_transcript_id: thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
                                 canonical_transcript_length: gene.canonical_transcript_length,
                                 cytoband: gene.cytoband,
                                 canonical_transcript_length_genomic: gene.canonical_transcript_length_genomic,

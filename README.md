@@ -41,4 +41,4 @@ You'll have to run the following commands:
 utils/jb_run.js -p 3000
 ```
 
-JBrowse should now be running with the ICGC Plugin working!
+JBrowse should now be running with the GDC Plugin working!

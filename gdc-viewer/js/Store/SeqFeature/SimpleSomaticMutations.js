@@ -13,7 +13,6 @@ function(
     SimpleFeature
 ) {
     return declare(SeqFeatureStore, {
-
         constructor: function (args) {
         },
 
@@ -69,7 +68,7 @@ function(
             var searchBaseUrl = 'https://api.gdc.cancer.gov/';
 
             // Create full url
-            var url = searchBaseUrl + 'ssms'
+            var url = searchBaseUrl + 'ssms';
 
             // Retrieve all mutations in the given chromosome range
             return request(url, {
@@ -79,7 +78,6 @@ function(
             }).then(function(results) {
                 array.forEach(results.data.hits, function(variant) {
                     if (variant.start_position >= start && variant.end_position <= end && variant.chromosome.replace(/chr/, '') === ref) {
-                        console.log(variant);
                         variantFeature = {
                             id: variant.id,
                             data: {
