@@ -91,7 +91,6 @@ function(
 
             // Add filters to query
             url += '?filters=' + thisB.getLocationFilters(ref, start, end);
-            console.log(url);
 
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
 

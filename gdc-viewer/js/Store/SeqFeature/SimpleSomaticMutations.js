@@ -85,7 +85,8 @@ function(
                         data: {
                             start: variant.start_position,
                             end: variant.end_position,
-                            name: variant.id,
+                            name: variant.genomic_dna_change,
+                            id: variant.id,
                             type: variant.mutation_type,
                             subtype: variant.mutation_subtype,
                             'Genomic DNA Change': variant.genomic_dna_change,
