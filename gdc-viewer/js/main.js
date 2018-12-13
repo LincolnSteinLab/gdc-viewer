@@ -1,19 +1,39 @@
 define([
            'dojo/_base/declare',
-           'JBrowse/Plugin'
+           'dojo/_base/lang',
+           'JBrowse/Plugin',
+           'dijit/MenuItem',
+           './View/GDCDialog',
+           'require'
        ],
        function(
            declare,
-           JBrowsePlugin
+           lang,
+           JBrowsePlugin,
+           MenuItem,
+           GDCDialog,
+           require
        ) {
 return declare( JBrowsePlugin,
 {
-    constructor: function( args ) {
-        var browser = args.browser;
+    constructor: function () {
+        this.browser.afterMilestone('initView', function () {
+            this.browser.addGlobalMenuItem('gdc', new MenuItem(
+                {
+                    label: 'Search GDC',
+                    iconClass: "dijitIconSearch",
+                    onClick: lang.hitch(this, 'createGDCTrack')
+                }));
+                this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
+        }, this);            
+    },
 
-        // do anything you need to initialize your plugin here
-        console.log( "gdc-viewer plugin starting" );
+    createGDCTrack: function () {
+        var searchDialog = new GDCDialog();
+        searchDialog.show(this.browser,
+            function () {
 
+            });
     }
 });
 });
