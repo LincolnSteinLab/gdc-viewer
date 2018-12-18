@@ -105,21 +105,21 @@ function(
                         geneFeature = {
                             id: gene.id,
                             data: {
-                                start: gene.gene_start,
-                                end: gene.gene_end,
-                                strand: gene.gene_strand,
-                                description: gene.description,
-                                name: gene.name,
-                                symbol: gene.symbol,
-                                ensembl: thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
-                                biotype: gene.biotype,
-                                synonyms: gene.synonyms,
-                                canonical_transcript_id: thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
-                                canonical_transcript_length: gene.canonical_transcript_length,
-                                cytoband: gene.cytoband,
-                                canonical_transcript_length_genomic: gene.canonical_transcript_length_genomic,
-                                canonical_transcript_length_cds: gene.canonical_transcript_length_cds,
-                                is_cancer_gene_census: gene.is_cancer_gene_census
+                                'start': gene.gene_start,
+                                'end': gene.gene_end,
+                                'strand': gene.gene_strand,
+                                'description': gene.description,
+                                'name': gene.name,
+                                'symbol': gene.symbol,
+                                'Ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
+                                'Biotype': gene.biotype,
+                                'Synonyms': gene.synonyms,
+                                'Canonical Transcript ID': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
+                                'Canonical Transcript Length': gene.canonical_transcript_length,
+                                'Cytoband': gene.cytoband,
+                                'Canonical Transcript Length Genomic': gene.canonical_transcript_length_genomic,
+                                'Canonical Transcript Length CDS': gene.canonical_transcript_length_cds,
+                                'Is Cancer Gene Census': gene.is_cancer_gene_census
                             }
                         }
                         featureCallback(new SimpleFeature(geneFeature));

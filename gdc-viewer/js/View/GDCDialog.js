@@ -2,6 +2,11 @@ define([
     'dojo/_base/declare',
     'dojo/dom-construct',
     'dijit/focus',
+    'dijit/form/Button',
+    'dijit/form/CheckBox',
+    'dijit/layout/TabContainer',
+    'dijit/layout/AccordionContainer',
+    'dijit/layout/ContentPane',
     'dojo/aspect',
     'JBrowse/View/Dialog/WithActionBar'
 ],
@@ -9,6 +14,11 @@ function (
     declare,
     dom,
     focus,
+    Button,
+    CheckBox,
+    TabContainer,
+    AccordionContainer,
+    ContentPane,
     aspect,
     ActionBarDialog
 ) {
