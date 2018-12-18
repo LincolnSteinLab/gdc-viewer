@@ -93,6 +93,7 @@ function(
             url += '?filters=' + thisB.getLocationFilters(ref, start, end);
 
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
+            const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
 
             // Retrieve all mutations in the given chromosome range
             return request(url, {
@@ -111,7 +112,8 @@ function(
                                 'description': gene.description,
                                 'name': gene.name,
                                 'symbol': gene.symbol,
-                                'Ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
+                                'GDC': thisB.createLinkWithId(GDC_LINK, gene.gene_id),
+                                'Ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.id),
                                 'Biotype': gene.biotype,
                                 'Synonyms': gene.synonyms,
                                 'Canonical Transcript ID': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
