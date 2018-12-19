@@ -69,6 +69,12 @@ key=GDC Genes
 metadata.datatype=Gene
 ```
 
+You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
+
+```
+filters={"op":"!=","content":{"field":"biotype","value":"protein_coding"}}
+```
+
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
 
@@ -79,6 +85,12 @@ storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
 type=JBrowse/View/Track/CanvasVariants
 key=GDC SSM
 metadata.datatype=SSM
+```
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
+
+```
+filters={"op":"=","content":{"field":"reference_allele","value":"G"}}
 ```
 
 ## CNVs
@@ -93,6 +105,12 @@ key=GDC CNV
 metadata.datatype=CNV
 autoscale=local
 bicolor_pivot=0
+```
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.
+
+```
+filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
 ```
 
 Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
