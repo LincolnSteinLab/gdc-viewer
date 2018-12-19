@@ -139,7 +139,7 @@ function(
         },
 
         /**
-         * Create lcation filter based on chr, start, and end
+         * Creates the filter for the query to only look at SSMs in the given range
          * @param {*} chr 
          * @param {*} start 
          * @param {*} end 

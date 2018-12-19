@@ -111,6 +111,12 @@ function(
             });
         },
         
+        /**
+         * Creates the filter for the query to only look at CNVs in the given range
+         * @param {*} chr 
+         * @param {*} start 
+         * @param {*} end 
+         */
         getLocationFilters: function(chr, start, end) {
             var locationFilter = '{ "op": "and", "content": [ { "op": ">=", "content": { "field": "start_position", "value": "' + start + '" } }, { "op": "<=", "content": { "field": "end_position", "value": "' + end + '" } }, { "op": "=", "content": { "field":"chromosome", "value":[ "' + chr + '" ] } } ] }';
             return(encodeURI(locationFilter));
