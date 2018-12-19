@@ -116,7 +116,7 @@ function(
                             'start': variant.start_position,
                             'end': variant.end_position,
                             'name': variant.genomic_dna_change,
-                            'id': thisB.createLinkWithId(GDC_LINK, variant.id),
+                            'GDC': thisB.createLinkWithId(GDC_LINK, variant.id),
                             'type': variant.mutation_type,
                             'Subtype': variant.mutation_subtype,
                             'Genomic DNA Change': variant.genomic_dna_change,
