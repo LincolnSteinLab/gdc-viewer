@@ -56,6 +56,10 @@ function(
             }
         },
 
+        /**
+         * Converts the CNV change string to a numeric value
+         * @param {*} cnvChange Gain or Loss
+         */
         convertCNVChangeToScore: function(cnvChange) {
             cnvChange = cnvChange.toLowerCase();
             if (cnvChange == 'gain') {
