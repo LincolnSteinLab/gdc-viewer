@@ -14,6 +14,29 @@ function(
 ) {
     return declare(SeqFeatureStore, {
         constructor: function (args) {
+            // Filters to apply to SSM query
+            this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+        },
+
+        /**
+         * Creates a combined filter query based on the location and any filters passed
+         * @param {*} chr 
+         * @param {*} start 
+         * @param {*} end 
+         */
+        getFilterQuery: function (chr, start, end) {
+            var thisB = this;
+            var resultingFilterQuery = {
+                "op": "and",
+                "content": [
+                    thisB.getLocationFilters(chr, start, end)
+                ]
+            };
+            if (Object.keys(thisB.filters).length > 0) {
+                resultingFilterQuery.content.push(thisB.filters);
+            }
+            
+            return encodeURI(JSON.stringify(resultingFilterQuery));
         },
 
         /**
@@ -31,13 +54,11 @@ function(
          */
         createCOSMICLinks: function(cosmic) {
             var thisB = this;
-            console.log(cosmic)
 
             var cosmicLinks = [];
             const COSMIC_LINK = 'https://cancer.sanger.ac.uk/cosmic/mutation/overview?id=';
             array.forEach(cosmic, function(cosmicId) {
                 var cosmicIdNoPrefix = cosmicId.replace('COSM', '');
-                console.log(cosmicId + " " + cosmicIdNoPrefix)
                 cosmicLinks.push(thisB.createLinkWithId(COSMIC_LINK, cosmicIdNoPrefix));
             });
 
@@ -99,7 +120,7 @@ function(
             var url = searchBaseUrl + 'ssms';
 
             // Add filters to query
-            url += '?filters=' + thisB.getLocationFilters(ref, start, end);
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
 
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
@@ -145,8 +166,7 @@ function(
          * @param {*} end 
          */
         getLocationFilters: function(chr, start, end) {
-            var locationFilter = '{ "op": "and", "content": [ { "op": ">=", "content": { "field": "start_position", "value": "' + start + '" } }, { "op": "<=", "content": { "field": "end_position", "value": "' + end + '" } }, { "op": "=", "content": { "field":"chromosome", "value":[ "chr' + chr + '" ] } } ] }';
-            return(encodeURI(locationFilter));
+            return({"op":"and","content":[{"op":">=","content":{"field":"start_position","value":start}},{"op":"<=","content":{"field":"end_position","value":end}},{"op":"=","content":{"field":"chromosome","value":['chr'+chr]}}]});
         }
     });
 });

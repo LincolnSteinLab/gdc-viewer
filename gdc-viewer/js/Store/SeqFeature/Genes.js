@@ -15,6 +15,29 @@ function(
     return declare(SeqFeatureStore, {
 
         constructor: function (args) {
+            // Filters to apply to Gene query
+            this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+        },
+
+        /**
+         * Creates a combined filter query based on the location and any filters passed
+         * @param {*} chr 
+         * @param {*} start 
+         * @param {*} end 
+         */
+        getFilterQuery: function (chr, start, end) {
+            var thisB = this;
+            var resultingFilterQuery = {
+                "op": "and",
+                "content": [
+                    thisB.getLocationFilters(chr, start, end)
+                ]
+            };
+            if (Object.keys(thisB.filters).length > 0) {
+                resultingFilterQuery.content.push(thisB.filters);
+            }
+            
+            return encodeURI(JSON.stringify(resultingFilterQuery));
         },
 
          /**
@@ -90,7 +113,7 @@ function(
             var url = searchBaseUrl + 'genes';
 
             // Add filters to query
-            url += '?filters=' + thisB.getLocationFilters(ref, start, end);
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
 
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
@@ -142,8 +165,7 @@ function(
          * @param {*} end 
          */
         getLocationFilters: function(chr, start, end) {
-            var locationFilter = '{ "op": "and", "content": [ { "op": ">=", "content": { "field": "gene_start", "value": "' + start + '" } }, { "op": "<=", "content": { "field": "gene_end", "value": "' + end + '" } }, { "op": "=", "content": { "field":"gene_chromosome", "value":[ "' + chr + '" ] } } ] }';
-            return(encodeURI(locationFilter));
+            return({"op":"and","content":[{"op":">=","content":{"field":"gene_start","value":start}},{"op":"<=","content":{"field":"gene_end","value":end}},{"op":"=","content":{"field":"gene_chromosome","value":[chr]}}]});
         }
     });
 });

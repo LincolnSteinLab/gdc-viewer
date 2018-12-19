@@ -14,6 +14,29 @@ function(
 ) {
     return declare(SeqFeatureStore, {
         constructor: function (args) {
+            // Filters to apply to CNV query
+            this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+        },
+
+        /**
+         * Creates a combined filter query based on the location and any filters passed
+         * @param {*} chr 
+         * @param {*} start 
+         * @param {*} end 
+         */
+        getFilterQuery: function (chr, start, end) {
+            var thisB = this;
+            var resultingFilterQuery = {
+                "op": "and",
+                "content": [
+                    thisB.getLocationFilters(chr, start, end)
+                ]
+            };
+            if (Object.keys(thisB.filters).length > 0) {
+                resultingFilterQuery.content.push(thisB.filters);
+            }
+            
+            return encodeURI(JSON.stringify(resultingFilterQuery));
         },
 
         /**
@@ -84,7 +107,7 @@ function(
             var url = searchBaseUrl + 'cnvs';
 
             // Add filters to query
-            url += '?filters=' + thisB.getLocationFilters(ref, start, end);
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
 
             // Retrieve all mutations in the given chromosome range
             return request(url, {
@@ -118,8 +141,7 @@ function(
          * @param {*} end 
          */
         getLocationFilters: function(chr, start, end) {
-            var locationFilter = '{ "op": "and", "content": [ { "op": ">=", "content": { "field": "start_position", "value": "' + start + '" } }, { "op": "<=", "content": { "field": "end_position", "value": "' + end + '" } }, { "op": "=", "content": { "field":"chromosome", "value":[ "' + chr + '" ] } } ] }';
-            return(encodeURI(locationFilter));
+            return({"op":"and","content":[{"op":">=","content":{"field":"start_position","value":start}},{"op":"<=","content":{"field":"end_position","value":end}},{"op":"=","content":{"field":"chromosome","value":[chr]}}]});
         }
     });
 });
