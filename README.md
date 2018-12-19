@@ -42,3 +42,57 @@ utils/jb_run.js -p 3000
 ```
 
 JBrowse should now be running with the GDC Plugin working!
+
+
+# JBrowse configuration
+## Faceted Track Selector
+Add the following to your jbrowse.conf to use the faceted track selector.
+```
+[trackSelector]
+type = Faceted
+displayColumns =
+  + label
+  + key
+  + datatype
+```
+
+# Available Store SeqFeature
+## Genes
+A simple view of all of the genes seen across all cases.
+
+Example Track:
+```
+[tracks.GDC_Genes]
+storeClass=gdc-viewer/Store/SeqFeature/Genes
+type=JBrowse/View/Track/CanvasVariants
+key=GDC Genes
+metadata.datatype=Gene
+```
+
+## SSMs
+A simple view of all of the simple somatic mutations seen across all cases.
+
+Example Track:
+```
+[tracks.GDC_SSM]
+storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
+type=JBrowse/View/Track/CanvasVariants
+key=GDC SSM
+metadata.datatype=SSM
+```
+
+## CNVs
+A simple view of all of the CNVs seen across all cases.
+
+Example Track:
+```
+[tracks.GDC_CNV]
+storeClass=gdc-viewer/Store/SeqFeature/CNVs
+type=JBrowse/View/Track/Wiggle/XYPlot
+key=GDC CNV
+metadata.datatype=CNV
+autoscale=local
+bicolor_pivot=0
+```
+
+Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
