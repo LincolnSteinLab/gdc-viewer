@@ -14,7 +14,7 @@ function(
 ) {
     return declare(SeqFeatureStore, {
         constructor: function (args) {
-            // Filters to apply to CNV query
+            // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
         },
 
