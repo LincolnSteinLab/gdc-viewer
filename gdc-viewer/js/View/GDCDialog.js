@@ -46,7 +46,25 @@ function (
         donorAccordion: undefined,
         geneAccordion: undefined,
         mutationAccordion: undefined,
-        accordionId: 0,
+
+        // Selected filter objects
+        caseFilters: {
+            'project.primary_site': [],
+            'project.name': [],
+            'disease_type': [],
+            'demographic.gender': [],
+            'project.program.name': [],
+            'diagnoses.vital_status': [],
+            'demographic.race': [],
+            'demographic.ethnicity': []
+        },
+        mutationFilters: {
+        },
+        geneFilters: {
+            'biotype': [],
+            'is_cancer_gene_census': []
+        },
+        
 
         // Pagination variables
         donorPage: 1,
@@ -56,9 +74,8 @@ function (
 
         // Available types
         types: ['case', 'ssm', 'gene'],
-        caseFacets: ['project.primary_site', 'project.name', 'disease_type' ,'demographic.gender', 'project.program.name', 'diagnoses.vital_status', 'demographic.race', 'demographic.ethnicity'],
-        geneFacets: ['biotype', 'is_cancer_gene_census'],
         mutationFacets: ['vep_impact', 'sift_impact', 'polyphen_impact', 'consequence_type', 'type', 'variant_caller', 'cosmic_id', 'dnSNP rsID'],
+
         constructor: function () {
             var thisB = this;
 
@@ -71,9 +88,6 @@ function (
         _dialogContent: function () {
             var thisB = this;
             var container = dom.create('div', { className: 'dialog-container', style: { width: '1000px', height: '700px' } });
-
-            // Unique ID for accordion
-            thisB.accordionId = thisB.guid();
 
             // Create the scaffolding to hold everything
             thisB.createScaffolding(container);
@@ -152,7 +166,7 @@ function (
          */
         createAccordions: function (type) {
             var thisB = this;
-            var newAccordionId = 'accordion_' + type + '_' + thisB.accordionId;
+            var newAccordionId = 'accordion_' + type + '_' + thisB.guid();
 
             if (type === 'case') {
                 thisB.donorAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer" }, thisB.donorFacetTab.containerNode);
@@ -191,6 +205,7 @@ function (
             var thisB = this;
 
             var url = thisB.createFacetUrl(type);
+            console.log(url)
             fetch(url).then(function (facetsResponse) {
                 dom.empty(loadingIcon);
                 facetsResponse.json().then(function (facetsJsonResponse) {
@@ -198,21 +213,52 @@ function (
                         var contentPane = new ContentPane({
                             title: thisB.prettyFacetName(facet),
                             style: "height: auto",
-                            id: facet + '-' + type + '-' + thisB.accordionId
+                            id: facet + '-' + type + '-' + thisB.guid()
                         });
                         var facetHolder = dom.create('span', { className: "flex-column" });
 
-                        if (facetsJsonResponse.data.aggregations[facet].buckets) {
+                        if (facetsJsonResponse.data.aggregations[facet].buckets && facetsJsonResponse.data.aggregations[facet].buckets.length > 0) {
                             facetsJsonResponse.data.aggregations[facet].buckets.sort(thisB.compareTermElements);
                             facetsJsonResponse.data.aggregations[facet].buckets.forEach((term) => {
                                 var facetCheckbox = dom.create('span', { className: "flex-row" }, facetHolder)
 
                                 var checkBox = new CheckBox({
                                     name: facet + '-' + term.key,
-                                    id: facet + '-' + term.key + '-' + type + '-' + thisB.accordionId,
+                                    id: facet + '-' + term.key + '-' + type + '-' + thisB.guid(),
                                     value: { "facet": facet, "term" : term.key },
+                                    checked: thisB.isChecked(facet, term.key, thisB.getFiltersForType(type)),
+                                    onChange: function(isChecked) {
+                                        if (isChecked) {
+                                            if (type === 'case') {
+                                                console.log(this.value)
+                                                thisB.caseFilters[this.value.facet].push(this.value.term);
+                                            } else if (type === 'ssm') {
+                                                //thisB.mutationFilters = thisB.addToFilters(this.value, thisB.mutationFilters);
+                                            } else if (type === 'gene') {
+                                                thisB.geneFilters[this.value.facet].push(this.value.term);
+                                            }
+                                        } else {
+                                            if (type === 'case') {
+                                                var indexOfValue = thisB.caseFilters[this.value.facet].indexOf(this.value.term);
+                                                if (indexOfValue != -1) {
+                                                    thisB.caseFilters[this.value.facet].splice(indexOfValue, 1);
+                                                }
+                                            } else if (type === 'ssm') {
+                                                //thisB.mutationFilters = thisB.removeFromFilters(this.value, thisB.mutationFilters);
+                                            } else if (type === 'gene') {
+                                                var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
+                                                if (indexOfValue != -1) {
+                                                    thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
+                                                }
+                                            }
+                                        }
+                                        thisB.updateAccordion(type);
+                                        thisB.updateSearchResults('case');
+                                        thisB.updateSearchResults('ssm');
+                                        thisB.updateSearchResults('gene');
+                                    }
                                 }, 'checkbox').placeAt(facetCheckbox);
-                                var label = dom.create("label", { "for" : facet + '-' + term.key + '-' + type + '-' + thisB.accordionId, innerHTML: term.key + ' (' + term.doc_count + ')' }, facetCheckbox);
+                                var label = dom.create("label", { "for" : facet + '-' + term.key + '-' + type + '-' + thisB.guid(), innerHTML: term.key + ' (' + term.doc_count + ')' }, facetCheckbox);
                             });
                         }
 
@@ -235,6 +281,19 @@ function (
         updateSearchResults: function(type) {
             var thisB = this;
             var url = 'https://api.gdc.cancer.gov/' + type + 's';
+
+            dom.empty(thisB.prettyFacetHolder);
+
+            // if (Object.keys(thisB.donorFilters).length + Object.keys(thisB.mutationFilters).length + Object.keys(thisB.geneFilters).length > 0) {
+            //     var clearFacetButton = new Button({
+            //         iconClass: "dijitIconDelete",
+            //         onClick: function() {
+            //             thisB.clearFacets()
+            //         }
+            //     }, "clearFacets").placeAt(thisB.prettyFacetHolder);
+            // }
+
+            thisB.prettyPrintFilters(thisB.prettyFacetHolder);
 
             if (type == 'case') {
                 url += '?from=' + thisB.getStartIndex(thisB.donorPage) + '&size=' + thisB.pageSize;
@@ -486,11 +545,130 @@ function (
             return thisB.pageSize * (page - 1) + 1;
         },
 
-        prettyFacetName: function (facetName) {
-            var splitFacet = facetName.split('.');
-            if (splitFacet.length > 1) {
-                facetName = splitFacet[splitFacet.length - 1];
+        /**
+         * Retrieves the filters of some type
+         * @param {string} type The type of accordion
+         */
+        getFiltersForType: function(type) {
+            var thisB = this;
+            var filters = {};
+            if (type === 'case') {
+                filters = thisB.caseFilters;
+            } else if (type === 'mutation') {
+                filters = thisB.mutationFilters;
+            } else if (type === 'gene') {
+                filters = thisB.geneFilters;
             }
+            return filters;
+        },
+
+        /**
+         * Check if the term is found in the given facet
+         * @param {string} facet name of the facet
+         * @param {string} term name of option within facet
+         * @param {object} filters list of filters to check
+         */
+        isChecked: function(facet, term, filters) {
+            return filters[facet] && filters[facet].indexOf(term) > -1;
+        },
+
+        /**
+         * Updates the accordion of the given type based on current facets
+         * @param {string} type The type of the accordion to update
+         */
+        updateAccordion: function(type) {
+            var thisB = this;
+            thisB.destroyAccordions(type);
+            thisB.createAccordions(type);
+            thisB.donorPage = 1;
+            thisB.genePage = 1;
+            thisB.mutationPage = 1;
+        },
+
+        /**
+         * Destroys an accordion of the given type
+         * @param {string} type The type of accordion
+         */
+        destroyAccordions: function(type) {
+            var thisB = this;
+            if (type === 'case') {
+                thisB.donorAccordion.destroyDescendants();
+            } else if (type === 'ssm') {
+                thisB.mutationAccordion.destroyDescendants();
+            } else if (type === 'gene') {
+                thisB.geneAccordion.destroyDescendants();
+            }
+        },
+
+        /**
+         * Converts a filter object to one that can be passed to the GDC API
+         * @param {*} filters 
+         */
+        convertFilterObjectToGDCFilter: function(filters) {
+            var baseAndOperation = {"op":"and","content":[]};
+            var baseInOperation = {"op":"in","content":{"field": "","value": []}};
+            var gdcFilters = baseAndOperation;
+            for (var key in filters) {
+                console.log(key)
+                if (filters[key] != undefined && filters[key].length > 0) {
+                    var filterOperation = baseInOperation;
+                    filterOperation.content.field = key
+                    filterOperation.content.value = filters[key];
+                    gdcFilters.content.push(filterOperation);
+                }
+            }
+
+            if (gdcFilters.content != undefined && gdcFilters.content.length > 0) {
+                var stringGDCFilters = '&filters=' + JSON.stringify(gdcFilters)
+                return encodeURI(stringGDCFilters);
+            } else {
+                return '';
+            }
+        },
+
+        /**
+         * Pretty prints the current filters
+         * @param {object} location  place to display the filters
+         */
+        prettyPrintFilters: function(location) {
+            var thisB = this;
+
+            var combinedFilters = Object.assign({}, thisB.caseFilters, thisB.mutationFilters, thisB.geneFilters);
+
+            var currentFilter = 0;
+            var prettyFacetString = "";
+            var filterCount = Object.keys(combinedFilters).length;
+
+            for (var key in combinedFilters) {
+                if (combinedFilters[key] != undefined && combinedFilters[key].length > 0) {
+                    var facetString = `<span><span class="filterName">${key}</span>`;
+                    if (combinedFilters[key].length > 1) {
+                        facetString += ` <strong>IN [ </strong>`;
+                        var filterLength = combinedFilters[key].length;
+                        combinedFilters[key].forEach(function(value, i) {
+                            facetString += `<span class="filterValue">${value}</span>`;
+                            if (i < filterLength - 1) {
+                                facetString += ` , `
+                            }
+                        });
+                        facetString += `<strong> ]</strong>`;
+                    } else {
+                        facetString += ` <strong>IS </strong><span class="filterValue">${combinedFilters[key]}</span>`;
+                    }
+
+                    if (currentFilter < filterCount - 1) {
+                        facetString += ` <strong>AND</strong> `;
+                    }
+                    facetString += `</span>`;
+                    prettyFacetString += facetString;
+                }
+                currentFilter++;
+            }
+            var node = dom.toDom(prettyFacetString);
+            dom.place(node, location);
+        },
+
+        prettyFacetName: function (facetName) {
             return facetName.replace('_', ' ');
         },
 
@@ -499,11 +677,14 @@ function (
 
             var facetURL = 'https://api.gdc.cancer.gov/' + type + 's?size=0&facets=';
             if (type == 'case') {
-                facetURL += thisB.caseFacets.join(",");
+                facetURL += Object.keys(thisB.caseFilters).join(",");
+                facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
             } else if (type == 'ssm') {
                 facetURL += thisB.mutationFacets.join(",");
+                facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
             } else if (type == 'gene') {
-                facetURL += thisB.geneFacets.join(",");
+                facetURL += Object.keys(thisB.geneFilters).join(",");
+                facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
             }
 
             return facetURL;
