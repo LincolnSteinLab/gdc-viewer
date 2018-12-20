@@ -58,13 +58,20 @@ function (
             'demographic.race': [],
             'demographic.ethnicity': []
         },
+
         mutationFilters: {
+            'consequence.transcript.annotation.vep_impact': [],
+            'consequence.transcript.annotation.sift_impact': [],
+            'consequence.transcript.annotation.polyphen_impact': [],
+            'mutation_subtype': [],
+            'occurrence.case.observation.variant_calling.variant_caller': [],
+            'consequence.transcript.consequence_type': []
         },
+
         geneFilters: {
             'biotype': [],
             'is_cancer_gene_census': []
         },
-        
 
         // Pagination variables
         donorPage: 1,
@@ -74,7 +81,6 @@ function (
 
         // Available types
         types: ['case', 'ssm', 'gene'],
-        mutationFacets: ['vep_impact', 'sift_impact', 'polyphen_impact', 'consequence_type', 'type', 'variant_caller', 'cosmic_id', 'dnSNP rsID'],
 
         constructor: function () {
             var thisB = this;
@@ -205,7 +211,6 @@ function (
             var thisB = this;
 
             var url = thisB.createFacetUrl(type);
-            console.log(url)
             fetch(url).then(function (facetsResponse) {
                 dom.empty(loadingIcon);
                 facetsResponse.json().then(function (facetsJsonResponse) {
@@ -230,10 +235,9 @@ function (
                                     onChange: function(isChecked) {
                                         if (isChecked) {
                                             if (type === 'case') {
-                                                console.log(this.value)
                                                 thisB.caseFilters[this.value.facet].push(this.value.term);
                                             } else if (type === 'ssm') {
-                                                //thisB.mutationFilters = thisB.addToFilters(this.value, thisB.mutationFilters);
+                                                thisB.mutationFilters[this.value.facet].push(this.value.term);
                                             } else if (type === 'gene') {
                                                 thisB.geneFilters[this.value.facet].push(this.value.term);
                                             }
@@ -244,7 +248,10 @@ function (
                                                     thisB.caseFilters[this.value.facet].splice(indexOfValue, 1);
                                                 }
                                             } else if (type === 'ssm') {
-                                                //thisB.mutationFilters = thisB.removeFromFilters(this.value, thisB.mutationFilters);
+                                                var indexOfValue = thisB.mutationFilters[this.value.facet].indexOf(this.value.term);
+                                                if (indexOfValue != -1) {
+                                                    thisB.mutationFilters[this.value.facet].splice(indexOfValue, 1);
+                                                }
                                             } else if (type === 'gene') {
                                                 var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
                                                 if (indexOfValue != -1) {
@@ -284,19 +291,10 @@ function (
 
             dom.empty(thisB.prettyFacetHolder);
 
-            // if (Object.keys(thisB.donorFilters).length + Object.keys(thisB.mutationFilters).length + Object.keys(thisB.geneFilters).length > 0) {
-            //     var clearFacetButton = new Button({
-            //         iconClass: "dijitIconDelete",
-            //         onClick: function() {
-            //             thisB.clearFacets()
-            //         }
-            //     }, "clearFacets").placeAt(thisB.prettyFacetHolder);
-            // }
-
             thisB.prettyPrintFilters(thisB.prettyFacetHolder);
 
             if (type == 'case') {
-                url += '?from=' + thisB.getStartIndex(thisB.donorPage) + '&size=' + thisB.pageSize;
+                url += '?from=' + thisB.getStartIndex(thisB.donorPage) + '&size=' + thisB.pageSize + thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type));
                 dom.empty(thisB.donorResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.donorResultsTab.containerNode);
                 
@@ -315,7 +313,7 @@ function (
                         console.error('error', err);
                     });
             } else if (type == 'ssm') {
-                url += '?from=' + thisB.getStartIndex(thisB.mutationPage) + '&size=' + thisB.pageSize;
+                url += '?from=' + thisB.getStartIndex(thisB.mutationPage) + '&size=' + thisB.pageSize + thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type));
                 dom.empty(thisB.mutationResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.mutationResultsTab.containerNode);
                 
@@ -334,7 +332,7 @@ function (
                         console.error('error', err);
                     });
             } else if (type == 'gene') {
-                url += '?from=' + thisB.getStartIndex(thisB.genePage) + '&size=' + thisB.pageSize;
+                url += '?from=' + thisB.getStartIndex(thisB.genePage) + '&size=' + thisB.pageSize + thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type));
                 dom.empty(thisB.geneResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.geneResultsTab.containerNode);
                 
@@ -554,7 +552,7 @@ function (
             var filters = {};
             if (type === 'case') {
                 filters = thisB.caseFilters;
-            } else if (type === 'mutation') {
+            } else if (type === 'ssm') {
                 filters = thisB.mutationFilters;
             } else if (type === 'gene') {
                 filters = thisB.geneFilters;
@@ -609,7 +607,6 @@ function (
             var baseInOperation = {"op":"in","content":{"field": "","value": []}};
             var gdcFilters = baseAndOperation;
             for (var key in filters) {
-                console.log(key)
                 if (filters[key] != undefined && filters[key].length > 0) {
                     var filterOperation = baseInOperation;
                     filterOperation.content.field = key
@@ -635,17 +632,37 @@ function (
 
             var combinedFilters = Object.assign({}, thisB.caseFilters, thisB.mutationFilters, thisB.geneFilters);
 
-            var currentFilter = 0;
-            var prettyFacetString = "";
-            var filterCount = Object.keys(combinedFilters).length;
-
+            // remove any objects with empty array
+            var hasFilter = false
+            var filteredCombinedFilters = {}
             for (var key in combinedFilters) {
                 if (combinedFilters[key] != undefined && combinedFilters[key].length > 0) {
+                    filteredCombinedFilters[key] = combinedFilters[key];
+                    hasFilter = true
+                }
+            }
+
+            if (hasFilter) {
+                var clearFacetButton = new Button({
+                    iconClass: "dijitIconDelete",
+                    onClick: function() {
+                        thisB.clearFacets()
+                    }
+                }, "clearFacets").placeAt(location);
+            }
+
+
+            var currentFilter = 0;
+            var prettyFacetString = "";
+            var filterCount = Object.keys(filteredCombinedFilters).length;
+
+            for (var key in filteredCombinedFilters) {
+                if (filteredCombinedFilters[key] != undefined && filteredCombinedFilters[key].length > 0) {
                     var facetString = `<span><span class="filterName">${key}</span>`;
-                    if (combinedFilters[key].length > 1) {
+                    if (filteredCombinedFilters[key].length > 1) {
                         facetString += ` <strong>IN [ </strong>`;
-                        var filterLength = combinedFilters[key].length;
-                        combinedFilters[key].forEach(function(value, i) {
+                        var filterLength = filteredCombinedFilters[key].length;
+                        filteredCombinedFilters[key].forEach(function(value, i) {
                             facetString += `<span class="filterValue">${value}</span>`;
                             if (i < filterLength - 1) {
                                 facetString += ` , `
@@ -653,7 +670,7 @@ function (
                         });
                         facetString += `<strong> ]</strong>`;
                     } else {
-                        facetString += ` <strong>IS </strong><span class="filterValue">${combinedFilters[key]}</span>`;
+                        facetString += ` <strong>IS </strong><span class="filterValue">${filteredCombinedFilters[key]}</span>`;
                     }
 
                     if (currentFilter < filterCount - 1) {
@@ -668,10 +685,18 @@ function (
             dom.place(node, location);
         },
 
+        /**
+         * Pretty prints a facet name
+         * @param {*} facetName 
+         */
         prettyFacetName: function (facetName) {
             return facetName.replace('_', ' ');
         },
 
+        /**
+         * Creates a facet url for the given type applying all filters
+         * @param {*} type 
+         */
         createFacetUrl: function(type) {
             var thisB = this;
 
@@ -680,7 +705,7 @@ function (
                 facetURL += Object.keys(thisB.caseFilters).join(",");
                 facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
             } else if (type == 'ssm') {
-                facetURL += thisB.mutationFacets.join(",");
+                facetURL += Object.keys(thisB.mutationFilters).join(",");
                 facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
             } else if (type == 'gene') {
                 facetURL += Object.keys(thisB.geneFilters).join(",");
@@ -688,6 +713,27 @@ function (
             }
 
             return facetURL;
+        },
+
+        /**
+         * Clears all of the facets
+         */
+        clearFacets: function() {
+            var thisB = this;
+            for (var key in thisB.caseFilters) {
+                thisB.caseFilters[key] = []
+            }
+            for (var key in thisB.geneFilters) {
+                thisB.geneFilters[key] = []
+            }
+            for (var key in thisB.mutationFilters) {
+                thisB.mutationFilters[key] = []
+            }
+
+            for (var type of thisB.types) {
+                thisB.updateAccordion(type);
+                thisB.updateSearchResults(type);
+            }
         },
 
         /**
