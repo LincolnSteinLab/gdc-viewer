@@ -48,6 +48,12 @@ function (
         mutationAccordion: undefined,
         accordionId: 0,
 
+        // Pagination variables
+        donorPage: 1,
+        mutationPage: 1,
+        genePage: 1,
+        pageSize: 20,
+
         // Available types
         types: ['case', 'ssm', 'gene'],
         caseFacets: ['project.primary_site', 'project.name', 'disease_type' ,'demographic.gender', 'project.program.name', 'diagnoses.vital_status', 'demographic.race', 'demographic.ethnicity'],
@@ -231,18 +237,18 @@ function (
             var url = 'https://api.gdc.cancer.gov/' + type + 's';
 
             if (type == 'case') {
+                url += '?from=' + thisB.getStartIndex(thisB.donorPage) + '&size=' + thisB.pageSize;
                 dom.empty(thisB.donorResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.donorResultsTab.containerNode);
                 
                 fetch(url).then(function (facetsResponse) {
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
-                        console.log(facetsJsonResponse)
-                        //var endResult = facetsJsonResponse.pagination.from + facetsJsonResponse.pagination.count;
+                        var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.donorResultsTab.containerNode);
-                        //var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.pagination.from + " to " + endResult + " of " + facetsJsonResponse.pagination.total }, thisB.donorResultsTab.containerNode);
+                        var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.donorResultsTab.containerNode);
                         thisB.createDonorsTable(facetsJsonResponse.data.hits, thisB.donorResultsTab.containerNode);
-                        //thisB.createPaginationButtons(thisB.donorResultsTab.containerNode, facetsJsonResponse.pagination, type, thisB.donorPage);
+                        thisB.createPaginationButtons(thisB.donorResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.donorPage);
                         }, function (res3) {
                             console.error('error', res3);
                         });
@@ -250,18 +256,18 @@ function (
                         console.error('error', err);
                     });
             } else if (type == 'ssm') {
+                url += '?from=' + thisB.getStartIndex(thisB.mutationPage) + '&size=' + thisB.pageSize;
                 dom.empty(thisB.mutationResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.mutationResultsTab.containerNode);
                 
                 fetch(url).then(function (facetsResponse) {
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
-                        console.log(facetsJsonResponse)
-                        //var endResult = facetsJsonResponse.pagination.from + facetsJsonResponse.pagination.count;
+                        var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.mutationResultsTab.containerNode);
-                        //var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.pagination.from + " to " + endResult + " of " + facetsJsonResponse.pagination.total }, thisB.mutationResultsTab.containerNode);
+                        var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.mutationResultsTab.containerNode);
                         thisB.createMutationsTable(facetsJsonResponse.data.hits, thisB.mutationResultsTab.containerNode);
-                        //thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, facetsJsonResponse.pagination, type, thisB.mutationPage);
+                        thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.mutationPage);
                         }, function (res3) {
                             console.error('error', res3);
                         });
@@ -269,18 +275,18 @@ function (
                         console.error('error', err);
                     });
             } else if (type == 'gene') {
+                url += '?from=' + thisB.getStartIndex(thisB.genePage) + '&size=' + thisB.pageSize;
                 dom.empty(thisB.geneResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.geneResultsTab.containerNode);
                 
                 fetch(url).then(function (facetsResponse) {
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
-                        console.log(facetsJsonResponse)
-                        //var endResult = facetsJsonResponse.pagination.from + facetsJsonResponse.pagination.count;
+                        var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.geneResultsTab.containerNode);
-                        //var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.pagination.from + " to " + endResult + " of " + facetsJsonResponse.pagination.total }, thisB.geneResultsTab.containerNode);
+                        var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.geneResultsTab.containerNode);
                         thisB.createGenesTable(facetsJsonResponse.data.hits, thisB.geneResultsTab.containerNode);
-                        //thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, facetsJsonResponse.pagination, type, thisB.genePage);
+                        thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.genePage);
                         }, function (res3) {
                             console.error('error', res3);
                         });
@@ -407,6 +413,77 @@ function (
             }
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
+        },
+
+        /**
+         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
+         * @param {object} holder
+         * @param {integer} pagination
+         */
+        createPaginationButtons: function(holder, pagination, type, pageNum) {
+            var thisB = this;
+
+            var paginationHolder = dom.create('div', { style:"display: flex;justify-content: center;"}, holder);
+            
+            if (pageNum > 1) {
+                var previousButton = new Button({
+                    label: "Previous",
+                    onClick: function() {
+                        thisB.previousPage(type);
+                    }
+                }, "previousButton").placeAt(paginationHolder);
+
+            }
+
+            if (pageNum < pagination.pages) {
+                var nextButton = new Button({
+                    label: "Next",
+                    onClick: function() {
+                        thisB.nextPage(type);
+                    }
+                }, "nextButton").placeAt(paginationHolder);
+            }
+        },
+
+        /**
+         * Loads the facet results at the previous page
+         * @param {string} type Page type
+         */
+        previousPage: function(type) {
+            var thisB = this;
+            if (type === 'case') {
+                thisB.donorPage = thisB.donorPage - 1;
+            } else if (type === 'ssm') {
+                thisB.mutationPage = thisB.mutationPage - 1;
+            } else if (type === 'gene') {
+                thisB.genePage = thisB.genePage - 1;
+            }
+            thisB.updateSearchResults(type);
+        },
+
+        /**
+         * Loads the facet results at the next page
+         * @param {string} type Page type
+         */
+        nextPage: function(type) {
+            var thisB = this;
+            if (type === 'case') {
+                thisB.donorPage = thisB.donorPage + 1;
+            } else if (type === 'ssm') {
+                thisB.mutationPage = thisB.mutationPage + 1;
+            } else if (type === 'gene') {
+                thisB.genePage = thisB.genePage + 1;
+            }
+            thisB.updateSearchResults(type);
+        },
+
+        /**
+         * Calculate the 'from' parameter for the URL call
+         * @param {integer} page current page
+         */
+        getStartIndex: function(page) {
+            var thisB = this;
+            return thisB.pageSize * (page - 1) + 1;
         },
 
         prettyFacetName: function (facetName) {
