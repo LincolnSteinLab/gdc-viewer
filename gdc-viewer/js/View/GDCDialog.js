@@ -322,6 +322,13 @@ function (
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.mutationResultsTab.containerNode);
+                        // This needs to use a merged object of all facets
+                        var addMutationsButton = new Button({
+                            label: "Add All SSMs",
+                            onClick: function() {
+                                thisB.addTrack('SimpleSomaticMutations', undefined, thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type)), 'CanvasVariants');
+                            }
+                        }, "addMutations").placeAt(thisB.mutationResultsTab.containerNode);
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.mutationResultsTab.containerNode);
                         thisB.createMutationsTable(facetsJsonResponse.data.hits, thisB.mutationResultsTab.containerNode);
                         thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.mutationPage);
@@ -341,6 +348,13 @@ function (
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.geneResultsTab.containerNode);
+                        // This needs to use a merged object of all facets
+                        var addGenesButton = new Button({
+                            label: "Add All Genes",
+                            onClick: function() {
+                                thisB.addTrack('Genes', undefined, thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type)), 'CanvasVariants');
+                            }
+                        }, "addGenes").placeAt(thisB.geneResultsTab.containerNode);
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.geneResultsTab.containerNode);
                         thisB.createGenesTable(facetsJsonResponse.data.hits, thisB.geneResultsTab.containerNode);
                         thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.genePage);
@@ -734,6 +748,55 @@ function (
                 thisB.updateAccordion(type);
                 thisB.updateSearchResults(type);
             }
+        },
+
+        /**
+         * Generic function for adding a track of some type
+         * @param {*} storeClass 
+         * @param {*} donorId 
+         * @param {*} combinedFacetObject 
+         * @param {*} trackType 
+         */
+        addTrack: function (storeClass, donorId, combinedFacetObject, trackType) {
+            if (combinedFacetObject !== undefined) {
+                combinedFacetObject = combinedFacetObject.replace('&filters=', '')
+                combinedFacetObject = decodeURI(combinedFacetObject)
+                if (combinedFacetObject === '') {
+                    combinedFacetObject = undefined
+                }
+            }
+            
+            var storeConf = {
+                browser: this.browser,
+                refSeq: this.browser.refSeq,
+                type: 'gdc-viewer/Store/SeqFeature/' + storeClass,
+                donor: donorId,
+                filters: combinedFacetObject
+            };
+            var storeName = this.browser.addStoreConfig(null, storeConf);
+            var randomId = Math.random().toString(36).substring(7);
+
+            var key = 'GDC_' + storeClass;
+            var label = key + '_' + randomId;
+
+            if (donorId != null && donorId != undefined) {
+                key += '_' + donorId
+                label += '_' + donorId
+            }
+
+            var trackConf = {
+                type: 'JBrowse/View/Track/' + trackType,
+                store: storeName,
+                label: label,
+                key: key,
+                metadata: {
+                    datatype: storeClass,
+                    donor: donorId
+                }
+            };
+            trackConf.store = storeName;
+            this.browser.publish('/jbrowse/v1/v/tracks/new', [trackConf]);
+            this.browser.publish('/jbrowse/v1/v/tracks/show', [trackConf]);
         },
 
         /**
