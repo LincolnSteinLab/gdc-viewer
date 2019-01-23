@@ -17,6 +17,7 @@ function(
         constructor: function (args) {
             // Filters to apply to Gene query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            this.size = args.size !== undefined ? parseInt(args.size) : 500;
         },
 
         /**
@@ -113,7 +114,7 @@ function(
             var url = searchBaseUrl + 'genes';
 
             // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
 
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';

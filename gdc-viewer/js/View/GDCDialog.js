@@ -293,8 +293,12 @@ function (
 
             thisB.prettyPrintFilters(thisB.prettyFacetHolder);
 
+            var filterObject = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined);
+            if (filterObject != '') {
+                filterObject = '&filters=' + filterObject;
+            }
             if (type == 'case') {
-                url += '?from=' + thisB.getStartIndex(thisB.donorPage) + '&size=' + thisB.pageSize + thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type));
+                url += '?from=' + thisB.getStartIndex(thisB.donorPage) + '&size=' + thisB.pageSize + filterObject;
                 dom.empty(thisB.donorResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.donorResultsTab.containerNode);
                 
@@ -313,7 +317,7 @@ function (
                         console.error('error', err);
                     });
             } else if (type == 'ssm') {
-                url += '?from=' + thisB.getStartIndex(thisB.mutationPage) + '&size=' + thisB.pageSize + thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type));
+                url += '?from=' + thisB.getStartIndex(thisB.mutationPage) + '&size=' + thisB.pageSize + filterObject;
                 dom.empty(thisB.mutationResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.mutationResultsTab.containerNode);
                 
@@ -326,7 +330,7 @@ function (
                         var addMutationsButton = new Button({
                             label: "Add All SSMs",
                             onClick: function() {
-                                thisB.addTrack('SimpleSomaticMutations', undefined, thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type)), 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations', undefined, filterObject, 'CanvasVariants');
                             }
                         }, "addMutations").placeAt(thisB.mutationResultsTab.containerNode);
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.mutationResultsTab.containerNode);
@@ -339,7 +343,7 @@ function (
                         console.error('error', err);
                     });
             } else if (type == 'gene') {
-                url += '?from=' + thisB.getStartIndex(thisB.genePage) + '&size=' + thisB.pageSize + thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type));
+                url += '?from=' + thisB.getStartIndex(thisB.genePage) + '&size=' + thisB.pageSize + filterObject;
                 dom.empty(thisB.geneResultsTab.containerNode);
                 var resultsInfo = thisB.createLoadingIcon(thisB.geneResultsTab.containerNode);
                 
@@ -352,7 +356,7 @@ function (
                         var addGenesButton = new Button({
                             label: "Add All Genes",
                             onClick: function() {
-                                thisB.addTrack('Genes', undefined, thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type)), 'CanvasVariants');
+                                thisB.addTrack('Genes', undefined, filterObject, 'CanvasVariants');
                             }
                         }, "addGenes").placeAt(thisB.geneResultsTab.containerNode);
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.geneResultsTab.containerNode);
@@ -381,6 +385,8 @@ function (
                     <th>Case ID</th>
                     <th>Primary Site</th>
                     <th>Disease Type</th>
+                    <th>Genes</th>
+                    <th>Mutations</th>
                 </tr>
             `;
 
@@ -395,6 +401,18 @@ function (
                         <td>${hit.disease_type}</td>
                 `
                 var donorRowContentNode = dom.toDom(donorRowContent);
+
+                var geneButton = `<td></td>`;
+                var geneButtonNode = dom.toDom(geneButton);
+                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, undefined));
+
+                dom.place(geneButtonNode, donorRowContentNode);
+
+                var ssmButton = `<td></td>`;
+                var ssmButtonNode = dom.toDom(ssmButton);
+                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, undefined));
+
+                dom.place(ssmButtonNode, donorRowContentNode);
 
                 var row = `<tr></tr>`;
                 var rowNodeHolder = dom.toDom(row);
@@ -615,26 +633,42 @@ function (
         /**
          * Converts a filter object to one that can be passed to the GDC API
          * @param {*} filters 
+         * @param {*} donorId 
          */
-        convertFilterObjectToGDCFilter: function(filters) {
-            var baseAndOperation = {"op":"and","content":[]};
-            var baseInOperation = {"op":"in","content":{"field": "","value": []}};
-            var gdcFilters = baseAndOperation;
+        convertFilterObjectToGDCFilter: function(filters, donorId) {
+            var gdcFilters = {"op":"and","content":[]};
+            
             for (var key in filters) {
                 if (filters[key] != undefined && filters[key].length > 0) {
-                    var filterOperation = baseInOperation;
+                    var filterOperation = {"op":"in","content":{"field": "","value": []}};
                     filterOperation.content.field = key
                     filterOperation.content.value = filters[key];
                     gdcFilters.content.push(filterOperation);
                 }
             }
 
+            if (donorId != undefined) {
+                var filterOperation = {"op":"in","content":{"field": "","value": []}};
+                filterOperation.content.field = 'cases.case_id'
+                filterOperation.content.value = donorId;
+                gdcFilters.content.push(filterOperation);
+            }
+
             if (gdcFilters.content != undefined && gdcFilters.content.length > 0) {
-                var stringGDCFilters = '&filters=' + JSON.stringify(gdcFilters)
+                var stringGDCFilters = JSON.stringify(gdcFilters)
                 return encodeURI(stringGDCFilters);
             } else {
                 return '';
             }
+        },
+
+        /**
+         * Combines all three types of filters into one encoded filter string
+         */
+        combineAllFilters: function() {
+            var thisB = this;
+            var combinedFilters = Object.assign({}, thisB.caseFilters, thisB.mutationFilters, thisB.geneFilters);
+            return decodeURI(thisB.convertFilterObjectToGDCFilter(combinedFilters, null));
         },
 
         /**
@@ -643,7 +677,6 @@ function (
          */
         prettyPrintFilters: function(location) {
             var thisB = this;
-
             var combinedFilters = Object.assign({}, thisB.caseFilters, thisB.mutationFilters, thisB.geneFilters);
 
             // remove any objects with empty array
@@ -664,7 +697,6 @@ function (
                     }
                 }, "clearFacets").placeAt(location);
             }
-
 
             var currentFilter = 0;
             var prettyFacetString = "";
@@ -715,15 +747,16 @@ function (
             var thisB = this;
 
             var facetURL = 'https://api.gdc.cancer.gov/' + type + 's?size=0&facets=';
+            var filterObj = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined);
             if (type == 'case') {
                 facetURL += Object.keys(thisB.caseFilters).join(",");
-                facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
+                facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
             } else if (type == 'ssm') {
                 facetURL += Object.keys(thisB.mutationFilters).join(",");
-                facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
+                facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
             } else if (type == 'gene') {
                 facetURL += Object.keys(thisB.geneFilters).join(",");
-                facetURL += thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type))
+                facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
             }
 
             return facetURL;
@@ -735,19 +768,53 @@ function (
         clearFacets: function() {
             var thisB = this;
             for (var key in thisB.caseFilters) {
-                thisB.caseFilters[key] = []
+                thisB.caseFilters[key] = undefined
             }
             for (var key in thisB.geneFilters) {
-                thisB.geneFilters[key] = []
+                thisB.geneFilters[key] = undefined
             }
             for (var key in thisB.mutationFilters) {
-                thisB.mutationFilters[key] = []
+                thisB.mutationFilters[key] = undefined
             }
 
             for (var type of thisB.types) {
                 thisB.updateAccordion(type);
                 thisB.updateSearchResults(type);
             }
+        },
+
+        /**
+         * Create a button to add a donor gene button that will create a gene track based on the given
+         * donor ID and facet object
+         * @param {string} donorId Id of donor
+         * @param {object} holder Div to place the button in
+         * @param {object} combinedFacetObject combined object of facets
+         */
+        createDonorGeneButton: function(donorId, holder, combinedFacetObject) {
+            var thisB = this;
+            var geneButton = new Button({
+                label: "Add",
+                onClick: function() {
+                    thisB.addTrack('Genes', donorId, combinedFacetObject, 'CanvasVariants');
+                }
+            }, "geneButton").placeAt(holder);
+        },
+
+        /**
+         * Create a button to add a donor ssm button that will create a ssm track based on the given
+         * donor ID and facet object
+         * @param {string} donorId Id of donor
+         * @param {object} holder Div to place the button in
+         * @param {object} combinedFacetObject combined object of facets
+         */
+        createDonorSSMButton: function(donorId, holder, combinedFacetObject) {
+            var thisB = this;
+            var ssmButton = new Button({
+                label: "Add",
+                onClick: function() {
+                    thisB.addTrack('SimpleSomaticMutations', donorId, combinedFacetObject, 'CanvasVariants');
+                }
+            }, "ssmButton").placeAt(holder);
         },
 
         /**
@@ -758,6 +825,7 @@ function (
          * @param {*} trackType 
          */
         addTrack: function (storeClass, donorId, combinedFacetObject, trackType) {
+            console.log(combinedFacetObject);
             if (combinedFacetObject !== undefined) {
                 combinedFacetObject = combinedFacetObject.replace('&filters=', '')
                 combinedFacetObject = decodeURI(combinedFacetObject)
@@ -765,6 +833,8 @@ function (
                     combinedFacetObject = undefined
                 }
             }
+
+            console.log(combinedFacetObject);
             
             var storeConf = {
                 browser: this.browser,

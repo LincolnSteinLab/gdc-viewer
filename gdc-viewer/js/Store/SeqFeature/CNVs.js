@@ -16,6 +16,7 @@ function(
         constructor: function (args) {
             // Filters to apply to CNV query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            this.size = args.size !== undefined ? parseInt(args.size) : 500;
         },
 
         /**
@@ -107,7 +108,7 @@ function(
             var url = searchBaseUrl + 'cnvs';
 
             // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
 
             // Retrieve all mutations in the given chromosome range
             return request(url, {
