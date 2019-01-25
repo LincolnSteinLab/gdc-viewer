@@ -404,13 +404,13 @@ function (
 
                 var geneButton = `<td></td>`;
                 var geneButtonNode = dom.toDom(geneButton);
-                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, undefined));
+                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id));
 
                 dom.place(geneButtonNode, donorRowContentNode);
 
                 var ssmButton = `<td></td>`;
                 var ssmButtonNode = dom.toDom(ssmButton);
-                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, undefined));
+                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id));
 
                 dom.place(ssmButtonNode, donorRowContentNode);
 
@@ -647,12 +647,13 @@ function (
                 }
             }
 
-            if (donorId != undefined) {
-                var filterOperation = {"op":"in","content":{"field": "","value": []}};
-                filterOperation.content.field = 'cases.case_id'
-                filterOperation.content.value = donorId;
-                gdcFilters.content.push(filterOperation);
-            }
+            // Ignore donor id for now
+            // if (donorId != undefined) {
+            //     var filterOperation = {"op":"in","content":{"field": "","value": []}};
+            //     filterOperation.content.field = 'cases.case_id'
+            //     filterOperation.content.value = donorId;
+            //     gdcFilters.content.push(filterOperation);
+            // }
 
             if (gdcFilters.content != undefined && gdcFilters.content.length > 0) {
                 var stringGDCFilters = JSON.stringify(gdcFilters)
@@ -825,7 +826,6 @@ function (
          * @param {*} trackType 
          */
         addTrack: function (storeClass, donorId, combinedFacetObject, trackType) {
-            console.log(combinedFacetObject);
             if (combinedFacetObject !== undefined) {
                 combinedFacetObject = combinedFacetObject.replace('&filters=', '')
                 combinedFacetObject = decodeURI(combinedFacetObject)
@@ -834,8 +834,6 @@ function (
                 }
             }
 
-            console.log(combinedFacetObject);
-            
             var storeConf = {
                 browser: this.browser,
                 refSeq: this.browser.refSeq,

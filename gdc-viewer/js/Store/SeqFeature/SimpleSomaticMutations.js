@@ -122,7 +122,6 @@ function(
 
             // Add filters to query
             url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
-
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
             // Retrieve all mutations in the given chromosome range
