@@ -185,15 +185,15 @@ function (
             var newAccordionId = 'accordion_' + type + '_' + thisB.guid();
 
             if (type === 'case') {
-                thisB.caseAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer" }, thisB.caseFacetTab.containerNode);
+                thisB.caseAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer", style: "overflow: scroll" }, thisB.caseFacetTab.containerNode);
                 var loadingIcon = thisB.createLoadingIcon(thisB.caseFacetTab.containerNode);
                 thisB.createFacet('case', thisB.caseAccordion, loadingIcon);
             } else if (type === 'ssm') {
-                thisB.mutationAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer" }, thisB.mutationFacetTab.containerNode);
+                thisB.mutationAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer", style: "overflow: scroll" }, thisB.mutationFacetTab.containerNode);
                 var loadingIcon = thisB.createLoadingIcon(thisB.mutationFacetTab.containerNode);
                 thisB.createFacet('ssm', thisB.mutationAccordion, loadingIcon);
             } else if (type === 'gene') {
-                thisB.geneAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer" }, thisB.geneFacetTab.containerNode);
+                thisB.geneAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer", style: "overflow: scroll" }, thisB.geneFacetTab.containerNode);
                 var loadingIcon = thisB.createLoadingIcon(thisB.geneFacetTab.containerNode);
                 thisB.createFacet('gene', thisB.geneAccordion, loadingIcon);
             }
@@ -230,7 +230,7 @@ function (
                     for (var facet in facetsJsonResponse.data.aggregations) {
                         var contentPane = new ContentPane({
                             title: thisB.prettyFacetName(facet),
-                            style: "height: auto",
+                            style: "height: auto;",
                             id: facet + '-' + type + '-' + thisB.guid()
                         });
                         var facetHolder = dom.create('span', { className: "flex-column" });
@@ -289,6 +289,7 @@ function (
                     }
 
                     accordion.startup();
+                    accordion.resize();
                     thisB.resize();
                 })
             }, function (err) {
