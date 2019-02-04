@@ -138,7 +138,7 @@ function (
             thisB.facetTabs.startup();
 
             // Create results tabs
-            thisB.prettyFacetHolder = dom.create('div', { style: { 'flex': '3 0 0', 'margin': '5px' } }, thisB.searchResultsVerticalHolder);
+            thisB.prettyFacetHolder = dom.create('div', { style: { 'flex': '3 0 0', 'margin': '5px', 'display': 'flex', 'flex-wrap': 'wrap', 'align-content': 'stretch', 'align-items': 'center' } }, thisB.searchResultsVerticalHolder);
 
             thisB.searchResultsTabHolder = dom.create('div', { style: { width: '100%', height: '100%'  } }, thisB.searchResultsVerticalHolder);
             thisB.resultsTabs = new TabContainer({ style: {width: '100%', height: '100%'  } }, thisB.searchResultsTabHolder);
@@ -328,7 +328,7 @@ function (
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.caseResultsTab.containerNode);
+                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.caseResultsTab.containerNode);
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.caseResultsTab.containerNode);
                         thisB.createDonorsTable(facetsJsonResponse.data.hits, thisB.caseResultsTab.containerNode);
                         thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.casePage);
@@ -351,8 +351,7 @@ function (
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.mutationResultsTab.containerNode);
-                        // This needs to use a merged object of all facets
+                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.mutationResultsTab.containerNode);
                         var addMutationsButton = new Button({
                             label: "Add All SSMs",
                             onClick: function() {
@@ -736,23 +735,19 @@ function (
 
             for (var key in filteredCombinedFilters) {
                 if (filteredCombinedFilters[key] != undefined && filteredCombinedFilters[key].length > 0) {
-                    var facetString = `<span><span class="filterName">${key}</span>`;
+                    var facetString = `<span class="filterNameGDC">${key}</span>`;
                     if (filteredCombinedFilters[key].length > 1) {
-                        facetString += ` <strong>IN [ </strong>`;
-                        var filterLength = filteredCombinedFilters[key].length;
+                        facetString += ` <strong><span class="joinWordGDC">IN</span> ( </strong>`;
                         filteredCombinedFilters[key].forEach(function(value, i) {
-                            facetString += `<span class="filterValue">${value}</span>`;
-                            if (i < filterLength - 1) {
-                                facetString += ` , `
-                            }
+                            facetString += `<span class="filterValueGDC">${value}</span>`;
                         });
-                        facetString += `<strong> ]</strong>`;
+                        facetString += `<strong> )</strong>`;
                     } else {
-                        facetString += ` <strong>IS </strong><span class="filterValue">${filteredCombinedFilters[key]}</span>`;
+                        facetString += ` <strong class="joinWordGDC">IS </strong><span class="filterValueGDC">${filteredCombinedFilters[key]}</span>`;
                     }
 
                     if (currentFilter < filterCount - 1) {
-                        facetString += ` <strong>AND</strong> `;
+                        facetString += ` <strong class="joinWordGDC">AND</strong> `;
                     }
                     facetString += `</span>`;
                     prettyFacetString += facetString;
@@ -800,13 +795,13 @@ function (
         clearFacets: function() {
             var thisB = this;
             for (var key in thisB.caseFilters) {
-                thisB.caseFilters[key] = undefined
+                thisB.caseFilters[key] = []
             }
             for (var key in thisB.geneFilters) {
-                thisB.geneFilters[key] = undefined
+                thisB.geneFilters[key] = []
             }
             for (var key in thisB.mutationFilters) {
-                thisB.mutationFilters[key] = undefined
+                thisB.mutationFilters[key] = []
             }
 
             for (var type of thisB.types) {
