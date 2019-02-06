@@ -806,7 +806,11 @@ function (
          * @param {*} facetName 
          */
         prettyFacetName: function (facetName) {
-            return facetName.replace('_', ' ');
+            const splitFacetName = facetName.split('.');
+            if (splitFacetName.length > 1) {
+                facetName = splitFacetName[splitFacetName.length - 1];
+            }
+            return facetName.replace(/_/g, ' ');
         },
 
         /**
