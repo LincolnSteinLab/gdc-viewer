@@ -412,6 +412,24 @@ function (
                             }
                         }, "addGenesWithoutFilters").placeAt(thisB.geneResultsTab.containerNode);
 
+                        var addCNVButtonFilters = new Button({
+                            iconClass: "dijitIconNewTask",
+                            label: "All CNVs With Filters",
+                            onClick: function() {
+                                thisB.addTrack('CNVs', undefined, filterObject, 'Wiggle/XYPlot');
+                                alert("Adding CNV track with no filters");
+                            }
+                        }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
+
+                        var addCNVButtonNoFilters = new Button({
+                            iconClass: "dijitIconNewTask",
+                            label: "All CNVs Without Filters",
+                            onClick: function() {
+                                thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
+                                alert("Adding CNV track with no filters");
+                            }
+                        }, "addCNVButtonNoFilters").placeAt(thisB.geneResultsTab.containerNode);
+
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.geneResultsTab.containerNode);
                         thisB.createGenesTable(facetsJsonResponse.data.hits, thisB.geneResultsTab.containerNode);
                         thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.genePage);
@@ -916,6 +934,11 @@ function (
                     donor: caseId
                 }
             };
+
+            if (storeClass === 'CNVs') {
+                trackConf.autoscale = 'local';
+                trackConf.bicolor_pivot = 0;
+            }
 
             console.log("Adding track of type " + trackType + " and store class " + storeClass + ": " + key + " (" + label + ")");
 

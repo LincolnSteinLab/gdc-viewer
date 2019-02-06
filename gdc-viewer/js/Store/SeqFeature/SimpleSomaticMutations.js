@@ -16,7 +16,7 @@ function(
         constructor: function (args) {
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
-            this.size = args.size !== undefined ? parseInt(args.size) : 200;
+            this.size = args.size !== undefined ? parseInt(args.size) : 500;
         },
 
         /**
