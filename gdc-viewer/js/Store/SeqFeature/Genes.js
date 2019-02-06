@@ -115,6 +115,7 @@ function(
 
             // Add filters to query
             url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
+            console.log(url);
             
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';

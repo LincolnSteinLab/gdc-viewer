@@ -84,6 +84,8 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"!=","content":{"field":"biotype","value":"protein_coding"}}
 ```
 
+You can set the max number of genes to return with the size field. It defaults to 500.
+
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
 
@@ -101,6 +103,8 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 ```
 filters={"op":"=","content":{"field":"reference_allele","value":"G"}}
 ```
+
+You can set the max number of SSMs to return with the size field. It defaults to 500.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
@@ -121,5 +125,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 ```
 filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
 ```
+
+You can set the max number of CNVs to return with the size field. It defaults to 500.
 
 Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
