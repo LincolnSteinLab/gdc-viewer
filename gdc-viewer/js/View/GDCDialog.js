@@ -719,7 +719,6 @@ function (
                 }
             }
 
-            // Ignore case id for now
             if (caseId != undefined) {
                 var filterOperation = {"op":"in","content":{"field": "","value": []}};
                 filterOperation.content.field = caseField;
