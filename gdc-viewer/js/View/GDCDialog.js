@@ -353,7 +353,8 @@ function (
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.mutationResultsTab.containerNode);
                         var addMutationsButtonFilters = new Button({
-                            label: "Add All SSMs With Filters",
+                            iconClass: "dijitIconNewTask",
+                            label: "All SSMs With Filters",
                             onClick: function() {
                                 thisB.addTrack('SimpleSomaticMutations', undefined, filterObject, 'CanvasVariants');
                                 alert("Adding Simple Somatic Mutations track for all mutations with filters.");
@@ -361,7 +362,8 @@ function (
                         }, "addMutationsWithFilters").placeAt(thisB.mutationResultsTab.containerNode);
 
                         var addMutationsButtonNoFilters = new Button({
-                            label: "Add All SSMs Without Filters",
+                            iconClass: "dijitIconNewTask",
+                            label: "All SSMs Without Filters",
                             onClick: function() {
                                 thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
                                 alert("Adding Simple Somatic Mutations track for all mutations without filters.");
@@ -393,7 +395,8 @@ function (
                         var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.geneResultsTab.containerNode);
                         // This needs to use a merged object of all facets
                         var addGenesButtonFilters = new Button({
-                            label: "Add All Genes With Filters",
+                            iconClass: "dijitIconNewTask",
+                            label: "All Genes With Filters",
                             onClick: function() {
                                 thisB.addTrack('Genes', undefined, filterObject, 'CanvasVariants');
                                 alert("Adding Gene track for all genes with filters");
@@ -401,7 +404,8 @@ function (
                         }, "addGenesWithFilters").placeAt(thisB.geneResultsTab.containerNode);
 
                         var addGenesButtonNoFilters = new Button({
-                            label: "Add All Genes Without Filters",
+                            iconClass: "dijitIconNewTask",
+                            label: "All Genes Without Filters",
                             onClick: function() {
                                 thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
                                 alert("Adding Gene track for all genes without filters");
@@ -453,13 +457,15 @@ function (
 
                 var geneButton = `<td></td>`;
                 var geneButtonNode = dom.toDom(geneButton);
-                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id), hit.submitter_id);
+                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id), hit.submitter_id, 'Filtered');
+                thisB.createDonorGeneButton(hit.id, geneButtonNode, undefined, hit.submitter_id, 'All');
 
                 dom.place(geneButtonNode, caseRowContentNode);
 
                 var ssmButton = `<td></td>`;
                 var ssmButtonNode = dom.toDom(ssmButton);
-                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id), hit.submitter_id);
+                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id), hit.submitter_id, 'Filtered');
+                thisB.createDonorSSMButton(hit.id, ssmButtonNode, undefined, hit.submitter_id, 'All');
 
                 dom.place(ssmButtonNode, caseRowContentNode);
 
@@ -835,10 +841,11 @@ function (
          * @param {object} holder Div to place the button in
          * @param {object} combinedFacetObject combined object of facets
          */
-        createDonorGeneButton: function(caseId, holder, combinedFacetObject, prettyId) {
+        createDonorGeneButton: function(caseId, holder, combinedFacetObject, prettyId, text) {
             var thisB = this;
             var geneButton = new Button({
-                label: "Add",
+                iconClass: "dijitIconNewTask",
+                label: text,
                 onClick: function() {
                     thisB.addTrack('Genes', caseId, combinedFacetObject, 'CanvasVariants');
                     alert("Adding Gene track for case " + prettyId);
@@ -853,10 +860,11 @@ function (
          * @param {object} holder Div to place the button in
          * @param {object} combinedFacetObject combined object of facets
          */
-        createDonorSSMButton: function(caseId, holder, combinedFacetObject) {
+        createDonorSSMButton: function(caseId, holder, combinedFacetObject, prettyId, text) {
             var thisB = this;
             var ssmButton = new Button({
-                label: "Add",
+                iconClass: "dijitIconNewTask",
+                label: text,
                 onClick: function() {
                     thisB.addTrack('SimpleSomaticMutations', caseId, combinedFacetObject, 'CanvasVariants');
                     alert("Adding Simple Somatic Mutation track for case " + prettyId);
