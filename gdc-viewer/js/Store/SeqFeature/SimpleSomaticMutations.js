@@ -16,6 +16,7 @@ function(
         constructor: function (args) {
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            this.size = args.size !== undefined ? parseInt(args.size) : 500;
         },
 
         /**
@@ -120,8 +121,7 @@ function(
             var url = searchBaseUrl + 'ssms';
 
             // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
-
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
             // Retrieve all mutations in the given chromosome range
@@ -136,7 +136,6 @@ function(
                         data: {
                             'start': variant.start_position,
                             'end': variant.end_position,
-                            'name': variant.genomic_dna_change,
                             'GDC': thisB.createLinkWithId(GDC_LINK, variant.id),
                             'type': variant.mutation_type,
                             'Subtype': variant.mutation_subtype,

@@ -17,6 +17,7 @@ function(
         constructor: function (args) {
             // Filters to apply to Gene query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            this.size = args.size !== undefined ? parseInt(args.size) : 500;
         },
 
         /**
@@ -113,8 +114,8 @@ function(
             var url = searchBaseUrl + 'genes';
 
             // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end);
-
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
+            
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
 
@@ -132,9 +133,9 @@ function(
                                 'start': gene.gene_start,
                                 'end': gene.gene_end,
                                 'strand': gene.gene_strand,
-                                'description': gene.description,
-                                'name': gene.name,
-                                'symbol': gene.symbol,
+                                'Gene Description': gene.description,
+                                'Gene Name': gene.name,
+                                'Symbol': gene.symbol,
                                 'GDC': thisB.createLinkWithId(GDC_LINK, gene.gene_id),
                                 'Ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.id),
                                 'Biotype': gene.biotype,

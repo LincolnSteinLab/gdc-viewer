@@ -3,16 +3,14 @@ define([
            'dojo/_base/lang',
            'JBrowse/Plugin',
            'dijit/MenuItem',
-           './View/GDCDialog',
-           'require'
+           './View/GDCDialog'
        ],
        function(
            declare,
            lang,
            JBrowsePlugin,
            MenuItem,
-           GDCDialog,
-           require
+           GDCDialog
        ) {
 return declare( JBrowsePlugin,
 {
@@ -29,11 +27,17 @@ return declare( JBrowsePlugin,
     },
 
     createGDCTrack: function () {
-        var searchDialog = new GDCDialog();
+        var searchDialog = new GDCDialog(
+            {
+                onHide: function() {
+                    this.destroy();
+                }
+            }
+        );
         searchDialog.show(this.browser,
             function () {
-
-            });
+            }
+        );
     }
 });
 });
