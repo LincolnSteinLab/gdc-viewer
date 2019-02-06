@@ -31,7 +31,9 @@ bin/prepare-refseqs.pl --fasta Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
 Note that you can specify multiple fast in one command by doing `--fasta fasta1.fa.gz --fasta fasta2.fa.gz ...`
 
 ## 4. Adding new tracks
-We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC Dialog accessible within JBrowse.
+We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse.
+
+To access the GDC dialog, choose `GDC` in the menu and select `Search GDC`. You'll see a dialog with two sections. These are similar to the Exploration section of the GDC portal. The facets section allows you to apply facets to the search results present on the results section of the dialog. Note the three tabs in each section that represent the endpoints available from the GDC. Currently facets in one endpoint only impact the results of the corresponing search result endpoint, though this should be changed in the future to mimic the Exploration page on the GDC website.
 
 ## 5. Run JBrowse
 You'll have to run the following commands:
@@ -56,7 +58,14 @@ displayColumns =
   + datatype
 ```
 
+Note that this will only show preloaded tracks as well as tracks you have added using the Faceted Search Dialog. It does not dynamically create tracks based on what is available from the GDC.
+
 # Available Store SeqFeature
+## A note on filters
+All SeqFeatures support filters as they are defined in the [GDC API Documentation](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query).
+
+Currently filters don't work across endpoint types. So a case filter does not impact the SSMs displayed. The Exploration endpoint may allow for this to be fixed.
+
 ## Genes
 A simple view of all of the genes seen across all cases.
 

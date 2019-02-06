@@ -381,7 +381,7 @@ function (
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the current filters applied.", style: { 'font-style': 'italic' } }, thisB.geneResultsTab.containerNode);
+                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.geneResultsTab.containerNode);
                         // This needs to use a merged object of all facets
                         var addGenesButton = new Button({
                             label: "Add All Genes",
