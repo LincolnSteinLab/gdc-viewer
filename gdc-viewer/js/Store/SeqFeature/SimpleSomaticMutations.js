@@ -80,7 +80,7 @@ function(
         },
 
         prettyScore: function(label, score) {
-            return label != null ? label + ' (' + score + ')' : 'n/a';
+            return label != null && score != null ? label + ' (' + score + ')' : 'n/a';
         },
 
         /**
