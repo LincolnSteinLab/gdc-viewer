@@ -312,7 +312,7 @@ function (
             thisB.prettyPrintFilters(thisB.prettyFacetHolder);
 
             // Convert the transient filter object into one that GDC can read
-            var filterObject = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined);
+            var filterObject = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined, undefined);
             filterObject = filterObject != '' ? '&filters=' + filterObject : filterObject;
 
             if (type == 'case') {
@@ -417,7 +417,7 @@ function (
                             label: "All CNVs With Filters",
                             onClick: function() {
                                 thisB.addTrack('CNVs', undefined, filterObject, 'Wiggle/XYPlot');
-                                alert("Adding CNV track with no filters");
+                                alert("Adding CNV track with filters");
                             }
                         }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
 
@@ -475,14 +475,14 @@ function (
 
                 var geneButton = `<td></td>`;
                 var geneButtonNode = dom.toDom(geneButton);
-                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id), hit.submitter_id, 'Filtered');
+                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id'), hit.submitter_id, 'Filtered');
                 thisB.createDonorGeneButton(hit.id, geneButtonNode, undefined, hit.submitter_id, 'All');
 
                 dom.place(geneButtonNode, caseRowContentNode);
 
                 var ssmButton = `<td></td>`;
                 var ssmButtonNode = dom.toDom(ssmButton);
-                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id), hit.submitter_id, 'Filtered');
+                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id'), hit.submitter_id, 'Filtered');
                 thisB.createDonorSSMButton(hit.id, ssmButtonNode, undefined, hit.submitter_id, 'All');
 
                 dom.place(ssmButtonNode, caseRowContentNode);
@@ -707,7 +707,7 @@ function (
          * @param {*} filters 
          * @param {*} caseId 
          */
-        convertFilterObjectToGDCFilter: function(filters, caseId) {
+        convertFilterObjectToGDCFilter: function(filters, caseId, caseField) {
             var gdcFilters = {"op":"and","content":[]};
             
             for (var key in filters) {
@@ -720,12 +720,12 @@ function (
             }
 
             // Ignore case id for now
-            // if (caseId != undefined) {
-            //     var filterOperation = {"op":"in","content":{"field": "","value": []}};
-            //     filterOperation.content.field = 'cases.case_id'
-            //     filterOperation.content.value = caseId;
-            //     gdcFilters.content.push(filterOperation);
-            // }
+            if (caseId != undefined) {
+                var filterOperation = {"op":"in","content":{"field": "","value": []}};
+                filterOperation.content.field = caseField;
+                filterOperation.content.value = caseId;
+                gdcFilters.content.push(filterOperation);
+            }
 
             if (gdcFilters.content != undefined && gdcFilters.content.length > 0) {
                 var stringGDCFilters = JSON.stringify(gdcFilters)
@@ -741,7 +741,7 @@ function (
         combineAllFilters: function() {
             var thisB = this;
             var combinedFilters = Object.assign({}, thisB.caseFilters, thisB.mutationFilters, thisB.geneFilters);
-            return decodeURI(thisB.convertFilterObjectToGDCFilter(combinedFilters, null));
+            return decodeURI(thisB.convertFilterObjectToGDCFilter(combinedFilters, null, null));
         },
 
         /**
@@ -816,7 +816,7 @@ function (
             var thisB = this;
 
             var facetURL = 'https://api.gdc.cancer.gov/' + type + 's?size=0&facets=';
-            var filterObj = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined);
+            var filterObj = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined, undefined);
             if (type == 'case') {
                 facetURL += Object.keys(thisB.caseFilters).join(",");
                 facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
