@@ -16,7 +16,7 @@ function(
         constructor: function (args) {
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
-            this.size = args.size !== undefined ? parseInt(args.size) : 500;
+            this.size = args.size !== undefined ? parseInt(args.size) : 200;
         },
 
         /**
@@ -50,6 +50,15 @@ function(
         },
 
         /**
+         * Creates a link to a given ID and name
+         * @param {string} link Base URL for link
+         * @param {string} id ID to apped to base URL
+         */
+        createLinkWithIdAndName: function(link, id, name) {
+            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
+        },
+
+        /**
          * Create an array of links for COSMIC
          * @param {*} cosmic 
          */
@@ -64,6 +73,68 @@ function(
             });
 
             return cosmicLinks.join(", ");
+        },
+
+        convertIntToStrand: function(strand) {
+            return strand == 1 ? '+' : '-'
+        },
+
+        prettyScore: function(label, score) {
+            return label != null ? label + ' (' + score + ')' : 'n/a';
+        },
+
+        /**
+         * Creates a table of consequences for a mutation
+         * @param {List<Consequence>} consequences 
+         */
+        createConsequencesTable: function(consequences) {
+            var thisB = this;
+            const TRANSCRIPT_LINK = 'http://may2015.archive.ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=';
+            const GENES_LINK = 'https://portal.gdc.cancer.gov/genes/';
+            var thStyle = 'border: 1px solid #e6e6e6; padding: .2rem .2rem;';
+            var headerRow = `
+                <tr style=\"background-color: #f2f2f2\">
+                    <th style="${thStyle}">Gene</th>
+                    <th style="${thStyle}">AA Change</th>
+                    <th style="${thStyle}">Consequence</th>
+                    <th style="${thStyle}">Coding DNA Change</th> 
+                    <th style="${thStyle}">Impact</th>
+                    <th style="${thStyle}">Gene Strand</th>
+                    <th style="${thStyle}">Transcript(s)</th>
+                </tr>
+            `;
+
+            var consequenceTable = '<table style="width: 560px; border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
+
+            var count = 0;
+            for (consequence of consequences) {
+                var trStyle = '';
+                if (count % 2 != 0) {
+                    trStyle = 'style=\"background-color: #f2f2f2\"';
+                }
+                var consequenceRow = `<tr ${trStyle}>
+                    <td style="${thStyle}">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.transcript.gene.gene_id, consequence.transcript.gene.symbol)}</td>
+                    <td style="${thStyle}">${consequence.transcript.aa_change}</td>
+                    <td style="${thStyle}">${consequence.transcript.consequence_type}</td>
+                    <td style="${thStyle}">${consequence.transcript.annotation.hgvsc}</td>
+                    <td style="${thStyle}">
+                        <ul style="list-style: none;">
+                            <li>VEP: ${consequence.transcript.annotation.vep_impact}</li>
+                            <li>SIFT: ${thisB.prettyScore(consequence.transcript.annotation.sift_impact, consequence.transcript.annotation.sift_score)}</li>
+                            <li>Polyphen: ${thisB.prettyScore(consequence.transcript.annotation.polyphen_impact, consequence.transcript.annotation.polyphen_score)}</li>
+                        </ul>
+                    </td>
+                    <td style="${thStyle}">${thisB.convertIntToStrand(consequence.transcript.gene.gene_strand)}</td>
+                    <td style="${thStyle}">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.transcript.transcript_id)}${consequence.transcript.is_canonical ? ' (C)' : ''}</td>
+                    </tr>
+                `;
+                
+                consequenceTable += consequenceRow;
+                count++;
+            }
+
+            consequenceTable += '</table>';
+            return consequenceTable;
         },
 
         /**
@@ -121,7 +192,7 @@ function(
             var url = searchBaseUrl + 'ssms';
 
             // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
+            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size + '&expand=consequence,consequence.transcript,consequence.transcript.annotation,consequence.transcript.gene';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
             // Retrieve all mutations in the given chromosome range
@@ -145,7 +216,8 @@ function(
                             'Tumour Allele': variant.tumor_allele,
                             'NCBI Build': variant.ncbi_build,
                             'Chromosome': variant.chromosome,
-                            'Gene AA Change': variant.gene_aa_change
+                            'Gene AA Change': variant.gene_aa_change,
+                            'Consequences': thisB.createConsequencesTable(variant.consequence),
                         }
                     }
                     featureCallback(new SimpleFeature(variantFeature));
