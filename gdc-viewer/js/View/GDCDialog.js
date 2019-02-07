@@ -444,6 +444,15 @@ function (
             }
         },
 
+        addTooltipToButton: function(button, tooltipText) {
+            // Attach tooltip
+            var tooltip = new Tooltip({
+                label: tooltipText
+            });
+
+            tooltip.addTarget(button);
+        },
+
         /**
          * Creates the cases table for the given hits in some location
          * @param {List<object>} hits array of case hits
@@ -478,50 +487,50 @@ function (
                 // Create element to hold buttons
                 var geneButtonNode = dom.toDom(`<td></td>`);
 
-                // Create element to hold button (required for tooltips)
-                var withFilterNode = dom.toDom(`<span></span>`);
+                // Create button and place in parent
+                var donorGeneButtonWithFilters = dom.toDom(`<span></span>`);
+                thisB.createDonorGeneButton(hit.id, donorGeneButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
+                thisB.addTooltipToButton(donorGeneButtonWithFilters, "Add all genes for the given donor, filter with current facets");
+                dom.place(donorGeneButtonWithFilters, geneButtonNode);
 
                 // Create button and place in parent
-                thisB.createDonorGeneButton(hit.id, withFilterNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
-                dom.place(withFilterNode, geneButtonNode)
+                var donorGeneButtonNoFilters = dom.toDom(`<span></span>`);
+                thisB.createDonorGeneButton(hit.id, donorGeneButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
+                thisB.addTooltipToButton(donorGeneButtonNoFilters, "Add all genes for the given donor, do not filter with current facets");
+                dom.place(donorGeneButtonNoFilters, geneButtonNode);
 
-                // Attach tooltip
-                var tooltipWithFilters = new Tooltip({
-                    label: "Add all genes for the given donor, filter with current facets"
-                });
-                
-                tooltipWithFilters.addTarget(withFilterNode);
-
-                // Create element to hold button (required for tooltips)
-                var withoutFilterNode = dom.toDom(`<span></span>`);
-
-                // Create button and place in parent
-                thisB.createDonorGeneButton(hit.id, withoutFilterNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
-                dom.place(withoutFilterNode, geneButtonNode)
-
-                // Attach tooltip
-                var tooltipNoFilters = new Tooltip({
-                    label: "Add all genes for the given donor, do not filter with current facets"
-                });
-
-                tooltipNoFilters.addTarget(withoutFilterNode);
-
+                // Place buttons in table
                 dom.place(geneButtonNode, caseRowContentNode);
 
-                var ssmButton = `<td></td>`;
-                var ssmButtonNode = dom.toDom(ssmButton);
-                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', false), hit.submitter_id, 'Filtered');
-                thisB.createDonorSSMButton(hit.id, ssmButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', true), hit.submitter_id, 'All');
+                // Create element to hold buttons
+                var ssmButtonNode = dom.toDom(`<td></td>`);
 
+                // Create Button and place in parent
+                var donorSSMButtonWithFilters = dom.toDom(`<span></span>`);
+                thisB.createDonorSSMButton(hit.id, donorSSMButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', false), hit.submitter_id, 'Filtered');
+                thisB.addTooltipToButton(donorSSMButtonWithFilters, "Add all SSMs for the given donor, filter with current facets");
+                dom.place(donorSSMButtonWithFilters, ssmButtonNode);
+
+                // Create Button and place in parent
+                var donorSSMButtonNoFilters = dom.toDom(`<span></span>`);
+                thisB.createDonorSSMButton(hit.id, donorSSMButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', true), hit.submitter_id, 'All');
+                thisB.addTooltipToButton(donorSSMButtonNoFilters, "Add all SSMs for the given donor, do not filter with current facets");
+                dom.place(donorSSMButtonNoFilters, ssmButtonNode);
+
+                // Place buttons in table
                 dom.place(ssmButtonNode, caseRowContentNode);
 
+                // Place columns into row
                 var row = `<tr></tr>`;
                 var rowNodeHolder = dom.toDom(row);
                 dom.place(caseRowContentNode, rowNodeHolder);
                 dom.place(rowNodeHolder, rowsHolderNode);
 
             }
+            // Place rows into table
             dom.place(rowsHolderNode, tableNode);
+
+            // Place table into dialog
             dom.place(tableNode, location);
         },
 
@@ -889,12 +898,14 @@ function (
          * Create a button to add a case gene button that will create a gene track based on the given
          * case ID and facet object
          * @param {string} caseId Id of case
-         * @param {object} holder Div to place the button in
+         * @param {string} holder Dom object to place button in
          * @param {object} combinedFacetObject combined object of facets
+         * @param {string} prettyId Pretty case id used to display add track alerts
+         * @param {string} text Button text
          */
         createDonorGeneButton: function(caseId, holder, combinedFacetObject, prettyId, text) {
             var thisB = this;
-            var geneButton = new Button({
+            var button = new Button({
                 iconClass: "dijitIconNewTask",
                 label: text,
                 onClick: function() {
