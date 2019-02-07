@@ -7,6 +7,7 @@ define([
     'dijit/layout/TabContainer',
     'dijit/layout/AccordionContainer',
     'dijit/layout/ContentPane',
+    'dijit/Tooltip',
     'dojo/aspect',
     'JBrowse/View/Dialog/WithActionBar'
 ],
@@ -19,6 +20,7 @@ function (
     TabContainer,
     AccordionContainer,
     ContentPane,
+    Tooltip,
     aspect,
     ActionBarDialog
 ) {
@@ -473,10 +475,36 @@ function (
                 `
                 var caseRowContentNode = dom.toDom(caseRowContent);
 
-                var geneButton = `<td></td>`;
-                var geneButtonNode = dom.toDom(geneButton);
-                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
-                thisB.createDonorGeneButton(hit.id, geneButtonNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
+                // Create element to hold buttons
+                var geneButtonNode = dom.toDom(`<td></td>`);
+
+                // Create element to hold button (required for tooltips)
+                var withFilterNode = dom.toDom(`<span></span>`);
+
+                // Create button and place in parent
+                thisB.createDonorGeneButton(hit.id, withFilterNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
+                dom.place(withFilterNode, geneButtonNode)
+
+                // Attach tooltip
+                var tooltipWithFilters = new Tooltip({
+                    label: "Add all genes for the given donor, filter with current facets"
+                });
+                
+                tooltipWithFilters.addTarget(withFilterNode);
+
+                // Create element to hold button (required for tooltips)
+                var withoutFilterNode = dom.toDom(`<span></span>`);
+
+                // Create button and place in parent
+                thisB.createDonorGeneButton(hit.id, withoutFilterNode, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
+                dom.place(withoutFilterNode, geneButtonNode)
+
+                // Attach tooltip
+                var tooltipNoFilters = new Tooltip({
+                    label: "Add all genes for the given donor, do not filter with current facets"
+                });
+
+                tooltipNoFilters.addTarget(withoutFilterNode);
 
                 dom.place(geneButtonNode, caseRowContentNode);
 
@@ -873,7 +901,7 @@ function (
                     thisB.addTrack('Genes', caseId, combinedFacetObject, 'CanvasVariants');
                     alert("Adding Gene track for case " + prettyId);
                 }
-            }, "geneButton").placeAt(holder);
+            }).placeAt(holder);
         },
 
         /**
