@@ -235,7 +235,7 @@ function (
                             style: "height: auto;",
                             id: facet + '-' + type + '-' + thisB.guid()
                         });
-                        var facetHolder = dom.create('span', { className: "flex-column", style: "width: 100%;" });
+                        var facetHolder = dom.create('span', { className: "flex-column" });
 
                         if (facetsJsonResponse.data.aggregations[facet].buckets && facetsJsonResponse.data.aggregations[facet].buckets.length > 0) {
                             facetsJsonResponse.data.aggregations[facet].buckets.sort(thisB.compareTermElements);
@@ -291,7 +291,6 @@ function (
                     }
 
                     accordion.startup();
-                    accordion.resize();
                     thisB.resize();
                 })
             }, function (err) {
@@ -330,7 +329,6 @@ function (
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.caseResultsTab.containerNode);
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.caseResultsTab.containerNode);
                         thisB.createDonorsTable(facetsJsonResponse.data.hits, thisB.caseResultsTab.containerNode);
                         thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.casePage);
@@ -353,7 +351,6 @@ function (
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.mutationResultsTab.containerNode);
                         var addMutationsButtonFilters = new Button({
                             iconClass: "dijitIconNewTask",
                             label: "All SSMs With Filters",
@@ -396,7 +393,6 @@ function (
                     dom.empty(resultsInfo);
                     facetsResponse.json().then(function (facetsJsonResponse) {
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var helpMessage = dom.create('div', { innerHTML: "Note: Gene and SSM tracks added through this browser will have all the relevant current filters applied.", style: { 'font-style': 'italic' } }, thisB.geneResultsTab.containerNode);
                         // This needs to use a merged object of all facets
                         var addGenesButtonFilters = new Button({
                             iconClass: "dijitIconNewTask",
@@ -817,6 +813,7 @@ function (
                         thisB.clearFacets()
                     }
                 }, "clearFacets").placeAt(location);
+                thisB.addTooltipToButton(clearFacetButton, "Clear all facets");
             }
 
             var currentFilter = 0;
@@ -888,6 +885,8 @@ function (
          */
         clearFacets: function() {
             var thisB = this;
+            dom.empty(thisB.prettyFacetHolder);
+
             for (var key in thisB.caseFilters) {
                 thisB.caseFilters[key] = []
             }
