@@ -362,6 +362,7 @@ function (
                                 alert("Adding Simple Somatic Mutations track for all mutations with filters.");
                             }
                         }, "addMutationsWithFilters").placeAt(thisB.mutationResultsTab.containerNode);
+                        thisB.addTooltipToButton(addMutationsButtonFilters, "Add track with all SSMs, filter with current facets");
 
                         var addMutationsButtonNoFilters = new Button({
                             iconClass: "dijitIconNewTask",
@@ -371,6 +372,7 @@ function (
                                 alert("Adding Simple Somatic Mutations track for all mutations without filters.");
                             }
                         }, "addMutationsWithoutFilters").placeAt(thisB.mutationResultsTab.containerNode);
+                        thisB.addTooltipToButton(addMutationsButtonNoFilters, "Add track with all SSMs, do not filter with current facets");
 
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.mutationResultsTab.containerNode);
                         thisB.createMutationsTable(facetsJsonResponse.data.hits, thisB.mutationResultsTab.containerNode);
@@ -404,6 +406,7 @@ function (
                                 alert("Adding Gene track for all genes with filters");
                             }
                         }, "addGenesWithFilters").placeAt(thisB.geneResultsTab.containerNode);
+                        thisB.addTooltipToButton(addGenesButtonFilters, "Add track with all genes, filter with current facets");
 
                         var addGenesButtonNoFilters = new Button({
                             iconClass: "dijitIconNewTask",
@@ -413,6 +416,7 @@ function (
                                 alert("Adding Gene track for all genes without filters");
                             }
                         }, "addGenesWithoutFilters").placeAt(thisB.geneResultsTab.containerNode);
+                        thisB.addTooltipToButton(addGenesButtonNoFilters, "Add track with all genes, do not filter with current facets");
 
                         var addCNVButtonFilters = new Button({
                             iconClass: "dijitIconNewTask",
@@ -422,6 +426,7 @@ function (
                                 alert("Adding CNV track with filters");
                             }
                         }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
+                        thisB.addTooltipToButton(addCNVButtonFilters, "Add track with all CNVs, filter with current facets");
 
                         var addCNVButtonNoFilters = new Button({
                             iconClass: "dijitIconNewTask",
@@ -431,6 +436,7 @@ function (
                                 alert("Adding CNV track with no filters");
                             }
                         }, "addCNVButtonNoFilters").placeAt(thisB.geneResultsTab.containerNode);
+                        thisB.addTooltipToButton(addCNVButtonNoFilters, "Add track with all CNVs, do not filter with current facets");
 
                         var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.geneResultsTab.containerNode);
                         thisB.createGenesTable(facetsJsonResponse.data.hits, thisB.geneResultsTab.containerNode);
@@ -444,8 +450,12 @@ function (
             }
         },
 
+        /**
+         * Adds a tooltip with some text to a location
+         * @param {*} button Location to attach tooltip
+         * @param {*} tooltipText Text to display in tooltip
+         */
         addTooltipToButton: function(button, tooltipText) {
-            // Attach tooltip
             var tooltip = new Tooltip({
                 label: tooltipText
             });
