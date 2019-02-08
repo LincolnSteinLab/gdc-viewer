@@ -249,7 +249,6 @@ function (
                                     value: { "facet": facet, "term" : term.key },
                                     checked: thisB.isChecked(facet, term.key, thisB.getFiltersForType(type)),
                                     onChange: function(isChecked) {
-                                        // On select, add/remove filter from currently
                                         if (isChecked) {
                                             if (type === 'case') {
                                                 thisB.caseFilters[this.value.facet].push(this.value.term);
@@ -276,7 +275,9 @@ function (
                                                 }
                                             }
                                         }
-                                        thisB.updateAccordion(type);
+                                        thisB.updateAccordion('case');
+                                        thisB.updateAccordion('ssm');
+                                        thisB.updateAccordion('gene');
                                         thisB.updateSearchResults('case');
                                         thisB.updateSearchResults('ssm');
                                         thisB.updateSearchResults('gene');
@@ -288,9 +289,11 @@ function (
 
                         dojo.place(facetHolder, contentPane.containerNode);
                         accordion.addChild(contentPane);
+                        contentPane.startup();
                     }
 
                     accordion.startup();
+                    accordion.resize();
                     thisB.resize();
                 })
             }, function (err) {
@@ -353,7 +356,7 @@ function (
                         var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
                         var addMutationsButtonFilters = new Button({
                             iconClass: "dijitIconNewTask",
-                            label: "All SSMs With Filters",
+                            label: "All SSMs With Facets",
                             onClick: function() {
                                 thisB.addTrack('SimpleSomaticMutations', undefined, filterObject, 'CanvasVariants');
                                 alert("Adding Simple Somatic Mutations track for all mutations with filters.");
@@ -363,7 +366,7 @@ function (
 
                         var addMutationsButtonNoFilters = new Button({
                             iconClass: "dijitIconNewTask",
-                            label: "All SSMs Without Filters",
+                            label: "All SSMs Without Facets",
                             onClick: function() {
                                 thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
                                 alert("Adding Simple Somatic Mutations track for all mutations without filters.");
@@ -396,40 +399,40 @@ function (
                         // This needs to use a merged object of all facets
                         var addGenesButtonFilters = new Button({
                             iconClass: "dijitIconNewTask",
-                            label: "All Genes With Filters",
+                            label: "All Genes With Facets",
                             onClick: function() {
                                 thisB.addTrack('Genes', undefined, filterObject, 'CanvasVariants');
-                                alert("Adding Gene track for all genes with filters");
+                                alert("Adding Gene track for all genes with facets");
                             }
                         }, "addGenesWithFilters").placeAt(thisB.geneResultsTab.containerNode);
                         thisB.addTooltipToButton(addGenesButtonFilters, "Add track with all genes, filter with current facets");
 
                         var addGenesButtonNoFilters = new Button({
                             iconClass: "dijitIconNewTask",
-                            label: "All Genes Without Filters",
+                            label: "All Genes Without Facets",
                             onClick: function() {
                                 thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
-                                alert("Adding Gene track for all genes without filters");
+                                alert("Adding Gene track for all genes without facets");
                             }
                         }, "addGenesWithoutFilters").placeAt(thisB.geneResultsTab.containerNode);
                         thisB.addTooltipToButton(addGenesButtonNoFilters, "Add track with all genes, do not filter with current facets");
 
                         var addCNVButtonFilters = new Button({
                             iconClass: "dijitIconNewTask",
-                            label: "All CNVs With Filters",
+                            label: "All CNVs With Facets",
                             onClick: function() {
                                 thisB.addTrack('CNVs', undefined, filterObject, 'Wiggle/XYPlot');
-                                alert("Adding CNV track with filters");
+                                alert("Adding CNV track with facets");
                             }
                         }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
                         thisB.addTooltipToButton(addCNVButtonFilters, "Add track with all CNVs, filter with current facets");
 
                         var addCNVButtonNoFilters = new Button({
                             iconClass: "dijitIconNewTask",
-                            label: "All CNVs Without Filters",
+                            label: "All CNVs Without Facets",
                             onClick: function() {
                                 thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
-                                alert("Adding CNV track with no filters");
+                                alert("Adding CNV track with no facets");
                             }
                         }, "addCNVButtonNoFilters").placeAt(thisB.geneResultsTab.containerNode);
                         thisB.addTooltipToButton(addCNVButtonNoFilters, "Add track with all CNVs, do not filter with current facets");
@@ -813,7 +816,7 @@ function (
                         thisB.clearFacets()
                     }
                 }, "clearFacets").placeAt(location);
-                thisB.addTooltipToButton(clearFacetButton, "Clear all facets");
+                thisB.addTooltipToButton(clearFacetButton, "Clear all filters");
             }
 
             var currentFilter = 0;
@@ -850,10 +853,6 @@ function (
          * @param {*} facetName 
          */
         prettyFacetName: function (facetName) {
-            const splitFacetName = facetName.split('.');
-            if (splitFacetName.length > 1) {
-                facetName = splitFacetName[splitFacetName.length - 1];
-            }
             return facetName.replace(/_/g, ' ');
         },
 
