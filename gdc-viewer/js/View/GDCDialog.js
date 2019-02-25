@@ -275,12 +275,10 @@ function (
                                                 }
                                             }
                                         }
-                                        thisB.updateAccordion('case');
-                                        thisB.updateAccordion('ssm');
-                                        thisB.updateAccordion('gene');
-                                        thisB.updateSearchResults('case');
-                                        thisB.updateSearchResults('ssm');
-                                        thisB.updateSearchResults('gene');
+                                        for (var type of thisB.types) {
+                                            thisB.updateAccordion(type);
+                                            thisB.updateSearchResults(type);
+                                        }
                                     }
                                 }, 'checkbox').placeAt(facetCheckbox);
                                 var label = dom.create("label", { "for" : facet + '-' + term.key + '-' + type + '-' + thisB.guid(), innerHTML: term.key + ' (' + term.doc_count + ')' }, facetCheckbox);
@@ -499,13 +497,13 @@ function (
                 // Create button and place in parent
                 var donorGeneButtonWithFilters = dom.toDom(`<span></span>`);
                 thisB.createDonorGeneButton(hit.id, donorGeneButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
-                thisB.addTooltipToButton(donorGeneButtonWithFilters, "Add all genes for the given donor, filter with current facets");
+                thisB.addTooltipToButton(donorGeneButtonWithFilters, "Add track with all genes for the given donor, filter with current facets");
                 dom.place(donorGeneButtonWithFilters, geneButtonNode);
 
                 // Create button and place in parent
                 var donorGeneButtonNoFilters = dom.toDom(`<span></span>`);
                 thisB.createDonorGeneButton(hit.id, donorGeneButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
-                thisB.addTooltipToButton(donorGeneButtonNoFilters, "Add all genes for the given donor, do not filter with current facets");
+                thisB.addTooltipToButton(donorGeneButtonNoFilters, "Add track with all genes for the given donor, do not filter with current facets");
                 dom.place(donorGeneButtonNoFilters, geneButtonNode);
 
                 // Place buttons in table
@@ -517,13 +515,13 @@ function (
                 // Create Button and place in parent
                 var donorSSMButtonWithFilters = dom.toDom(`<span></span>`);
                 thisB.createDonorSSMButton(hit.id, donorSSMButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', false), hit.submitter_id, 'Filtered');
-                thisB.addTooltipToButton(donorSSMButtonWithFilters, "Add all SSMs for the given donor, filter with current facets");
+                thisB.addTooltipToButton(donorSSMButtonWithFilters, "Add track with all SSMs for the given donor, filter with current facets");
                 dom.place(donorSSMButtonWithFilters, ssmButtonNode);
 
                 // Create Button and place in parent
                 var donorSSMButtonNoFilters = dom.toDom(`<span></span>`);
                 thisB.createDonorSSMButton(hit.id, donorSSMButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', true), hit.submitter_id, 'All');
-                thisB.addTooltipToButton(donorSSMButtonNoFilters, "Add all SSMs for the given donor, do not filter with current facets");
+                thisB.addTooltipToButton(donorSSMButtonNoFilters, "Add track with all SSMs for the given donor, do not filter with current facets");
                 dom.place(donorSSMButtonNoFilters, ssmButtonNode);
 
                 // Place buttons in table
