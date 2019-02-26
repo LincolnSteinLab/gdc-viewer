@@ -54,23 +54,23 @@ function (
 
         // Each filter object shows the current filters applied for a given type
         caseFilters: {
-            'project.primary_site': [],
-            'project.name': [],
+            'project__primary_site': [],
+            'project__name': [],
             'disease_type': [],
-            'demographic.gender': [],
-            'project.program.name': [],
-            'diagnoses.vital_status': [],
-            'demographic.race': [],
-            'demographic.ethnicity': []
+            'demographic__gender': [],
+            'project__program__name': [],
+            'diagnoses__vital_status': [],
+            'demographic__race': [],
+            'demographic__ethnicity': []
         },
 
         mutationFilters: {
-            'consequence.transcript.annotation.vep_impact': [],
-            'consequence.transcript.annotation.sift_impact': [],
-            'consequence.transcript.annotation.polyphen_impact': [],
+            'consequence__transcript__annotation__vep_impact': [],
+            'consequence__transcript__annotation__sift_impact': [],
+            'consequence__transcript__annotation__polyphen_impact': [],
             'mutation_subtype': [],
-            'occurrence.case.observation.variant_calling.variant_caller': [],
-            'consequence.transcript.consequence_type': []
+            'occurrence__case__observation__variant_calling__variant_caller': [],
+            'consequence__transcript__consequence_type': []
         },
 
         geneFilters: {
@@ -83,6 +83,9 @@ function (
         mutationPage: 1,
         genePage: 1,
         pageSize: 20,
+
+        // GraphQL stuff
+        facetQuery: `query Queries($filters_0:FiltersArgument!,$first_1:Int!,$offset_2:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},diagnoses__vital_status {buckets {doc_count,key}},diagnoses__days_to_death {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first_1,offset:$offset_2,filters:$filters_0,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters_0) {total}},cnvs {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters_0) {total}},ssms {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters_0) {total}}}}`,
 
         constructor: function () {
             var thisB = this;
@@ -172,10 +175,134 @@ function (
             // Create the scaffolding to hold everything
             thisB.createScaffolding(dialogContainer);
 
-            for (var type of thisB.types) {
-                thisB.createAccordions(type);
-                thisB.updateSearchResults(type);
+            //for (var type of thisB.types) {
+            //    thisB.createAccordions(type);
+            //    thisB.updateSearchResults(type);
+            //}
+            thisB.initializeFacets();
+        },
+
+        initializeFacets: function() {
+            var thisB = this;
+            
+            var combinedFilters = thisB.combineAllFilters();
+            if (combinedFilters) {
+                combinedFilters = JSON.parse(combinedFilters);
             }
+            // Get filters
+            var baseUrl = 'https://api.gdc.cancer.gov/v0/graphql';
+            var bodyVal = {
+                query: thisB.facetQuery,
+                variables: {
+                    "filters_0": combinedFilters,
+                    "first_1": 20,
+                    "offset_2": 0
+                  }
+            }
+
+            console.log(bodyVal);
+
+            fetch(baseUrl, {
+                method: 'post',
+                headers: { 'X-Requested-With': null },
+                body: JSON.stringify(bodyVal)
+            }).then(function(response) {
+                return(response.json());
+            }).then(function(response) {
+                console.log(response);
+                thisB.createNewAccordions(response);
+            }).catch(function(err) {
+                console.log(err);
+            });
+        },
+
+        createNewAccordions(response) {
+            var thisB = this;
+            for (var type of thisB.types) {
+                var newAccordionId = 'accordion_' + type + '_' + thisB.guid();
+                if (type === 'case') {
+                    thisB.caseAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer", style: "overflow: scroll" }, thisB.caseFacetTab.containerNode);
+                    thisB.createNewFacet('case', thisB.caseAccordion, response.data.viewer.explore.cases);
+                } else if (type === 'ssm') {
+                    thisB.mutationAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer", style: "overflow: scroll" }, thisB.mutationFacetTab.containerNode);
+                    thisB.createNewFacet('ssm', thisB.mutationAccordion, response.data.viewer.explore.ssms);
+                } else if (type === 'gene') {
+                    thisB.geneAccordion = new AccordionContainer({ id: newAccordionId, className: "accordionContainer", style: "overflow: scroll" }, thisB.geneFacetTab.containerNode);
+                    thisB.createNewFacet('gene', thisB.geneAccordion, response.data.viewer.explore.genes);
+                }
+            }
+        },
+
+        createNewFacet(type, accordion, results) {
+            var thisB = this;
+            // Add a content pane per facet group
+            for (var facet in results._aggregations) {
+                var contentPane = new ContentPane({
+                    title: thisB.prettyFacetName(facet),
+                    style: "height: auto;",
+                    id: facet + '-' + type + '-' + thisB.guid()
+                });
+                var facetHolder = dom.create('span', { className: "flex-column" });
+
+                if (results._aggregations[facet].buckets && results._aggregations[facet].buckets.length > 0) {
+                    results._aggregations[facet].buckets.sort(thisB.compareTermElements);
+                    // Add a checkbox per facet option
+                    results._aggregations[facet].buckets.forEach((term) => {
+                        var facetCheckbox = dom.create('span', { className: "flex-row" }, facetHolder)
+
+                        var checkBox = new CheckBox({
+                            name: facet + '-' + term.key,
+                            id: facet + '-' + term.key + '-' + type + '-' + thisB.guid(),
+                            value: { "facet": facet, "term" : term.key, "type": type },
+                            checked: thisB.isChecked(facet, term.key, thisB.getFiltersForType(type)),
+                            onChange: function(isChecked) {
+                                console.log(isChecked);
+                                if (isChecked) {
+                                    if (this.value.type === 'case') {
+                                        console.log('pushing ' + this.value.term + ' into ' + this.value.facet);
+                                        thisB.caseFilters[this.value.facet].push(this.value.term);
+                                        console.log(thisB.caseFilters);
+                                    } else if (this.value.type === 'ssm') {
+                                        thisB.mutationFilters[this.value.facet].push(this.value.term);
+                                    } else if (this.value.type === 'gene') {
+                                        thisB.geneFilters[this.value.facet].push(this.value.term);
+                                    }
+                                } else {
+                                    if (this.value.type === 'case') {
+                                        var indexOfValue = thisB.caseFilters[this.value.facet].indexOf(this.value.term);
+                                        if (indexOfValue != -1) {
+                                            thisB.caseFilters[this.value.facet].splice(indexOfValue, 1);
+                                        }
+                                    } else if (this.value.type === 'ssm') {
+                                        var indexOfValue = thisB.mutationFilters[this.value.facet].indexOf(this.value.term);
+                                        if (indexOfValue != -1) {
+                                            thisB.mutationFilters[this.value.facet].splice(indexOfValue, 1);
+                                        }
+                                    } else if (this.value.type === 'gene') {
+                                        var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
+                                        if (indexOfValue != -1) {
+                                            thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
+                                        }
+                                    }
+                                }
+                                for (var type of thisB.types) {
+                                    thisB.destroyAccordions(type);
+                                }
+                                thisB.initializeFacets();
+                            }
+                        }, 'checkbox').placeAt(facetCheckbox);
+                        var label = dom.create("label", { "for" : facet + '-' + term.key + '-' + type + '-' + thisB.guid(), innerHTML: term.key + ' (' + term.doc_count + ')' }, facetCheckbox);
+                    });
+                }
+
+                dojo.place(facetHolder, contentPane.containerNode);
+                accordion.addChild(contentPane);
+                contentPane.startup();
+            }
+
+            accordion.startup();
+            accordion.resize();
+            thisB.resize();
         },
 
         /**
@@ -785,7 +912,18 @@ function (
          */
         combineAllFilters: function() {
             var thisB = this;
-            var combinedFilters = Object.assign({}, thisB.caseFilters, thisB.mutationFilters, thisB.geneFilters);
+
+            // Need to update so that I prepend stuff to the front of these filters
+            var caseFiltersCopy = {};
+            Object.keys(thisB.caseFilters).forEach(filter => caseFiltersCopy['cases.' + filter.replace(/__/g, '.')] = thisB.caseFilters[filter]);
+
+            var geneFiltersCopy = {};
+            Object.keys(thisB.geneFilters).forEach(filter => geneFiltersCopy['genes.' + filter.replace(/__/g, '.')] = thisB.geneFilters[filter]);
+
+            var mutationFiltersCopy = {};
+            Object.keys(thisB.mutationFilters).forEach(filter => mutationFiltersCopy['ssms.' + filter.replace(/__/g, '.')] = thisB.mutationFilters[filter]);
+
+            var combinedFilters = Object.assign({}, caseFiltersCopy, mutationFiltersCopy, geneFiltersCopy);
             return decodeURI(thisB.convertFilterObjectToGDCFilter(combinedFilters, null, null, false));
         },
 
