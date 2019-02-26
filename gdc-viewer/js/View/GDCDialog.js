@@ -342,7 +342,7 @@ function (
          */
         updateSSMSearchResults: function() {
             var thisB = this;
-            var url = 'https://portal.gdc.cancer.gov/auth/api/v0/graphql/SsmsTable';
+            var url = thisB.baseGraphQLUrl + '/SsmsTable';
 
             // Clear existing pretty filters
             dom.empty(thisB.prettyFacetHolder);
@@ -352,7 +352,7 @@ function (
 
             // Clear current results
             dom.empty(thisB.mutationResultsTab.containerNode);
-            var resultsInfo = thisB.createLoadingIcon(thisB.mutationResultsTab.containerNode);
+            thisB.createLoadingIcon(thisB.mutationResultsTab.containerNode);
 
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.mutationPage);
@@ -387,10 +387,7 @@ function (
             }).then(function(response) {
                 return(response.json());
             }).then(function(response) {
-                console.log(response);
-                dom.empty(resultsInfo);
-                // Do these results include the pagination information?
-                //var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
+                dom.empty(thisB.mutationResultsTab.containerNode);
                 var addMutationsButtonFilters = new Button({
                     iconClass: "dijitIconNewTask",
                     label: "All SSMs With Facets",
@@ -411,9 +408,11 @@ function (
                 }, "addMutationsWithoutFilters").placeAt(thisB.mutationResultsTab.containerNode);
                 thisB.addTooltipToButton(addMutationsButtonNoFilters, "Add track with all SSMs, do not filter with current facets");
 
-                //var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.mutationResultsTab.containerNode);
+                var totalSSMs = response.data.viewer.explore.ssms.hits.total;
+
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.mutationPage - 1) * thisB.pageSize + 1) + " to " + thisB.mutationPage * thisB.pageSize + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
                 thisB.createMutationsTable(response, thisB.mutationResultsTab.containerNode);
-                //thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.mutationPage);
+                thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, totalSSMs / thisB.pageSize, 'ssm', thisB.mutationPage);
             }).catch(function(err) {
                 console.log(err);
             });
@@ -813,7 +812,7 @@ function (
          * @param {object} holder
          * @param {integer} pagination
          */
-        createPaginationButtons: function(holder, pagination, type, pageNum) {
+        createPaginationButtons: function(holder, totalPages, type, pageNum) {
             var thisB = this;
 
             var paginationHolder = dom.create('div', { style:"display: flex;justify-content: center;"}, holder);
@@ -828,7 +827,7 @@ function (
 
             }
 
-            if (pageNum < pagination.pages) {
+            if (pageNum < totalPages) {
                 var nextButton = new Button({
                     label: "Next",
                     onClick: function() {
@@ -851,7 +850,8 @@ function (
             } else if (type === 'gene') {
                 thisB.genePage = thisB.genePage - 1;
             }
-            thisB.updateSearchResults(type);
+            
+            thisB.updateSSMSearchResults();
         },
 
         /**
@@ -867,7 +867,8 @@ function (
             } else if (type === 'gene') {
                 thisB.genePage = thisB.genePage + 1;
             }
-            thisB.updateSearchResults(type);
+            
+            thisB.updateSSMSearchResults();
         },
 
         /**
