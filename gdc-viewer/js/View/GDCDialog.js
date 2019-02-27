@@ -422,7 +422,113 @@ function (
          * Updates the Gene search results page
          */
         updateGeneSearchResults: function() {
-            
+            var thisB = this;
+            var url = thisB.baseGraphQLUrl + '/GenesTable';
+
+            // Clear existing pretty filters
+            dom.empty(thisB.prettyFacetHolder);
+
+            // Display currently selected filters
+            thisB.prettyPrintFilters(thisB.prettyFacetHolder);
+
+            // Clear current results
+            dom.empty(thisB.geneResultsTab.containerNode);
+            thisB.createLoadingIcon(thisB.geneResultsTab.containerNode);
+
+            // Create body for GraphQL query
+            var start = thisB.getStartIndex(thisB.genePage);
+            var size = thisB.pageSize;
+            var geneQuery = `query GenesTable_relayQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String $ssmCase: FiltersArgument $geneCaseFilter: FiltersArgument $ssmTested: FiltersArgument $cnvTested: FiltersArgument $cnvGainFilters: FiltersArgument $cnvLossFilters: FiltersArgument ) { genesTableViewer: viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $geneCaseFilter) { total } } cnvCases: cases { hits(first: 0, filters: $cnvTested) { total } } genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id symbol name cytoband biotype numCases: score is_cancer_gene_census ssm_case: case { hits(first: 0, filters: $ssmCase) { total } } cnv_case: case { hits(first: 0, filters: $cnvTested) { total } } case_cnv_gain: case { hits(first: 0, filters: $cnvGainFilters) { total } } case_cnv_loss: case { hits(first: 0, filters: $cnvLossFilters) { total } } } } } } } } }`;
+
+            var geneFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["ssm"]}}]}
+            var cnvTested = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
+            var cnvGainFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
+            var cnvLossFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
+
+            var combinedFilters = thisB.combineAllFilters();
+            if (combinedFilters) {
+                combinedFilters = JSON.parse(combinedFilters);
+                geneFilter.content.push(combinedFilters);
+                cnvTested.content.push(combinedFilters);
+                cnvLossFilter.content.push(combinedFilters);
+                cnvGainFilter.content.push(combinedFilters);
+            }
+
+            cnvLossFilter.content.push({op: "in", content: {field: "cnvs.cnv_change", value: ["Loss"]}});
+            cnvGainFilter.content.push({op: "in", content: {field: "cnvs.cnv_change", value: ["Gain"]}});
+
+            var bodyVal = {
+                query: geneQuery,
+                variables: {
+                    "cnvGainFilters": cnvGainFilter,
+                    "cnvLossFilters": cnvLossFilter,
+                    "cnvTested": cnvTested,
+                    "geneCaseFilter": geneFilter,
+                    "genesTable_filters": combinedFilters,
+                    "genesTable_size": parseInt(size),
+                    "genesTable_offset": parseInt(start),
+                    "score": "case.project.project_id",
+                    "ssmCase": {op: "and", content: [{op: "in", content: {field: "cases.available_variation_data", value: ["ssm"]}}, {op: "NOT", content: {field: "genes.case.ssm.observation.observation_id", value: "MISSING"}}]},
+                    "ssmTested": {op: "and", content: [{op: "in", content: {field: "cases.available_variation_data", value: ["ssm"]}}]}
+                }
+            }
+
+            fetch(url, {
+                method: 'post',
+                headers: { 'X-Requested-With': null },
+                body: JSON.stringify(bodyVal)
+            }).then(function(response) {
+                return(response.json());
+            }).then(function(response) {
+                dom.empty(thisB.geneResultsTab.containerNode);
+                var addGenesButtonFilters = new Button({
+                    iconClass: "dijitIconNewTask",
+                    label: "All Genes With Facets",
+                    onClick: function() {
+                        thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
+                        alert("Adding Gene track for all genes with facets");
+                    }
+                }, "addGenesWithFilters").placeAt(thisB.geneResultsTab.containerNode);
+                thisB.addTooltipToButton(addGenesButtonFilters, "Add track with all genes, filter with current facets");
+
+                var addGenesButtonNoFilters = new Button({
+                    iconClass: "dijitIconNewTask",
+                    label: "All Genes Without Facets",
+                    onClick: function() {
+                        thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
+                        alert("Adding Gene track for all genes without facets");
+                    }
+                }, "addGenesWithoutFilters").placeAt(thisB.geneResultsTab.containerNode);
+                thisB.addTooltipToButton(addGenesButtonNoFilters, "Add track with all genes, do not filter with current facets");
+
+                var addCNVButtonFilters = new Button({
+                    iconClass: "dijitIconNewTask",
+                    label: "All CNVs With Facets",
+                    onClick: function() {
+                        thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
+                        alert("Adding CNV track with facets");
+                    }
+                }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
+                thisB.addTooltipToButton(addCNVButtonFilters, "Add track with all CNVs, filter with current facets");
+
+                var addCNVButtonNoFilters = new Button({
+                    iconClass: "dijitIconNewTask",
+                    label: "All CNVs Without Facets",
+                    onClick: function() {
+                        thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
+                        alert("Adding CNV track with no facets");
+                    }
+                }, "addCNVButtonNoFilters").placeAt(thisB.geneResultsTab.containerNode);
+                thisB.addTooltipToButton(addCNVButtonNoFilters, "Add track with all CNVs, do not filter with current facets");
+
+                var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
+
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.genePage - 1) * thisB.pageSize + 1) + " to " + thisB.genePage * thisB.pageSize + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
+                thisB.createGenesTable(response, thisB.geneResultsTab.containerNode);
+                thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, totalGenes / thisB.pageSize, 'gene', thisB.genePage);
+            }).catch(function(err) {
+                console.log(err);
+            });
         },
 
         /**
@@ -480,154 +586,6 @@ function (
             }).catch(function(err) {
                 console.log(err);
             });
-        },
-
-        /**
-         * Updates the search results of some type based on the facets
-         * @param {string} type The type of accordion
-         */
-        updateSearchResults: function(type) {
-            var thisB = this;
-            var url = 'https://api.gdc.cancer.gov/' + type + 's';
-
-            // Clear existing pretty filters
-            dom.empty(thisB.prettyFacetHolder);
-
-            // Display currently selected filters
-            thisB.prettyPrintFilters(thisB.prettyFacetHolder);
-
-            // Convert the transient filter object into one that GDC can read
-            var filterObject = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined, undefined, false);
-            filterObject = filterObject != '' ? '&filters=' + filterObject : filterObject;
-
-            if (type == 'case') {
-                // Clear current results
-                dom.empty(thisB.caseResultsTab.containerNode);
-                var resultsInfo = thisB.createLoadingIcon(thisB.caseResultsTab.containerNode);
-
-                // Create URL object
-                url += '?from=' + thisB.getStartIndex(thisB.casePage) + '&size=' + thisB.pageSize + filterObject;
-
-                // Fetch the Case results
-                fetch(url).then(function (facetsResponse) {
-                    dom.empty(resultsInfo);
-                    facetsResponse.json().then(function (facetsJsonResponse) {
-                        var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.caseResultsTab.containerNode);
-                        thisB.createDonorsTable(facetsJsonResponse.data.hits, thisB.caseResultsTab.containerNode);
-                        thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.casePage);
-                        }, function (res3) {
-                            console.error('error', res3);
-                        });
-                    }, function (err) {
-                        console.error('error', err);
-                    });
-            } else if (type == 'ssm') {
-                // Clear current results
-                dom.empty(thisB.mutationResultsTab.containerNode);
-                var resultsInfo = thisB.createLoadingIcon(thisB.mutationResultsTab.containerNode);
-
-                // Create URL object
-                url += '?from=' + thisB.getStartIndex(thisB.mutationPage) + '&size=' + thisB.pageSize + filterObject;
-                
-                // Fetch the SSM results
-                fetch(url).then(function (facetsResponse) {
-                    dom.empty(resultsInfo);
-                    facetsResponse.json().then(function (facetsJsonResponse) {
-                        var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        var addMutationsButtonFilters = new Button({
-                            iconClass: "dijitIconNewTask",
-                            label: "All SSMs With Facets",
-                            onClick: function() {
-                                thisB.addTrack('SimpleSomaticMutations', undefined, filterObject, 'CanvasVariants');
-                                alert("Adding Simple Somatic Mutations track for all mutations with filters.");
-                            }
-                        }, "addMutationsWithFilters").placeAt(thisB.mutationResultsTab.containerNode);
-                        thisB.addTooltipToButton(addMutationsButtonFilters, "Add track with all SSMs, filter with current facets");
-
-                        var addMutationsButtonNoFilters = new Button({
-                            iconClass: "dijitIconNewTask",
-                            label: "All SSMs Without Facets",
-                            onClick: function() {
-                                thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
-                                alert("Adding Simple Somatic Mutations track for all mutations without filters.");
-                            }
-                        }, "addMutationsWithoutFilters").placeAt(thisB.mutationResultsTab.containerNode);
-                        thisB.addTooltipToButton(addMutationsButtonNoFilters, "Add track with all SSMs, do not filter with current facets");
-
-                        var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.mutationResultsTab.containerNode);
-                        thisB.createMutationsTable(facetsJsonResponse.data.hits, thisB.mutationResultsTab.containerNode);
-                        thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.mutationPage);
-                        }, function (res3) {
-                            console.error('error', res3);
-                        });
-                    }, function (err) {
-                        console.error('error', err);
-                    });
-            } else if (type == 'gene') {
-                // Clear current results
-                dom.empty(thisB.geneResultsTab.containerNode);
-                var resultsInfo = thisB.createLoadingIcon(thisB.geneResultsTab.containerNode);
-                
-                // Create URL object
-                url += '?from=' + thisB.getStartIndex(thisB.genePage) + '&size=' + thisB.pageSize + filterObject;
-                
-                // Fetch the Gene results
-                fetch(url).then(function (facetsResponse) {
-                    dom.empty(resultsInfo);
-                    facetsResponse.json().then(function (facetsJsonResponse) {
-                        var endResult = facetsJsonResponse.data.pagination.from + facetsJsonResponse.data.pagination.count;
-                        // This needs to use a merged object of all facets
-                        var addGenesButtonFilters = new Button({
-                            iconClass: "dijitIconNewTask",
-                            label: "All Genes With Facets",
-                            onClick: function() {
-                                thisB.addTrack('Genes', undefined, filterObject, 'CanvasVariants');
-                                alert("Adding Gene track for all genes with facets");
-                            }
-                        }, "addGenesWithFilters").placeAt(thisB.geneResultsTab.containerNode);
-                        thisB.addTooltipToButton(addGenesButtonFilters, "Add track with all genes, filter with current facets");
-
-                        var addGenesButtonNoFilters = new Button({
-                            iconClass: "dijitIconNewTask",
-                            label: "All Genes Without Facets",
-                            onClick: function() {
-                                thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
-                                alert("Adding Gene track for all genes without facets");
-                            }
-                        }, "addGenesWithoutFilters").placeAt(thisB.geneResultsTab.containerNode);
-                        thisB.addTooltipToButton(addGenesButtonNoFilters, "Add track with all genes, do not filter with current facets");
-
-                        var addCNVButtonFilters = new Button({
-                            iconClass: "dijitIconNewTask",
-                            label: "All CNVs With Facets",
-                            onClick: function() {
-                                thisB.addTrack('CNVs', undefined, filterObject, 'Wiggle/XYPlot');
-                                alert("Adding CNV track with facets");
-                            }
-                        }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
-                        thisB.addTooltipToButton(addCNVButtonFilters, "Add track with all CNVs, filter with current facets");
-
-                        var addCNVButtonNoFilters = new Button({
-                            iconClass: "dijitIconNewTask",
-                            label: "All CNVs Without Facets",
-                            onClick: function() {
-                                thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
-                                alert("Adding CNV track with no facets");
-                            }
-                        }, "addCNVButtonNoFilters").placeAt(thisB.geneResultsTab.containerNode);
-                        thisB.addTooltipToButton(addCNVButtonNoFilters, "Add track with all CNVs, do not filter with current facets");
-
-                        var resultsInfo = dom.create('div', { innerHTML: "Showing " + facetsJsonResponse.data.pagination.from + " to " + endResult + " of " + facetsJsonResponse.data.pagination.total }, thisB.geneResultsTab.containerNode);
-                        thisB.createGenesTable(facetsJsonResponse.data.hits, thisB.geneResultsTab.containerNode);
-                        thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, facetsJsonResponse.data.pagination, type, thisB.genePage);
-                        }, function (res3) {
-                            console.error('error', res3);
-                        });
-                    }, function (err) {
-                        console.error('error', err);
-                    });
-            }
         },
 
         /**
@@ -733,36 +691,44 @@ function (
          * @param {List<object>} hits array of gene hits
          * @param {object} location dom element to place the table
          */
-        createGenesTable: function(hits, location) {
+        createGenesTable: function(response, location) {
             var table = `<table class="results-table"></table>`;
             var tableNode = dom.toDom(table);
             var rowsHolder = `
                 <tr>
                     <th>Symbol</th>
                     <th>Name</th>
-                    <th>Location</th>
-                    <th>Biotype</th>
+                    <th># SSM Affected Cases in Cohort</th>
+                    <th># SSM Affected Cases Across the GDC</th>
+                    <th># CNV Gain</th>
+                    <th># CNV Loss</th>
+                    <th>Is Cancer Gene Census</th>
                 </tr>
             `;
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
-            for (var hitId in hits) {
-                var hit = hits[hitId];
+            if (response.data) {
+                for (var hitId in response.data.genesTableViewer.explore.genes.hits.edges) {
+                    var hit = response.data.genesTableViewer.explore.genes.hits.edges[hitId].node;
 
-                var caseRowContent = `
-                        <td><a target="_blank" href="https://portal.gdc.cancer.gov/genes/${hit.gene_id}">${hit.symbol}</a></td>
-                        <td>${hit.name}</td>
-                        <td>chr${hit.gene_chromosome}:${hit.gene_start}-${hit.gene_end}</td>
-                        <td>${hit.biotype}</td>
-                `
-                var caseRowContentNode = dom.toDom(caseRowContent);
+                    var caseRowContent = `
+                            <td><a target="_blank" href="https://portal.gdc.cancer.gov/genes/${hit.gene_id}">${hit.symbol}</a></td>
+                            <td>${hit.name}</td>
+                            <td>${hit.ssm_case.hits.total} / ${response.data.genesTableViewer.explore.cases.hits.total}</td>
+                            <td>${hit.ssm_case.hits.total} / ${response.data.genesTableViewer.explore.filteredCases.hits.total}</td>
+                            <td>${hit.case_cnv_gain.hits.total} / ${response.data.genesTableViewer.explore.cnvCases.hits.total}</td>
+                            <td>${hit.case_cnv_loss.hits.total} / ${response.data.genesTableViewer.explore.cnvCases.hits.total}</td>
+                            <td>${hit.is_cancer_gene_census ? 'Yes' : 'No' }</td>
+                    `
+                    var caseRowContentNode = dom.toDom(caseRowContent);
 
-                var row = `<tr></tr>`;
-                var rowNodeHolder = dom.toDom(row);
-                dom.place(caseRowContentNode, rowNodeHolder);
-                dom.place(rowNodeHolder, rowsHolderNode);
+                    var row = `<tr></tr>`;
+                    var rowNodeHolder = dom.toDom(row);
+                    dom.place(caseRowContentNode, rowNodeHolder);
+                    dom.place(rowNodeHolder, rowsHolderNode);
 
+                }
             }
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
@@ -1109,29 +1075,6 @@ function (
          */
         prettyFacetName: function (facetName) {
             return facetName.replace(/_/g, ' ');
-        },
-
-        /**
-         * Creates a facet url for the given type applying all filters
-         * @param {*} type 
-         */
-        createFacetUrl: function(type) {
-            var thisB = this;
-
-            var facetURL = 'https://api.gdc.cancer.gov/' + type + 's?size=0&facets=';
-            var filterObj = thisB.convertFilterObjectToGDCFilter(thisB.getFiltersForType(type), undefined, undefined, false);
-            if (type == 'case') {
-                facetURL += Object.keys(thisB.caseFilters).join(",");
-                facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
-            } else if (type == 'ssm') {
-                facetURL += Object.keys(thisB.mutationFilters).join(",");
-                facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
-            } else if (type == 'gene') {
-                facetURL += Object.keys(thisB.geneFilters).join(",");
-                facetURL += filterObj == '' ? '' : '&filters=' + filterObj;
-            }
-
-            return facetURL;
         },
 
         /**
