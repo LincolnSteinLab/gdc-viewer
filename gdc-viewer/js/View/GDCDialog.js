@@ -59,6 +59,7 @@ function (
             'disease_type': [],
             'demographic__gender': [],
             'project__program__name': [],
+            'project__program__id': [],
             'diagnoses__vital_status': [],
             'demographic__race': [],
             'demographic__ethnicity': []
@@ -99,7 +100,7 @@ function (
         _dialogContent: function () {
             var thisB = this;
             // Container holds all results in the dialog
-            var dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '1000px', height: '700px' } });
+            var dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '1200px', height: '700px' } });
 
             // Create the scaffolding to hold everything
             thisB.createScaffolding(dialogContainer);
@@ -260,63 +261,65 @@ function (
             var thisB = this;
             // Add a content pane per facet group
             for (var facet in results._aggregations) {
-                var contentPane = new ContentPane({
-                    title: thisB.prettyFacetName(facet),
-                    style: "height: auto;",
-                    id: facet + '-' + type + '-' + thisB.guid()
-                });
-
-                var facetHolder = dom.create('span', { className: "flex-column" });
-
-                if (results._aggregations[facet].buckets && results._aggregations[facet].buckets.length > 0) {
-                    results._aggregations[facet].buckets.sort(thisB.compareTermElements);
-                    // Add a checkbox per facet option
-                    results._aggregations[facet].buckets.forEach((term) => {
-                        var facetCheckbox = dom.create('span', { className: "flex-row" }, facetHolder)
-
-                        var checkBox = new CheckBox({
-                            name: facet + '-' + term.key,
-                            id: facet + '-' + term.key + '-' + type + '-' + thisB.guid(),
-                            value: { "facet": facet, "term" : term.key, "type": type },
-                            checked: thisB.isChecked(facet, term.key, thisB.getFiltersForType(type)),
-                            onChange: function(isChecked) {
-                                if (isChecked) {
-                                    if (this.value.type === 'case') {
-                                        thisB.caseFilters[this.value.facet].push(this.value.term);
-                                    } else if (this.value.type === 'ssm') {
-                                        thisB.mutationFilters[this.value.facet].push(this.value.term);
-                                    } else if (this.value.type === 'gene') {
-                                        thisB.geneFilters[this.value.facet].push(this.value.term);
-                                    }
-                                } else {
-                                    if (this.value.type === 'case') {
-                                        var indexOfValue = thisB.caseFilters[this.value.facet].indexOf(this.value.term);
-                                        if (indexOfValue != -1) {
-                                            thisB.caseFilters[this.value.facet].splice(indexOfValue, 1);
-                                        }
-                                    } else if (this.value.type === 'ssm') {
-                                        var indexOfValue = thisB.mutationFilters[this.value.facet].indexOf(this.value.term);
-                                        if (indexOfValue != -1) {
-                                            thisB.mutationFilters[this.value.facet].splice(indexOfValue, 1);
-                                        }
-                                    } else if (this.value.type === 'gene') {
-                                        var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
-                                        if (indexOfValue != -1) {
-                                            thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
-                                        }
-                                    }
-                                }
-                                thisB.destroyAccordions();
-                                thisB.refreshContent();
-                            }
-                        }, 'checkbox').placeAt(facetCheckbox);
-                        var label = dom.create("label", { "for" : facet + '-' + term.key + '-' + type + '-' + thisB.guid(), innerHTML: term.key + ' (' + term.doc_count + ')' }, facetCheckbox);
+                if (!["diagnoses__age_at_diagnosis", "diagnoses__days_to_death"].includes(facet)) {
+                    var contentPane = new ContentPane({
+                        title: thisB.prettyFacetName(facet),
+                        style: "height: auto;",
+                        id: facet + '-' + type + '-' + thisB.guid()
                     });
-                }
 
-                dojo.place(facetHolder, contentPane.containerNode);
-                accordion.addChild(contentPane);
-                contentPane.startup();
+                    var facetHolder = dom.create('span', { className: "flex-column" });
+
+                    if (results._aggregations[facet].buckets && results._aggregations[facet].buckets.length > 0) {
+                        results._aggregations[facet].buckets.sort(thisB.compareTermElements);
+                        // Add a checkbox per facet option
+                        results._aggregations[facet].buckets.forEach((term) => {
+                            var facetCheckbox = dom.create('span', { className: "flex-row" }, facetHolder)
+
+                            var checkBox = new CheckBox({
+                                name: facet + '-' + term.key,
+                                id: facet + '-' + term.key + '-' + type + '-' + thisB.guid(),
+                                value: { "facet": facet, "term" : term.key, "type": type },
+                                checked: thisB.isChecked(facet, term.key, thisB.getFiltersForType(type)),
+                                onChange: function(isChecked) {
+                                    if (isChecked) {
+                                        if (this.value.type === 'case') {
+                                            thisB.caseFilters[this.value.facet].push(this.value.term);
+                                        } else if (this.value.type === 'ssm') {
+                                            thisB.mutationFilters[this.value.facet].push(this.value.term);
+                                        } else if (this.value.type === 'gene') {
+                                            thisB.geneFilters[this.value.facet].push(this.value.term);
+                                        }
+                                    } else {
+                                        if (this.value.type === 'case') {
+                                            var indexOfValue = thisB.caseFilters[this.value.facet].indexOf(this.value.term);
+                                            if (indexOfValue != -1) {
+                                                thisB.caseFilters[this.value.facet].splice(indexOfValue, 1);
+                                            }
+                                        } else if (this.value.type === 'ssm') {
+                                            var indexOfValue = thisB.mutationFilters[this.value.facet].indexOf(this.value.term);
+                                            if (indexOfValue != -1) {
+                                                thisB.mutationFilters[this.value.facet].splice(indexOfValue, 1);
+                                            }
+                                        } else if (this.value.type === 'gene') {
+                                            var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
+                                            if (indexOfValue != -1) {
+                                                thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
+                                            }
+                                        }
+                                    }
+                                    thisB.destroyAccordions();
+                                    thisB.refreshContent();
+                                }
+                            }, 'checkbox').placeAt(facetCheckbox);
+                            var label = dom.create("label", { "for" : facet + '-' + term.key + '-' + type + '-' + thisB.guid(), innerHTML: term.key + ' (' + term.doc_count + ')' }, facetCheckbox);
+                        });
+                    }
+
+                    dojo.place(facetHolder, contentPane.containerNode);
+                    accordion.addChild(contentPane);
+                    contentPane.startup();
+                }
             }
 
             accordion.startup();
@@ -1046,7 +1049,7 @@ function (
 
             for (var key in filteredCombinedFilters) {
                 if (filteredCombinedFilters[key] != undefined && filteredCombinedFilters[key].length > 0) {
-                    var facetString = `<span class="filterNameGDC">${key}</span>`;
+                    var facetString = `<span class="filterNameGDC">${thisB.prettyFacetName(key)}</span>`;
                     if (filteredCombinedFilters[key].length > 1) {
                         facetString += ` <strong><span class="joinWordGDC">IN</span> ( </strong>`;
                         filteredCombinedFilters[key].forEach(function(value, i) {
@@ -1074,7 +1077,7 @@ function (
          * @param {*} facetName 
          */
         prettyFacetName: function (facetName) {
-            return facetName.replace(/_/g, ' ');
+            return facetName.replace(/__/g, ' > ').replace(/_/g, ' ');
         },
 
         /**
