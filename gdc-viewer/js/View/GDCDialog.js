@@ -8,6 +8,9 @@ define([
     'dijit/layout/AccordionContainer',
     'dijit/layout/ContentPane',
     'dijit/Tooltip',
+    'dijit/Menu',
+    'dijit/MenuItem',
+    'dijit/form/ComboButton',
     'dojo/aspect',
     'JBrowse/View/Dialog/WithActionBar'
 ],
@@ -21,6 +24,9 @@ function (
     AccordionContainer,
     ContentPane,
     Tooltip,
+    Menu,
+    MenuItem,
+    ComboButton,
     aspect,
     ActionBarDialog
 ) {
@@ -400,25 +406,35 @@ function (
                     combinedFilters = JSON.parse(combinedFilters);
                 }
                 dom.empty(thisB.mutationResultsTab.containerNode);
-                var addMutationsButtonFilters = new Button({
+
+                // Buttons for SSMs
+                var ssmMenu = new Menu({ style: "display: none;"});
+                var menuItemSSMFiltered = new MenuItem({
+                    label: "Filtered SSMs",
                     iconClass: "dijitIconNewTask",
-                    label: "All SSMs With Facets",
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, combinedFilters, 'CanvasVariants');
                         alert("Adding Simple Somatic Mutations track for all mutations with filters.");
                     }
-                }, "addMutationsWithFilters").placeAt(thisB.mutationResultsTab.containerNode);
-                thisB.addTooltipToButton(addMutationsButtonFilters, "Add track with all SSMs, filter with current facets");
+                });
+                ssmMenu.addChild(menuItemSSMFiltered);
+                ssmMenu.startup();
 
-                var addMutationsButtonNoFilters = new Button({
+                var buttonAllSSMs = new ComboButton({
+                    label: "All SSMs",
                     iconClass: "dijitIconNewTask",
-                    label: "All SSMs Without Facets",
+                    dropDown: ssmMenu,
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
                         alert("Adding Simple Somatic Mutations track for all mutations without filters.");
                     }
-                }, "addMutationsWithoutFilters").placeAt(thisB.mutationResultsTab.containerNode);
-                thisB.addTooltipToButton(addMutationsButtonNoFilters, "Add track with all SSMs, do not filter with current facets");
+                });
+                buttonAllSSMs.placeAt(thisB.mutationResultsTab.containerNode);
+                buttonAllSSMs.startup();
+                thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all SSMs, filter with current facets");
+                thisB.addTooltipToButton(buttonAllSSMs, "Add track with all SSMs, do not filter with current facets");
+                //
+
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
 
@@ -498,45 +514,60 @@ function (
                     combinedFilters = JSON.parse(combinedFilters);
                 }
 
-                var addGenesButtonFilters = new Button({
+                // Buttons for Genes
+                var geneMenu = new Menu({ style: "display: none;"});
+                var menuItemGeneFiltered = new MenuItem({
+                    label: "Filtered Genes",
                     iconClass: "dijitIconNewTask",
-                    label: "All Genes With Facets",
                     onClick: function() {
                         thisB.addTrack('Genes', undefined, combinedFilters, 'CanvasVariants');
                         alert("Adding Gene track for all genes with facets");
                     }
-                }, "addGenesWithFilters").placeAt(thisB.geneResultsTab.containerNode);
-                thisB.addTooltipToButton(addGenesButtonFilters, "Add track with all genes, filter with current facets");
+                });
+                geneMenu.addChild(menuItemGeneFiltered);
+                geneMenu.startup();
 
-                var addGenesButtonNoFilters = new Button({
+                var buttonAllGenes = new ComboButton({
+                    label: "All Genes",
                     iconClass: "dijitIconNewTask",
-                    label: "All Genes Without Facets",
+                    dropDown: geneMenu,
+                    style: "padding-right: 8px;",
                     onClick: function() {
                         thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
                         alert("Adding Gene track for all genes without facets");
                     }
-                }, "addGenesWithoutFilters").placeAt(thisB.geneResultsTab.containerNode);
-                thisB.addTooltipToButton(addGenesButtonNoFilters, "Add track with all genes, do not filter with current facets");
+                });
+                buttonAllGenes.placeAt(thisB.geneResultsTab.containerNode);
+                buttonAllGenes.startup();
+                thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes, filter with current facets");
+                thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes, do not filter with current facets");
 
-                var addCNVButtonFilters = new Button({
+                // Buttons for CNVs
+                var cnvMenu = new Menu({ style: "display: none;"});
+                var menuItemCnvFiltered = new MenuItem({
+                    label: "Filtered CNVs",
                     iconClass: "dijitIconNewTask",
-                    label: "All CNVs With Facets",
                     onClick: function() {
                         thisB.addTrack('CNVs', undefined, combinedFilters, 'Wiggle/XYPlot');
                         alert("Adding CNV track with facets");
                     }
-                }, "addCNVButtonWithFilters").placeAt(thisB.geneResultsTab.containerNode);
-                thisB.addTooltipToButton(addCNVButtonFilters, "Add track with all CNVs, filter with current facets");
+                });
+                cnvMenu.addChild(menuItemCnvFiltered);
+                cnvMenu.startup();
 
-                var addCNVButtonNoFilters = new Button({
+                var buttonAllCnvs = new ComboButton({
+                    label: "All CNVs",
                     iconClass: "dijitIconNewTask",
-                    label: "All CNVs Without Facets",
+                    dropDown: cnvMenu,
                     onClick: function() {
                         thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
                         alert("Adding CNV track with no facets");
                     }
-                }, "addCNVButtonNoFilters").placeAt(thisB.geneResultsTab.containerNode);
-                thisB.addTooltipToButton(addCNVButtonNoFilters, "Add track with all CNVs, do not filter with current facets");
+                });
+                buttonAllCnvs.placeAt(thisB.geneResultsTab.containerNode);
+                buttonAllCnvs.startup();
+                thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs, filter with current facets");
+                thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs, do not filter with current facets");
 
                 var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
 
