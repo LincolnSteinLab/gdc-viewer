@@ -416,16 +416,70 @@ function (
             }).catch(function(err) {
                 console.log(err);
             });
+        },
 
+        /**
+         * Updates the Gene search results page
+         */
+        updateGeneSearchResults: function() {
             
         },
 
-        updateGeneSearchResults: function() {
-
-        },
-
+        /**
+         * Updates the Case search results page
+         */
         updateCaseSearchResults: function() {
+            var thisB = this;
+            var url = thisB.baseGraphQLUrl + '/ExploreCasesTable';
 
+            // Clear existing pretty filters
+            dom.empty(thisB.prettyFacetHolder);
+
+            // Display currently selected filters
+            thisB.prettyPrintFilters(thisB.prettyFacetHolder);
+
+            // Clear current results
+            dom.empty(thisB.caseResultsTab.containerNode);
+            thisB.createLoadingIcon(thisB.caseResultsTab.containerNode);
+
+            // Create body for GraphQL query
+            var start = thisB.getStartIndex(thisB.casePage);
+            var size = thisB.pageSize;
+            var caseQuery = `query ExploreCasesTable_relayQuery( $filters: FiltersArgument $cases_size: Int $cases_offset: Int $cases_score: String $cases_sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $cases_size, offset: $cases_offset, filters: $filters, score: $cases_score, sort: $cases_sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
+
+            var combinedFilters = thisB.combineAllFilters();
+            if (combinedFilters) {
+                combinedFilters = JSON.parse(combinedFilters);
+            }
+
+            var bodyVal = {
+                query: caseQuery,
+                variables: {
+                    "filters": combinedFilters,
+                    "cases_size": parseInt(size),
+                    "cases_offset": parseInt(start),
+                    "cases_score": "gene.gene_id",
+                    "cases_sort": null
+                }
+            }
+
+            fetch(url, {
+                method: 'post',
+                headers: { 'X-Requested-With': null },
+                body: JSON.stringify(bodyVal)
+            }).then(function(response) {
+                return(response.json());
+            }).then(function(response) {
+                dom.empty(thisB.caseResultsTab.containerNode);
+
+                var totalCases = response.data.exploreCasesTableViewer.explore.cases.hits.total;
+
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.casePage - 1) * thisB.pageSize + 1) + " to " + thisB.casePage * thisB.pageSize + " of " + totalCases }, thisB.caseResultsTab.containerNode);
+                thisB.createDonorsTable(response, thisB.caseResultsTab.containerNode);
+                thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
+            }).catch(function(err) {
+                console.log(err);
+            });
         },
 
         /**
@@ -594,15 +648,16 @@ function (
          * @param {List<object>} hits array of case hits
          * @param {object} location dom element to place the table
          */
-        createDonorsTable: function(hits, location) {
+        createDonorsTable: function(response, location) {
             var thisB = this;
             var table = `<table class="results-table"></table>`;
             var tableNode = dom.toDom(table);
             var rowsHolder = `
                 <tr>
                     <th>Case ID</th>
+                    <th>Project</th>
                     <th>Primary Site</th>
-                    <th>Disease Type</th>
+                    <th>Gender</th>
                     <th>Genes</th>
                     <th>Mutations</th>
                 </tr>
@@ -610,58 +665,61 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
-            for (var hitId in hits) {
-                var hit = hits[hitId];
+            if (response.data) {
+                for (var hitId in response.data.exploreCasesTableViewer.explore.cases.hits.edges) {
+                    var hit = response.data.exploreCasesTableViewer.explore.cases.hits.edges[hitId].node;
 
-                var caseRowContent = `
-                        <td><a target="_blank"  href="https://portal.gdc.cancer.gov/cases/${hit.case_id}">${hit.submitter_id}</a></td>
-                        <td>${hit.primary_site}</td>
-                        <td>${hit.disease_type}</td>
-                `
-                var caseRowContentNode = dom.toDom(caseRowContent);
+                    var caseRowContent = `
+                            <td><a target="_blank"  href="https://portal.gdc.cancer.gov/cases/${hit.case_id}">${hit.submitter_id}</a></td>
+                            <td><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${hit.project.project_id}">${hit.project.project_id}</td>
+                            <td>${hit.primary_site}</td>
+                            <td>${hit.demographic.gender}</td>
+                    `
+                    var caseRowContentNode = dom.toDom(caseRowContent);
 
-                // Create element to hold buttons
-                var geneButtonNode = dom.toDom(`<td></td>`);
+                    // Create element to hold buttons
+                    var geneButtonNode = dom.toDom(`<td></td>`);
 
-                // Create button and place in parent
-                var donorGeneButtonWithFilters = dom.toDom(`<span></span>`);
-                thisB.createDonorGeneButton(hit.id, donorGeneButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
-                thisB.addTooltipToButton(donorGeneButtonWithFilters, "Add track with all genes for the given donor, filter with current facets");
-                dom.place(donorGeneButtonWithFilters, geneButtonNode);
+                    // Create button and place in parent
+                    var donorGeneButtonWithFilters = dom.toDom(`<span></span>`);
+                    thisB.createDonorGeneButton(hit.id, donorGeneButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', false), hit.submitter_id, 'Filtered');
+                    thisB.addTooltipToButton(donorGeneButtonWithFilters, "Add track with all genes for the given donor, filter with current facets");
+                    dom.place(donorGeneButtonWithFilters, geneButtonNode);
 
-                // Create button and place in parent
-                var donorGeneButtonNoFilters = dom.toDom(`<span></span>`);
-                thisB.createDonorGeneButton(hit.id, donorGeneButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
-                thisB.addTooltipToButton(donorGeneButtonNoFilters, "Add track with all genes for the given donor, do not filter with current facets");
-                dom.place(donorGeneButtonNoFilters, geneButtonNode);
+                    // Create button and place in parent
+                    var donorGeneButtonNoFilters = dom.toDom(`<span></span>`);
+                    thisB.createDonorGeneButton(hit.id, donorGeneButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.geneFilters, hit.case_id, 'case.case_id', true), hit.submitter_id, 'All');
+                    thisB.addTooltipToButton(donorGeneButtonNoFilters, "Add track with all genes for the given donor, do not filter with current facets");
+                    dom.place(donorGeneButtonNoFilters, geneButtonNode);
 
-                // Place buttons in table
-                dom.place(geneButtonNode, caseRowContentNode);
+                    // Place buttons in table
+                    dom.place(geneButtonNode, caseRowContentNode);
 
-                // Create element to hold buttons
-                var ssmButtonNode = dom.toDom(`<td></td>`);
+                    // Create element to hold buttons
+                    var ssmButtonNode = dom.toDom(`<td></td>`);
 
-                // Create Button and place in parent
-                var donorSSMButtonWithFilters = dom.toDom(`<span></span>`);
-                thisB.createDonorSSMButton(hit.id, donorSSMButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', false), hit.submitter_id, 'Filtered');
-                thisB.addTooltipToButton(donorSSMButtonWithFilters, "Add track with all SSMs for the given donor, filter with current facets");
-                dom.place(donorSSMButtonWithFilters, ssmButtonNode);
+                    // Create Button and place in parent
+                    var donorSSMButtonWithFilters = dom.toDom(`<span></span>`);
+                    thisB.createDonorSSMButton(hit.id, donorSSMButtonWithFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', false), hit.submitter_id, 'Filtered');
+                    thisB.addTooltipToButton(donorSSMButtonWithFilters, "Add track with all SSMs for the given donor, filter with current facets");
+                    dom.place(donorSSMButtonWithFilters, ssmButtonNode);
 
-                // Create Button and place in parent
-                var donorSSMButtonNoFilters = dom.toDom(`<span></span>`);
-                thisB.createDonorSSMButton(hit.id, donorSSMButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', true), hit.submitter_id, 'All');
-                thisB.addTooltipToButton(donorSSMButtonNoFilters, "Add track with all SSMs for the given donor, do not filter with current facets");
-                dom.place(donorSSMButtonNoFilters, ssmButtonNode);
+                    // Create Button and place in parent
+                    var donorSSMButtonNoFilters = dom.toDom(`<span></span>`);
+                    thisB.createDonorSSMButton(hit.id, donorSSMButtonNoFilters, thisB.convertFilterObjectToGDCFilter(thisB.mutationFilters, hit.case_id, 'occurrence.case.case_id', true), hit.submitter_id, 'All');
+                    thisB.addTooltipToButton(donorSSMButtonNoFilters, "Add track with all SSMs for the given donor, do not filter with current facets");
+                    dom.place(donorSSMButtonNoFilters, ssmButtonNode);
 
-                // Place buttons in table
-                dom.place(ssmButtonNode, caseRowContentNode);
+                    // Place buttons in table
+                    dom.place(ssmButtonNode, caseRowContentNode);
 
-                // Place columns into row
-                var row = `<tr></tr>`;
-                var rowNodeHolder = dom.toDom(row);
-                dom.place(caseRowContentNode, rowNodeHolder);
-                dom.place(rowNodeHolder, rowsHolderNode);
+                    // Place columns into row
+                    var row = `<tr></tr>`;
+                    var rowNodeHolder = dom.toDom(row);
+                    dom.place(caseRowContentNode, rowNodeHolder);
+                    dom.place(rowNodeHolder, rowsHolderNode);
 
+                }
             }
             // Place rows into table
             dom.place(rowsHolderNode, tableNode);
@@ -751,9 +809,15 @@ function (
                     impactSpan += 'VEP: ' + vep_impact;
                 }
                 if (polyphen_score) {
+                    if (vep_impact) {
+                        impactSpan += '<br/>';
+                    }
                     impactSpan += 'Polyphen: ' + polyphen_impact + ' (' + polyphen_score + ')'
                 }
                 if (sift_score) {
+                    if (vep_impact || sift_score) {
+                        impactSpan += '<br/>';
+                    }
                     impactSpan += 'SIFT: ' + sift_impact + ' (' + sift_score + ')';
                 }
                 result += impactSpan;
@@ -845,13 +909,14 @@ function (
             var thisB = this;
             if (type === 'case') {
                 thisB.casePage = thisB.casePage - 1;
+                thisB.updateCaseSearchResults();
             } else if (type === 'ssm') {
                 thisB.mutationPage = thisB.mutationPage - 1;
+                thisB.updateSSMSearchResults();
             } else if (type === 'gene') {
                 thisB.genePage = thisB.genePage - 1;
+                thisB.updateGeneSearchResults();
             }
-            
-            thisB.updateSSMSearchResults();
         },
 
         /**
@@ -862,13 +927,14 @@ function (
             var thisB = this;
             if (type === 'case') {
                 thisB.casePage = thisB.casePage + 1;
+                thisB.updateCaseSearchResults();
             } else if (type === 'ssm') {
                 thisB.mutationPage = thisB.mutationPage + 1;
+                thisB.updateSSMSearchResults();
             } else if (type === 'gene') {
                 thisB.genePage = thisB.genePage + 1;
+                thisB.updateGeneSearchResults();
             }
-            
-            thisB.updateSSMSearchResults();
         },
 
         /**
