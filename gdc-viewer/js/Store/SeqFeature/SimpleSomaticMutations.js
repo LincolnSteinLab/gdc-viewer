@@ -37,7 +37,7 @@ function(
                 resultingFilterQuery.content.push(thisB.filters);
             }
             
-            return encodeURI(JSON.stringify(resultingFilterQuery));
+            return resultingFilterQuery;
         },
 
         /**
@@ -113,19 +113,19 @@ function(
                     trStyle = 'style=\"background-color: #f2f2f2\"';
                 }
                 var consequenceRow = `<tr ${trStyle}>
-                    <td style="${thStyle}">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.transcript.gene.gene_id, consequence.transcript.gene.symbol)}</td>
-                    <td style="${thStyle}">${consequence.transcript.aa_change}</td>
-                    <td style="${thStyle}">${consequence.transcript.consequence_type}</td>
-                    <td style="${thStyle}">${consequence.transcript.annotation.hgvsc}</td>
+                    <td style="${thStyle}">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.node.transcript.gene.gene_id, consequence.node.transcript.gene.symbol)}</td>
+                    <td style="${thStyle}">${consequence.node.transcript.aa_change}</td>
+                    <td style="${thStyle}">${consequence.node.transcript.consequence_type}</td>
+                    <td style="${thStyle}">${consequence.node.transcript.annotation.hgvsc}</td>
                     <td style="${thStyle}">
                         <ul style="list-style: none;">
-                            <li>VEP: ${consequence.transcript.annotation.vep_impact}</li>
-                            <li>SIFT: ${thisB.prettyScore(consequence.transcript.annotation.sift_impact, consequence.transcript.annotation.sift_score)}</li>
-                            <li>Polyphen: ${thisB.prettyScore(consequence.transcript.annotation.polyphen_impact, consequence.transcript.annotation.polyphen_score)}</li>
+                            <li>VEP: ${consequence.node.transcript.annotation.vep_impact}</li>
+                            <li>SIFT: ${thisB.prettyScore(consequence.node.transcript.annotation.sift_impact, consequence.node.transcript.annotation.sift_score)}</li>
+                            <li>Polyphen: ${thisB.prettyScore(consequence.node.transcript.annotation.polyphen_impact, consequence.node.transcript.annotation.polyphen_score)}</li>
                         </ul>
                     </td>
-                    <td style="${thStyle}">${thisB.convertIntToStrand(consequence.transcript.gene.gene_strand)}</td>
-                    <td style="${thStyle}">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.transcript.transcript_id)}${consequence.transcript.is_canonical ? ' (C)' : ''}</td>
+                    <td style="${thStyle}">${thisB.convertIntToStrand(consequence.node.transcript.gene.gene_strand)}</td>
+                    <td style="${thStyle}">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.node.transcript.transcript_id)}${consequence.node.transcript.is_canonical ? ' (C)' : ''}</td>
                     </tr>
                 `;
                 
@@ -177,6 +177,32 @@ function(
             }
         },
 
+        /**
+         * Creates the query object for graphQL call
+         * @param {*} ref 
+         * @param {*} start 
+         * @param {*} end 
+         */
+        createQuery: function(ref, start, end) {
+            var thisB = this;
+            var ssmQuery = `query ssmResultsTableQuery( $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id start_position end_position mutation_type cosmic_id reference_allele tumor_allele ncbi_build chromosome gene_aa_change score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact hgvsc } consequence_type gene { gene_id symbol } aa_change transcript_id } id } } } } } } } } } } }`;
+            var combinedFilters = thisB.getFilterQuery(ref, start, end);
+
+            var bodyVal = {
+                query: ssmQuery,
+                variables: {
+                    "ssmsTable_size": thisB.size,
+                    "consequenceFilters":{"op":"and","content":[{"op":"in","content":{"field":"consequence.transcript.is_canonical","value":["true"]}}]},
+                    "ssmsTable_offset": 0,
+                    "ssmsTable_filters": combinedFilters,
+                    "score":"occurrence.case.project.project_id",
+                    "sort":[{"field":"_score","order":"desc"},{"field":"_uid","order":"asc"}]
+                }
+            }
+
+            return bodyVal;
+        },
+
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
 
@@ -186,45 +212,44 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
-            var searchBaseUrl = 'https://api.gdc.cancer.gov/';
-
-            // Create full url
-            var url = searchBaseUrl + 'ssms';
-
-            // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size + '&expand=consequence,consequence.transcript,consequence.transcript.annotation,consequence.transcript.gene';
+            var url = 'https://api.gdc.cancer.gov/v0/graphql/SsmsTable';
+            
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
-            // Retrieve all mutations in the given chromosome range
-            return request(url, {
-                method: 'get',
+            var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
+            fetch(url, {
+                method: 'post',
                 headers: { 'X-Requested-With': null },
-                handleAs: 'json'
-            }).then(function(results) {
-                array.forEach(results.data.hits, function(variant) {
-                    variantFeature = {
-                        id: variant.id,
-                        data: {
-                            'start': variant.start_position,
-                            'end': variant.end_position,
-                            'GDC': thisB.createLinkWithId(GDC_LINK, variant.id),
-                            'type': variant.mutation_type,
-                            'Subtype': variant.mutation_subtype,
-                            'Genomic DNA Change': variant.genomic_dna_change,
-                            'COSMIC': thisB.createCOSMICLinks(variant.cosmic_id),
-                            'Reference Allele': variant.reference_allele,
-                            'Tumour Allele': variant.tumor_allele,
-                            'NCBI Build': variant.ncbi_build,
-                            'Chromosome': variant.chromosome,
-                            'Gene AA Change': variant.gene_aa_change,
-                            'Consequences': thisB.createConsequencesTable(variant.consequence),
+                body: bodyVal
+            }).then(function(response) {
+                return(response.json());
+            }).then(function(response) {
+                if (response.data) {
+                    for (var hitId in response.data.viewer.explore.ssms.hits.edges) {
+                        var variant = response.data.viewer.explore.ssms.hits.edges[hitId].node;
+                        variantFeature = {
+                            id: variant.ssm_id,
+                            data: {
+                                'start': variant.start_position,
+                                'end': variant.end_position,
+                                'GDC': thisB.createLinkWithId(GDC_LINK, variant.ssm_id),
+                                'type': variant.mutation_type,
+                                'Subtype': variant.mutation_subtype,
+                                'Genomic DNA Change': variant.genomic_dna_change,
+                                'COSMIC': thisB.createCOSMICLinks(variant.cosmic_id),
+                                'Reference Allele': variant.reference_allele,
+                                'Tumour Allele': variant.tumor_allele,
+                                'NCBI Build': variant.ncbi_build,
+                                'Chromosome': variant.chromosome,
+                                'Gene AA Change': variant.gene_aa_change,
+                                'Consequences': thisB.createConsequencesTable(variant.consequence.hits.edges),
+                            }
                         }
+                        featureCallback(new SimpleFeature(variantFeature));
                     }
-                    featureCallback(new SimpleFeature(variantFeature));
-                });
-
-                finishCallback();
-            }, function(err) {
+                    finishCallback();
+                }
+            }).catch(function(err) {
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
             });
@@ -237,7 +262,7 @@ function(
          * @param {*} end 
          */
         getLocationFilters: function(chr, start, end) {
-            return({"op":"and","content":[{"op":">=","content":{"field":"start_position","value":start}},{"op":"<=","content":{"field":"end_position","value":end}},{"op":"=","content":{"field":"chromosome","value":['chr'+chr]}}]});
+            return({"op":"and","content":[{"op":">=","content":{"field":"ssms.start_position","value":start}},{"op":"<=","content":{"field":"ssms.end_position","value":end}},{"op":"=","content":{"field":"ssms.chromosome","value":['chr'+chr]}}]});
         }
     });
 });

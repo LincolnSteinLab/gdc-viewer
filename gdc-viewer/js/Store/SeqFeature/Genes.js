@@ -1,14 +1,10 @@
 define([
     'dojo/_base/declare',
-    'dojo/_base/array',
-    'dojo/request',
     'JBrowse/Store/SeqFeature',
     'JBrowse/Model/SimpleFeature'
 ],
 function(
     declare,
-    array,
-    request,
     SeqFeatureStore,
     SimpleFeature
 ) {
@@ -37,8 +33,7 @@ function(
             if (Object.keys(thisB.filters).length > 0) {
                 resultingFilterQuery.content.push(thisB.filters);
             }
-            
-            return encodeURI(JSON.stringify(resultingFilterQuery));
+            return(resultingFilterQuery);
         },
 
          /**
@@ -99,6 +94,30 @@ function(
             }
         },
 
+        /**
+         * Creates the query object for graphQL call
+         * @param {*} ref 
+         * @param {*} start 
+         * @param {*} end 
+         */
+        createQuery: function(ref, start, end) {
+            var thisB = this;
+            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id symbol name gene_start gene_end gene_chromosome description canonical_transcript_id canonical_transcript_length canonical_transcript_length_genomic canonical_transcript_length_cds  is_cancer_gene_census cytoband biotype numCases: score is_cancer_gene_census } } } } } } }`;
+            var combinedFilters = thisB.getFilterQuery(ref, start, end);
+
+            var bodyVal = {
+                query: geneQuery,
+                variables: {
+                    "genesTable_filters": combinedFilters,
+                    "genesTable_size": thisB.size,
+                    "genesTable_offset": 0,
+                    "score": "case.project.project_id"
+                }
+            }
+
+            return bodyVal;
+        },
+
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
 
@@ -108,28 +127,24 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
-            var searchBaseUrl = 'https://api.gdc.cancer.gov/';
+            var url = 'https://api.gdc.cancer.gov/v0/graphql/GenesTable';
 
-            // Create full url
-            var url = searchBaseUrl + 'genes';
-
-            // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
-            console.log(url);
-            
             const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
 
-            // Retrieve all mutations in the given chromosome range
-            return request(url, {
-                method: 'get',
+            var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
+            fetch(url, {
+                method: 'post',
                 headers: { 'X-Requested-With': null },
-                handleAs: 'json'
-            }).then(function(results) {
-                array.forEach(results.data.hits, function(gene) {
-                    if (gene.gene_start >= start && gene.gene_end <= end && gene.gene_chromosome.replace(/chr/, '') === ref) {
+                body: bodyVal
+            }).then(function(response) {
+                return(response.json());
+            }).then(function(response) {
+                if (response.data) {
+                    for (var hitId in response.data.genesTableViewer.explore.genes.hits.edges) {
+                        var gene = response.data.genesTableViewer.explore.genes.hits.edges[hitId].node;
                         geneFeature = {
-                            id: gene.id,
+                            id: gene.gene_id,
                             data: {
                                 'start': gene.gene_start,
                                 'end': gene.gene_end,
@@ -138,7 +153,7 @@ function(
                                 'Gene Name': gene.name,
                                 'Symbol': gene.symbol,
                                 'GDC': thisB.createLinkWithId(GDC_LINK, gene.gene_id),
-                                'Ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.id),
+                                'Ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
                                 'Biotype': gene.biotype,
                                 'Synonyms': gene.synonyms,
                                 'Canonical Transcript ID': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
@@ -146,15 +161,14 @@ function(
                                 'Cytoband': gene.cytoband,
                                 'Canonical Transcript Length Genomic': gene.canonical_transcript_length_genomic,
                                 'Canonical Transcript Length CDS': gene.canonical_transcript_length_cds,
-                                'Is Cancer Gene Census': gene.is_cancer_gene_census
+                                'Is Cancer Gene Census': gene.is_cancer_gene_census,
                             }
                         }
                         featureCallback(new SimpleFeature(geneFeature));
                     }
-                });
-
-                finishCallback();
-            }, function(err) {
+                    finishCallback();
+                }
+            }).catch(function(err) {
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
             });
@@ -167,7 +181,7 @@ function(
          * @param {*} end 
          */
         getLocationFilters: function(chr, start, end) {
-            return({"op":"and","content":[{"op":">=","content":{"field":"gene_start","value":start}},{"op":"<=","content":{"field":"gene_end","value":end}},{"op":"=","content":{"field":"gene_chromosome","value":[chr]}}]});
+            return({"op":"and","content":[{"op":">=","content":{"field":"genes.gene_start","value":start}},{"op":"<=","content":{"field":"genes.gene_end","value":end}},{"op":"=","content":{"field":"genes.gene_chromosome","value":[chr]}}]});
         }
     });
 });

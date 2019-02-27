@@ -63,8 +63,7 @@ Note that this will only show preloaded tracks as well as tracks you have added 
 # Available Store SeqFeature
 ## A note on filters
 All SeqFeatures support filters as they are defined in the [GDC API Documentation](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query).
-
-Currently filters don't work across endpoint types. So a case filter does not impact the SSMs displayed. The Exploration endpoint may allow for this to be fixed.
+Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, SSM filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
 
 ## Genes
 A simple view of all of the genes seen across all cases.
@@ -81,7 +80,7 @@ metadata.datatype=Gene
 You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
 
 ```
-filters={"op":"!=","content":{"field":"biotype","value":"protein_coding"}}
+filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
 You can set the max number of genes to return with the size field. It defaults to 500.
@@ -101,7 +100,7 @@ metadata.datatype=SSM
 You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
 
 ```
-filters={"op":"=","content":{"field":"reference_allele","value":"G"}}
+filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
 You can set the max number of SSMs to return with the size field. It defaults to 500.

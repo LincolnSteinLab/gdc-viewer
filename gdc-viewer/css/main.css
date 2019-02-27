@@ -88,3 +88,7 @@ table.results-table tr:nth-child(odd) {
     height: 500px;
     overflow: scroll;
 }
+
+.dijitContentPane.dijitAccordionContainer-child.dijitAccordionContainer-dijitContentPane {
+    width: 100% !important;
+}
