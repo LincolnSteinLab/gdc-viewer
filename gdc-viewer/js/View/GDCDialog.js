@@ -266,7 +266,7 @@ function (
             var thisB = this;
             // Add a content pane per facet group
             for (var facet in results._aggregations) {
-                if (!["diagnoses__age_at_diagnosis", "diagnoses__days_to_death"].includes(facet)) {
+                if (!["diagnoses__age_at_diagnosis", "diagnoses__days_to_death", "case__cnv__cnv_change"].includes(facet)) {
                     var contentPane = new ContentPane({
                         title: thisB.prettyFacetName(facet),
                         style: "height: auto;",
