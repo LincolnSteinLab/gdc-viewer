@@ -120,14 +120,14 @@ function (
             var thisB = this;
 
             // Create main holder
-            thisB.facetAndResultsHolder = dom.create('div', { className: 'flexHolder', style: { width: '100%', height: '100%' } }, dialogContainer);
+            thisB.facetAndResultsHolder = dom.create('div', { className: 'flexHolder', style: { width: '100%', height: '100%', 'justify-content': 'space-between' } }, dialogContainer);
             
             // Create sections to hold facet tabs and search results tab
             thisB.facetTabHolder = dom.create('div', { style: { 'flex': '1 0 0'} }, thisB.facetAndResultsHolder);
             thisB.searchResultsVerticalHolder = dom.create('div', { style: { 'flex': '3 0 0' } }, thisB.facetAndResultsHolder);
 
             // Create facet tabs
-            thisB.facetTabs = new TabContainer({style: "flex: 1 0 0; "}, thisB.facetTabHolder);
+            thisB.facetTabs = new TabContainer({style: "flex: 1 0 0; padding-right: 3px;"}, thisB.facetTabHolder);
 
             thisB.caseFacetTab = new ContentPane({
                 title: "Cases"
@@ -245,9 +245,13 @@ function (
          */
         updateAccordions(response) {
             var thisB = this;
-            thisB.createFacet('case', thisB.caseAccordion, response.data.viewer.explore.cases);
-            thisB.createFacet('ssm', thisB.mutationAccordion, response.data.viewer.explore.ssms);
-            thisB.createFacet('gene', thisB.geneAccordion, response.data.viewer.explore.genes);
+            if (response && response.data && response.data.viewer && response.data.viewer.explore) {
+                thisB.createFacet('case', thisB.caseAccordion, response.data.viewer.explore.cases);
+                thisB.createFacet('ssm', thisB.mutationAccordion, response.data.viewer.explore.ssms);
+                thisB.createFacet('gene', thisB.geneAccordion, response.data.viewer.explore.genes);
+            } else {
+                console.log('Did no receive expected response from GDC.');
+            }
         },
 
         /**
@@ -360,7 +364,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.mutationPage);
             var size = thisB.pageSize;
-            var ssmQuery = `query SsmsTable_relayQuery( $ssmTested: FiltersArgument $ssmCaseFilter: FiltersArgument $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $ssmCaseFilter) { total } } ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact } consequence_type gene { gene_id symbol } aa_change } id } } } } filteredOccurences: occurrence { hits(first: 0, filters: $ssmCaseFilter) { total } } occurrence { hits(first: 0, filters: $ssmTested) { total } } } } } } } } }`;
+            var ssmQuery = `query ssmResultsTableQuery( $ssmTested: FiltersArgument $ssmCaseFilter: FiltersArgument $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $ssmCaseFilter) { total } } ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact } consequence_type gene { gene_id symbol } aa_change } id } } } } filteredOccurences: occurrence { hits(first: 0, filters: $ssmCaseFilter) { total } } occurrence { hits(first: 0, filters: $ssmTested) { total } } } } } } } } }`;
             var caseFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["ssm"]}}]}
 
             var combinedFilters = thisB.combineAllFilters();
@@ -413,7 +417,7 @@ function (
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.mutationPage - 1) * thisB.pageSize + 1) + " to " + thisB.mutationPage * thisB.pageSize + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.mutationPage - 1) * thisB.pageSize) + " to " + thisB.mutationPage * thisB.pageSize + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
                 thisB.createMutationsTable(response, thisB.mutationResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, totalSSMs / thisB.pageSize, 'ssm', thisB.mutationPage);
             }).catch(function(err) {
@@ -441,7 +445,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.genePage);
             var size = thisB.pageSize;
-            var geneQuery = `query GenesTable_relayQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String $ssmCase: FiltersArgument $geneCaseFilter: FiltersArgument $ssmTested: FiltersArgument $cnvTested: FiltersArgument $cnvGainFilters: FiltersArgument $cnvLossFilters: FiltersArgument ) { genesTableViewer: viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $geneCaseFilter) { total } } cnvCases: cases { hits(first: 0, filters: $cnvTested) { total } } genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id symbol name cytoband biotype numCases: score is_cancer_gene_census ssm_case: case { hits(first: 0, filters: $ssmCase) { total } } cnv_case: case { hits(first: 0, filters: $cnvTested) { total } } case_cnv_gain: case { hits(first: 0, filters: $cnvGainFilters) { total } } case_cnv_loss: case { hits(first: 0, filters: $cnvLossFilters) { total } } } } } } } } }`;
+            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String $ssmCase: FiltersArgument $geneCaseFilter: FiltersArgument $ssmTested: FiltersArgument $cnvTested: FiltersArgument $cnvGainFilters: FiltersArgument $cnvLossFilters: FiltersArgument ) { genesTableViewer: viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $geneCaseFilter) { total } } cnvCases: cases { hits(first: 0, filters: $cnvTested) { total } } genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id symbol name cytoband biotype numCases: score is_cancer_gene_census ssm_case: case { hits(first: 0, filters: $ssmCase) { total } } cnv_case: case { hits(first: 0, filters: $cnvTested) { total } } case_cnv_gain: case { hits(first: 0, filters: $cnvGainFilters) { total } } case_cnv_loss: case { hits(first: 0, filters: $cnvLossFilters) { total } } } } } } } } }`;
 
             var geneFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["ssm"]}}]}
             var cnvTested = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
@@ -526,7 +530,7 @@ function (
 
                 var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.genePage - 1) * thisB.pageSize + 1) + " to " + thisB.genePage * thisB.pageSize + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.genePage - 1) * thisB.pageSize) + " to " + thisB.genePage * thisB.pageSize + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
                 thisB.createGenesTable(response, thisB.geneResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, totalGenes / thisB.pageSize, 'gene', thisB.genePage);
             }).catch(function(err) {
@@ -554,7 +558,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.casePage);
             var size = thisB.pageSize;
-            var caseQuery = `query ExploreCasesTable_relayQuery( $filters: FiltersArgument $cases_size: Int $cases_offset: Int $cases_score: String $cases_sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $cases_size, offset: $cases_offset, filters: $filters, score: $cases_score, sort: $cases_sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
+            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $cases_size: Int $cases_offset: Int $cases_score: String $cases_sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $cases_size, offset: $cases_offset, filters: $filters, score: $cases_score, sort: $cases_sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
 
             var combinedFilters = thisB.combineAllFilters();
             if (combinedFilters) {
@@ -583,7 +587,7 @@ function (
 
                 var totalCases = response.data.exploreCasesTableViewer.explore.cases.hits.total;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.casePage - 1) * thisB.pageSize + 1) + " to " + thisB.casePage * thisB.pageSize + " of " + totalCases }, thisB.caseResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.casePage - 1) * thisB.pageSize) + " to " + thisB.casePage * thisB.pageSize + " of " + totalCases }, thisB.caseResultsTab.containerNode);
                 thisB.createDonorsTable(response, thisB.caseResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
             }).catch(function(err) {
@@ -718,10 +722,10 @@ function (
                     var caseRowContent = `
                             <td><a target="_blank" href="https://portal.gdc.cancer.gov/genes/${hit.gene_id}">${hit.symbol}</a></td>
                             <td>${hit.name}</td>
-                            <td>${hit.ssm_case.hits.total} / ${response.data.genesTableViewer.explore.cases.hits.total}</td>
-                            <td>${hit.ssm_case.hits.total} / ${response.data.genesTableViewer.explore.filteredCases.hits.total}</td>
-                            <td>${hit.case_cnv_gain.hits.total} / ${response.data.genesTableViewer.explore.cnvCases.hits.total}</td>
-                            <td>${hit.case_cnv_loss.hits.total} / ${response.data.genesTableViewer.explore.cnvCases.hits.total}</td>
+                            <td>${(hit.ssm_case.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.cases.hits.total).toLocaleString()}</td>
+                            <td>${(hit.ssm_case.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.filteredCases.hits.total).toLocaleString()}</td>
+                            <td>${(hit.case_cnv_gain.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.cnvCases.hits.total).toLocaleString()}</td>
+                            <td>${(hit.case_cnv_loss.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.cnvCases.hits.total).toLocaleString()}</td>
                             <td>${hit.is_cancer_gene_census ? 'Yes' : 'No' }</td>
                     `
                     var caseRowContentNode = dom.toDom(caseRowContent);
@@ -823,8 +827,8 @@ function (
                             <td><a target="_blank"  href="https://portal.gdc.cancer.gov/ssms/${hit.node.ssm_id}">${hit.node.genomic_dna_change}</a></td>
                             <td>${hit.node.mutation_subtype}</td>
                             <td>${thisB.getMutationConsequences(hit.node.consequence.hits.edges)}</td>
-                            <td>${hit.node.filteredOccurences.hits.total} / ${response.data.viewer.explore.filteredCases.hits.total}</td>
-                            <td>${hit.node.occurrence.hits.total} / ${response.data.viewer.explore.cases.hits.total}</td>
+                            <td>${(hit.node.filteredOccurences.hits.total).toLocaleString()} / ${(response.data.viewer.explore.filteredCases.hits.total).toLocaleString()}</td>
+                            <td>${(hit.node.occurrence.hits.total).toLocaleString()} / ${(response.data.viewer.explore.cases.hits.total).toLocaleString()}</td>
                             <td>${thisB.getMutationImpact(hit.node.consequence.hits.edges)}</td>
                     `
                     var caseRowContentNode = dom.toDom(caseRowContent);
@@ -912,7 +916,7 @@ function (
          */
         getStartIndex: function(page) {
             var thisB = this;
-            return thisB.pageSize * (page - 1) + 1;
+            return thisB.pageSize * (page - 1);
         },
 
         /**
