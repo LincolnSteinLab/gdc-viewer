@@ -723,8 +723,8 @@ function (
                     });
                     buttonAllGenes.placeAt(geneButtonNode);
                     buttonAllGenes.startup();
-                    thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes for the given donor, filter with current facets");
-                    thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes for the given donor, do not filter with current facets");
+                    thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with genes for the given donor, filter with current facets");
+                    thisB.addTooltipToButton(buttonAllGenes, "Add track with genes for the given donor, do not filter with current facets");
 
                     // Place buttons in table
                     dom.place(geneButtonNode, caseRowContentNode);
@@ -756,8 +756,8 @@ function (
                     });
                     buttonAllSsms.placeAt(ssmButtonNode);
                     buttonAllSsms.startup();
-                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all SSMs for the given donor, filter with current facets");
-                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all SSMs for the given donor, do not filter with current facets");
+                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with SSMs for the given donor, filter with current facets");
+                    thisB.addTooltipToButton(buttonAllSsms, "Add track with SSMs for the given donor, do not filter with current facets");
 
                     // Place buttons in table
                     dom.place(ssmButtonNode, caseRowContentNode);
@@ -1155,7 +1155,9 @@ function (
          * @param {*} facetName 
          */
         prettyFacetName: function (facetName) {
-            return facetName.replace(/__/g, ' > ').replace(/_/g, ' ');
+            var splitName = facetName.split('__')
+            var name = splitName[splitName.length - 1];
+            return name.replace(/_/g, ' ');
         },
 
         /**
