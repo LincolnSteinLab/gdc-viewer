@@ -433,8 +433,6 @@ function (
                 buttonAllSSMs.startup();
                 thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all SSMs, filter with current facets");
                 thisB.addTooltipToButton(buttonAllSSMs, "Add track with all SSMs, do not filter with current facets");
-                //
-
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
 
@@ -701,17 +699,32 @@ function (
                         combinedFilters = Object.assign({}, caseFilter);
                     }
 
-                    // Create button and place in parent
-                    var donorGeneButtonWithFilters = dom.toDom(`<span></span>`);
-                    thisB.createDonorGeneButton(hit.case_id, donorGeneButtonWithFilters, combinedFilters, 'Filtered');
-                    thisB.addTooltipToButton(donorGeneButtonWithFilters, "Add track with all genes for the given donor, filter with current facets");
-                    dom.place(donorGeneButtonWithFilters, geneButtonNode);
+                    // Gene Buttons
+                    var geneMenu = new Menu({ style: "display: none;"});
+                    var menuItemGeneFiltered = new MenuItem({
+                        label: "Filtered Genes",
+                        iconClass: "dijitIconNewTask",
+                        onClick: function() {
+                            thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
+                            alert("Adding Gene track for case " + hit.case_id);
+                        }
+                    });
+                    geneMenu.addChild(menuItemGeneFiltered);
+                    geneMenu.startup();
 
-                    // Create button and place in parent
-                    var donorGeneButtonNoFilters = dom.toDom(`<span></span>`);
-                    thisB.createDonorGeneButton(hit.case_id, donorGeneButtonNoFilters, caseFilter, 'All');
-                    thisB.addTooltipToButton(donorGeneButtonNoFilters, "Add track with all genes for the given donor, do not filter with current facets");
-                    dom.place(donorGeneButtonNoFilters, geneButtonNode);
+                    var buttonAllGenes = new ComboButton({
+                        label: "All Genes",
+                        iconClass: "dijitIconNewTask",
+                        dropDown: geneMenu,
+                        onClick: function() {
+                            thisB.addTrack('Genes', hit.case_id, undefined, 'CanvasVariants');
+                            alert("Adding Gene track for case " + hit.case_id);
+                        }
+                    });
+                    buttonAllGenes.placeAt(geneButtonNode);
+                    buttonAllGenes.startup();
+                    thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes for the given donor, filter with current facets");
+                    thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes for the given donor, do not filter with current facets");
 
                     // Place buttons in table
                     dom.place(geneButtonNode, caseRowContentNode);
@@ -719,17 +732,32 @@ function (
                     // Create element to hold buttons
                     var ssmButtonNode = dom.toDom(`<td></td>`);
 
-                    // Create Button and place in parent
-                    var donorSSMButtonWithFilters = dom.toDom(`<span></span>`);
-                    thisB.createDonorSSMButton(hit.case_id, donorSSMButtonWithFilters, combinedFilters, 'Filtered');
-                    thisB.addTooltipToButton(donorSSMButtonWithFilters, "Add track with all SSMs for the given donor, filter with current facets");
-                    dom.place(donorSSMButtonWithFilters, ssmButtonNode);
+                    // SSM Buttons
+                    var ssmMenu = new Menu({ style: "display: none;"});
+                    var menuItemSsmFiltered = new MenuItem({
+                        label: "Filtered SSMs",
+                        iconClass: "dijitIconNewTask",
+                        onClick: function() {
+                            thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'CanvasVariants');
+                            alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
+                        }
+                    });
+                    ssmMenu.addChild(menuItemSsmFiltered);
+                    ssmMenu.startup();
 
-                    // Create Button and place in parent
-                    var donorSSMButtonNoFilters = dom.toDom(`<span></span>`);
-                    thisB.createDonorSSMButton(hit.case_id, donorSSMButtonNoFilters, caseFilter, 'All');
-                    thisB.addTooltipToButton(donorSSMButtonNoFilters, "Add track with all SSMs for the given donor, do not filter with current facets");
-                    dom.place(donorSSMButtonNoFilters, ssmButtonNode);
+                    var buttonAllSsms = new ComboButton({
+                        label: "All SSMs",
+                        iconClass: "dijitIconNewTask",
+                        dropDown: ssmMenu,
+                        onClick: function() {
+                            thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'CanvasVariants');
+                            alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
+                        }
+                    });
+                    buttonAllSsms.placeAt(ssmButtonNode);
+                    buttonAllSsms.startup();
+                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all SSMs for the given donor, filter with current facets");
+                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all SSMs for the given donor, do not filter with current facets");
 
                     // Place buttons in table
                     dom.place(ssmButtonNode, caseRowContentNode);
