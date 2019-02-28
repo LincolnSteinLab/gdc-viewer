@@ -37,7 +37,7 @@ function(
                 resultingFilterQuery.content.push(thisB.filters);
             }
             
-            return encodeURI(JSON.stringify(resultingFilterQuery));
+            return resultingFilterQuery;
         },
 
         /**
@@ -93,6 +93,29 @@ function(
             }
         },
 
+        /**
+         * Creates the query object for graphQL call
+         * @param {*} ref 
+         * @param {*} start 
+         * @param {*} end 
+         */
+        createQuery: function(ref, start, end) {
+            var thisB = this;
+            var cnvQuery = `query cnvResults($filters_1: FiltersArgument) { explore { cnvs { hits(filters: $filters_1) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
+            var combinedFilters = thisB.getFilterQuery(ref, start, end);
+
+            var bodyVal = {
+                query: cnvQuery,
+                variables: {
+                    "size": thisB.size,
+                    "offset": 0,
+                    "filters_1": combinedFilters,
+                }
+            }
+
+            return bodyVal;
+        },
+
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
 
@@ -102,34 +125,31 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
-            var searchBaseUrl = 'https://api.gdc.cancer.gov/';
-
-            // Create full url
-            var url = searchBaseUrl + 'cnvs';
-
-            // Add filters to query
-            url += '?filters=' + thisB.getFilterQuery(ref, start, end) + '&size=' + thisB.size;
-
-            // Retrieve all mutations in the given chromosome range
-            return request(url, {
-                method: 'get',
+            var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
+            var url = 'https://api.gdc.cancer.gov/v0/graphql';
+            fetch(url, {
+                method: 'post',
                 headers: { 'X-Requested-With': null },
-                handleAs: 'json'
-            }).then(function(results) {
-                array.forEach(results.data.hits, function(cnv) {
-                    cnvFeature = {
-                        id: cnv.id,
-                        data: {
-                            'start': cnv.start_position,
-                            'end': cnv.end_position,
-                            'score': thisB.convertCNVChangeToScore(cnv.cnv_change)
+                body: bodyVal
+            }).then(function(response) {
+                return(response.json());
+            }).then(function(response) {
+                if (response.data) {
+                    for (var hitId in response.data.explore.cnvs.hits.edges) {
+                        var cnv = response.data.explore.cnvs.hits.edges[hitId].node;
+                        cnvFeature = {
+                            id: cnv.id,
+                            data: {
+                                'start': cnv.start_position,
+                                'end': cnv.end_position,
+                                'score': thisB.convertCNVChangeToScore(cnv.cnv_change)
+                            }
                         }
+                        featureCallback(new SimpleFeature(cnvFeature));
                     }
-                    featureCallback(new SimpleFeature(cnvFeature));
-                });
-
-                finishCallback();
-            }, function(err) {
+                    finishCallback();
+                }
+            }).catch(function(err) {
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
             });
@@ -142,7 +162,7 @@ function(
          * @param {*} end 
          */
         getLocationFilters: function(chr, start, end) {
-            return({"op":"and","content":[{"op":">=","content":{"field":"start_position","value":start}},{"op":"<=","content":{"field":"end_position","value":end}},{"op":"=","content":{"field":"chromosome","value":[chr]}}]});
+            return({"op":"and","content":[{"op":">=","content":{"field":"cnvs.start_position","value":start}},{"op":"<=","content":{"field":"cnvs.end_position","value":end}},{"op":"=","content":{"field":"cnvs.chromosome","value":[chr]}}]});
         }
     });
 });
