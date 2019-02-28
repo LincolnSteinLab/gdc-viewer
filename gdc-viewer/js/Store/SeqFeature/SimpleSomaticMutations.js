@@ -1,14 +1,12 @@
 define([
     'dojo/_base/declare',
     'dojo/_base/array',
-    'dojo/request',
     'JBrowse/Store/SeqFeature',
     'JBrowse/Model/SimpleFeature'
 ],
 function(
     declare,
     array,
-    request,
     SeqFeatureStore,
     SimpleFeature
 ) {
@@ -114,9 +112,9 @@ function(
                 }
                 var consequenceRow = `<tr ${trStyle}>
                     <td style="${thStyle}">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.node.transcript.gene.gene_id, consequence.node.transcript.gene.symbol)}</td>
-                    <td style="${thStyle}">${consequence.node.transcript.aa_change}</td>
-                    <td style="${thStyle}">${consequence.node.transcript.consequence_type}</td>
-                    <td style="${thStyle}">${consequence.node.transcript.annotation.hgvsc}</td>
+                    <td style="${thStyle}">${thisB.prettyText(consequence.node.transcript.aa_change)}</td>
+                    <td style="${thStyle}">${thisB.prettyText(consequence.node.transcript.consequence_type)}</td>
+                    <td style="${thStyle}">${thisB.prettyText(consequence.node.transcript.annotation.hgvsc)}</td>
                     <td style="${thStyle}">
                         <ul style="list-style: none;">
                             <li>VEP: ${consequence.node.transcript.annotation.vep_impact}</li>
@@ -137,6 +135,14 @@ function(
             return consequenceTable;
         },
 
+        /**
+         * Prints text to avoid undefined/null
+         * @param {*} text 
+         */
+        prettyText: function(text) {
+            return text ? text : 'n/a';
+        },
+ 
         /**
          * Returns the end value to be used for querying GDC
          * @param {string} chr Chromosome number (ex. 1)
@@ -212,8 +218,9 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
+            console.log('get features from chr ' + ref + ': ' + start + ' - ' + end);
+
             var url = 'https://api.gdc.cancer.gov/v0/graphql/SsmsTable';
-            
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
@@ -242,7 +249,7 @@ function(
                                 'NCBI Build': variant.ncbi_build,
                                 'Chromosome': variant.chromosome,
                                 'Gene AA Change': variant.gene_aa_change,
-                                'Consequences': thisB.createConsequencesTable(variant.consequence.hits.edges),
+                                'Consequences': thisB.createConsequencesTable(variant.consequence.hits.edges)
                             }
                         }
                         featureCallback(new SimpleFeature(variantFeature));

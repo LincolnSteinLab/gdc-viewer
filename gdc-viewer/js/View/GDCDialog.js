@@ -1148,6 +1148,18 @@ function (
             }
             var node = dom.toDom(prettyFacetString);
             dom.place(node, location);
+
+            // Add hard refresh button
+            var hardRefreshButton = new Button({
+                label: 'Reset',
+                onClick: function() {
+                    thisB.destroyAccordions();
+                    thisB.refreshContent();
+                }
+            }).placeAt(location);
+
+            thisB.addTooltipToButton(hardRefreshButton, "Manually refresh all content based on current filters");
+
         },
 
         /**
@@ -1180,46 +1192,6 @@ function (
             thisB.updatePagination();
             thisB.destroyAccordions();
             thisB.refreshContent();
-        },
-
-        /**
-         * Create a button to add a case gene button that will create a gene track based on the given
-         * case ID and facet object
-         * @param {string} caseId Id of case
-         * @param {string} holder Dom object to place button in
-         * @param {object} combinedFacetObject combined object of facets
-         * @param {string} text Button text
-         */
-        createDonorGeneButton: function(caseId, holder, combinedFacetObject, text) {
-            var thisB = this;
-            var button = new Button({
-                iconClass: "dijitIconNewTask",
-                label: text,
-                onClick: function() {
-                    thisB.addTrack('Genes', caseId, combinedFacetObject, 'CanvasVariants');
-                    alert("Adding Gene track for case " + caseId);
-                }
-            }).placeAt(holder);
-        },
-
-        /**
-         * Create a button to add a case ssm button that will create a ssm track based on the given
-         * case ID and facet object
-         * @param {string} caseId Id of case
-         * @param {object} holder Div to place the button in
-         * @param {object} combinedFacetObject combined object of facets
-         * @param {string} text Button text
-         */
-        createDonorSSMButton: function(caseId, holder, combinedFacetObject, text) {
-            var thisB = this;
-            var ssmButton = new Button({
-                iconClass: "dijitIconNewTask",
-                label: text,
-                onClick: function() {
-                    thisB.addTrack('SimpleSomaticMutations', caseId, combinedFacetObject, 'CanvasVariants');
-                    alert("Adding Simple Somatic Mutation track for case " + caseId);
-                }
-            }, "ssmButton").placeAt(holder);
         },
 
         /**
