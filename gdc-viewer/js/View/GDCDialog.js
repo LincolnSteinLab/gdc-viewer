@@ -426,7 +426,7 @@ function (
                     dropDown: ssmMenu,
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
-                        alert("Add track with all SSMs from the GDC, with current filters applied");
+                        alert("Add track with all SSMs from the GDC");
                     }
                 });
                 buttonAllSSMs.placeAt(thisB.mutationResultsTab.containerNode);
@@ -435,8 +435,13 @@ function (
                 thisB.addTooltipToButton(buttonAllSSMs, "Add track with all SSMs from the GDC");
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
+                var startResultCount = ((thisB.mutationPage - 1) * thisB.pageSize);
+                if (totalSSMs > 0) {
+                    startResultCount += 1;
+                }
+                var endResultCount = thisB.mutationPage * thisB.pageSize <= totalSSMs ? thisB.mutationPage * thisB.pageSize : totalSSMs;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.mutationPage - 1) * thisB.pageSize) + " to " + thisB.mutationPage * thisB.pageSize + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount + " to " + endResultCount + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
                 thisB.createMutationsTable(response, thisB.mutationResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, totalSSMs / thisB.pageSize, 'ssm', thisB.mutationPage);
             }).catch(function(err) {
@@ -568,8 +573,13 @@ function (
                 thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs from the GDC");
 
                 var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
+                var startResultCount = ((thisB.genePage - 1) * thisB.pageSize);
+                if (totalGenes > 0) {
+                    startResultCount += 1;
+                }
+                var endResultCount = thisB.genePage * thisB.pageSize <= totalGenes ? thisB.genePage * thisB.pageSize : totalGenes;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.genePage - 1) * thisB.pageSize) + " to " + thisB.genePage * thisB.pageSize + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount + " to " + endResultCount + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
                 thisB.createGenesTable(response, thisB.geneResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, totalGenes / thisB.pageSize, 'gene', thisB.genePage);
             }).catch(function(err) {
@@ -625,8 +635,13 @@ function (
                 dom.empty(thisB.caseResultsTab.containerNode);
 
                 var totalCases = response.data.exploreCasesTableViewer.explore.cases.hits.total;
+                var startResultCount = ((thisB.casePage - 1) * thisB.pageSize);
+                if (totalCases > 0) {
+                    startResultCount += 1;
+                }
+                var endResultCount = thisB.casePage * thisB.pageSize <= totalCases ? thisB.casePage * thisB.pageSize : totalCases;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.casePage - 1) * thisB.pageSize) + " to " + thisB.casePage * thisB.pageSize + " of " + totalCases }, thisB.caseResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount + " to " + endResultCount + " of " + totalCases }, thisB.caseResultsTab.containerNode);
                 thisB.createDonorsTable(response, thisB.caseResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
             }).catch(function(err) {
@@ -704,10 +719,12 @@ function (
                     var menuItemGeneFiltered = new MenuItem({
                         label: "Filtered Genes for Donor",
                         iconClass: "dijitIconNewTask",
-                        onClick: function() {
-                            thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
-                            alert("Adding Gene track for case " + hit.case_id);
-                        }
+                        onClick: (function(hit, combinedFilters) {
+                            return function() {
+                                thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
+                                alert("Adding Gene track for case " + hit.case_id);
+                            }
+                        })(hit, combinedFilters)
                     });
                     geneMenu.addChild(menuItemGeneFiltered);
                     geneMenu.startup();
@@ -716,10 +733,12 @@ function (
                         label: "All Genes for Donor",
                         iconClass: "dijitIconNewTask",
                         dropDown: geneMenu,
-                        onClick: function() {
-                            thisB.addTrack('Genes', hit.case_id, undefined, 'CanvasVariants');
-                            alert("Adding Gene track for case " + hit.case_id);
-                        }
+                        onClick: (function(hit) {
+                            return function() {
+                                thisB.addTrack('Genes', hit.case_id, undefined, 'CanvasVariants');
+                                alert("Adding Gene track for case " + hit.case_id);
+                            }
+                        })(hit)
                     });
                     buttonAllGenes.placeAt(geneButtonNode);
                     buttonAllGenes.startup();
@@ -737,10 +756,12 @@ function (
                     var menuItemSsmFiltered = new MenuItem({
                         label: "Filtered SSMs for Donor",
                         iconClass: "dijitIconNewTask",
-                        onClick: function() {
-                            thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'CanvasVariants');
-                            alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
-                        }
+                        onClick: (function(hit, combinedFilters) {
+                            return function() {
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'CanvasVariants');
+                                alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
+                            }
+                        })(hit, combinedFilters)
                     });
                     ssmMenu.addChild(menuItemSsmFiltered);
                     ssmMenu.startup();
@@ -749,10 +770,12 @@ function (
                         label: "All SSMs for Donor",
                         iconClass: "dijitIconNewTask",
                         dropDown: ssmMenu,
-                        onClick: function() {
-                            thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'CanvasVariants');
-                            alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
-                        }
+                        onClick: (function(hit) {
+                            return function() {
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'CanvasVariants');
+                                alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
+                            }
+                        })(hit)
                     });
                     buttonAllSsms.placeAt(ssmButtonNode);
                     buttonAllSsms.startup();
@@ -1148,6 +1171,18 @@ function (
             }
             var node = dom.toDom(prettyFacetString);
             dom.place(node, location);
+
+            // Add hard refresh button
+            var hardRefreshButton = new Button({
+                label: 'Reset',
+                onClick: function() {
+                    thisB.destroyAccordions();
+                    thisB.refreshContent();
+                }
+            }).placeAt(location);
+
+            thisB.addTooltipToButton(hardRefreshButton, "Manually refresh all content based on current filters");
+
         },
 
         /**
@@ -1180,46 +1215,6 @@ function (
             thisB.updatePagination();
             thisB.destroyAccordions();
             thisB.refreshContent();
-        },
-
-        /**
-         * Create a button to add a case gene button that will create a gene track based on the given
-         * case ID and facet object
-         * @param {string} caseId Id of case
-         * @param {string} holder Dom object to place button in
-         * @param {object} combinedFacetObject combined object of facets
-         * @param {string} text Button text
-         */
-        createDonorGeneButton: function(caseId, holder, combinedFacetObject, text) {
-            var thisB = this;
-            var button = new Button({
-                iconClass: "dijitIconNewTask",
-                label: text,
-                onClick: function() {
-                    thisB.addTrack('Genes', caseId, combinedFacetObject, 'CanvasVariants');
-                    alert("Adding Gene track for case " + caseId);
-                }
-            }).placeAt(holder);
-        },
-
-        /**
-         * Create a button to add a case ssm button that will create a ssm track based on the given
-         * case ID and facet object
-         * @param {string} caseId Id of case
-         * @param {object} holder Div to place the button in
-         * @param {object} combinedFacetObject combined object of facets
-         * @param {string} text Button text
-         */
-        createDonorSSMButton: function(caseId, holder, combinedFacetObject, text) {
-            var thisB = this;
-            var ssmButton = new Button({
-                iconClass: "dijitIconNewTask",
-                label: text,
-                onClick: function() {
-                    thisB.addTrack('SimpleSomaticMutations', caseId, combinedFacetObject, 'CanvasVariants');
-                    alert("Adding Simple Somatic Mutation track for case " + caseId);
-                }
-            }, "ssmButton").placeAt(holder);
         },
 
         /**
@@ -1284,7 +1279,7 @@ function (
          * @param {object} location Place to put the loading icon
          */
         createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-icgc' }, location);
+            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
             var spinner = dom.create('div', {}, loadingIcon);
             return loadingIcon;
         },
