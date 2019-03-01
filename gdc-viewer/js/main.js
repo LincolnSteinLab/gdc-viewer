@@ -4,7 +4,8 @@ define([
            'JBrowse/Plugin',
            'dijit/MenuItem',
            './View/GDCDialog',
-           './View/GDCProjectDialog'
+           './View/GDCProjectDialog',
+           './View/GDCPrimarySitesDialog'
        ],
        function(
            declare,
@@ -12,7 +13,8 @@ define([
            JBrowsePlugin,
            MenuItem,
            GDCDialog,
-           GDCProjectDialog
+           GDCProjectDialog,
+           GDCPrimarySitesDialog
        ) {
 return declare( JBrowsePlugin,
 {
@@ -34,7 +36,7 @@ return declare( JBrowsePlugin,
                 {
                     label: 'GDC Primary Sites',
                     iconClass: "dijitIconSearch",
-                    onClick: lang.hitch(this, 'createGDCProject')
+                    onClick: lang.hitch(this, 'createGDCPrimarySites')
                 }));
             this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
         }, this);            
@@ -56,6 +58,20 @@ return declare( JBrowsePlugin,
 
     createGDCProject: function () {
         var searchDialog = new GDCProjectDialog(
+            {
+                onHide: function() {
+                    this.destroy();
+                }
+            }
+        );
+        searchDialog.show(this.browser,
+            function () {
+            }
+        );
+    },
+
+    createGDCPrimarySites: function () {
+        var searchDialog = new GDCPrimarySitesDialog(
             {
                 onHide: function() {
                     this.destroy();

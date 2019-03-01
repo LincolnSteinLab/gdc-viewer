@@ -51,13 +51,13 @@ function (
             // Container holds all results in the dialog
             thisB.dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '1200px', height: '700px' } });
 
-            thisB.getProjectInformation();
+            thisB.getPrimarySiteInformation();
 
             thisB.resize();
             return thisB.dialogContainer;
         },
 
-        getProjectInformation: function() {
+        getPrimarySiteInformation: function() {
             var thisB = this;
             var url = thisB.baseGraphQLUrl;
 
@@ -66,12 +66,11 @@ function (
             thisB.createLoadingIcon(thisB.dialogContainer);
 
             // Create body for GraphQL query
-            var projectQuery = `query Projects($size: Int, $offset: Int, $sort: [Sort]) { projectsViewer: viewer { projects { hits(first: $size, offset: $offset, sort: $sort) { total edges { node { id project_id name disease_type program { name } primary_site summary { case_count } } } } } } }`;
+            var primarySiteQuery = `query primarySiteQuery { viewer { repository { cases { aggregations { primary_site { buckets { doc_count key } } } } } } }`;
 
             var bodyVal = {
-                query: projectQuery,
+                query: primarySiteQuery,
                 variables: {
-                    "sort": [{"field": "summary.case_count", "order": "desc"}],
                     "size": 1000,
                     "offset":0
                   }
@@ -85,26 +84,24 @@ function (
                 return(response.json());
             }).then(function(response) {
                 dom.empty(thisB.dialogContainer);
-                thisB.createProjectsTable(response);
+                console.log(response);
+                thisB.createPrimarySiteTable(response);
             }).catch(function(err) {
                 console.log(err);
             });
         },
 
         /**
-         * Creates a table with projects
+         * Creates a table with primary sites
          * @param {*} response 
          */
-        createProjectsTable: function(response) {
+        createPrimarySiteTable: function(response) {
             var thisB = this;
             var table = `<table class="results-table"></table>`;
             var tableNode = dom.toDom(table);
             var rowsHolder = `
                 <tr>
-                    <th>Project</th>
-                    <th>Disease Type</th>
                     <th>Primary Site</th>
-                    <th>Program</th>
                     <th>Cases</th>
                     <th>Actions</th>
                 </tr>
@@ -113,15 +110,12 @@ function (
             var rowsHolderNode = dom.toDom(rowsHolder);
 
             if (response.data) {
-                for (var hitId in response.data.projectsViewer.projects.hits.edges) {
-                    var hit = response.data.projectsViewer.projects.hits.edges[hitId].node;
+                for (var hitId in response.data.viewer.repository.cases.aggregations.primary_site.buckets) {
+                    var hit = response.data.viewer.repository.cases.aggregations.primary_site.buckets[hitId];
 
                     var projectRowContent = `
-                            <td>${hit.project_id}</td>
-                            <td>${hit.disease_type}</td>
-                            <td>${hit.primary_site}</td>
-                            <td>${hit.program.name}</td>
-                            <td>${(hit.summary.case_count).toLocaleString()}</td>
+                            <td>${hit.key}</td>
+                            <td>${(hit.doc_count).toLocaleString()}</td>
                     `
                     var projectRowContentNode = dom.toDom(projectRowContent);
 
@@ -132,36 +126,36 @@ function (
                     var geneMenu = new Menu({ style: "display: none;"});
 
                     var menuItemSSM = new MenuItem({
-                        label: "SSMs for Project",
+                        label: "SSMs for Primary Site",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations', hit.project_id, 'CanvasVariants');
-                                alert("Adding SSM track for project " + hit.project_id);
+                                thisB.addTrack('SimpleSomaticMutations', hit.key, 'CanvasVariants');
+                                alert("Adding SSM track for primary site " + hit.key);
                             }
                         })(hit)
                     });
                     geneMenu.addChild(menuItemSSM);
 
                     var menuItemGene = new MenuItem({
-                        label: "Genes for Project",
+                        label: "Genes for Primary Site",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.project_id, 'CanvasVariants');
-                                alert("Adding Gene track for project " + hit.project_id);
+                                thisB.addTrack('Genes', hit.key, 'CanvasVariants');
+                                alert("Adding Gene track for primary site " + hit.key);
                             }
                         })(hit)
                     });
                     geneMenu.addChild(menuItemGene);
 
                     var menuItemCNV = new MenuItem({
-                        label: "CNVs for Project",
+                        label: "CNVs for Primary Site",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.project_id, 'Wiggle/XYPlot');
-                                alert("Adding CNV track for project " + hit.project_id);
+                                thisB.addTrack('CNVs', hit.key, 'Wiggle/XYPlot');
+                                alert("Adding CNV track for primary site " + hit.key);
                             }
                         })(hit)
                     });
@@ -178,9 +172,9 @@ function (
                     buttonAllGenes.startup();
 
                     // Add  tooltips
-                    thisB.addTooltipToButton(menuItemGene, "Add track with all genes for the given project");
-                    thisB.addTooltipToButton(menuItemCNV, "Add track with all CNVs for the given project");
-                    thisB.addTooltipToButton(menuItemSSM, "Add track with all SSMs for the given project");
+                    thisB.addTooltipToButton(menuItemGene, "Add track with all genes for the given primary site");
+                    thisB.addTooltipToButton(menuItemCNV, "Add track with all CNVs for the given primary site");
+                    thisB.addTooltipToButton(menuItemSSM, "Add track with all SSMs for the given primary site");
 
                     // Place buttons in table
                     dom.place(projectButtonNode, projectRowContentNode);
@@ -197,34 +191,21 @@ function (
         },
 
         /**
-         * Adds a tooltip with some text to a location
-         * @param {*} button Location to attach tooltip
-         * @param {*} tooltipText Text to display in tooltip
-         */
-        addTooltipToButton: function(button, tooltipText) {
-            var tooltip = new Tooltip({
-                label: tooltipText
-            });
-
-            tooltip.addTarget(button);
-        },
-
-        /**
          * Generic function for adding a track of some type
          * @param {*} storeClass 
-         * @param {*} projectId 
+         * @param {*} primarySite 
          * @param {*} trackType 
          */
-        addTrack: function (storeClass, projectId, trackType) {
+        addTrack: function (storeClass, primarySite, trackType) {
 
-            var projectFilters = {"op":"in","content":{"field": "cases.project.project_id","value": projectId}};
+            var primarySiteFilters = {"op":"in","content":{"field": "cases.primary_site","value": primarySite}};
             
             var storeConf = {
                 browser: this.browser,
                 refSeq: this.browser.refSeq,
                 type: 'gdc-viewer/Store/SeqFeature/' + storeClass,
-                project: projectId,
-                filters: JSON.stringify(projectFilters)
+                primarySite: primarySite,
+                filters: JSON.stringify(primarySiteFilters)
             };
             var storeName = this.browser.addStoreConfig(null, storeConf);
             var randomId = Math.random().toString(36).substring(7);
@@ -232,8 +213,8 @@ function (
             var key = 'GDC_' + storeClass;
             var label = key + '_' + randomId;
 
-            key += '_' + projectId
-            label += '_' + projectId
+            key += '_' + primarySite
+            label += '_' + primarySite
 
             var trackConf = {
                 type: 'JBrowse/View/Track/' + trackType,
@@ -242,7 +223,7 @@ function (
                 key: key,
                 metadata: {
                     datatype: storeClass,
-                    project: projectId
+                    primarySite: primarySite
                 }
             };
 
@@ -257,6 +238,20 @@ function (
             this.browser.publish('/jbrowse/v1/v/tracks/new', [trackConf]);
             this.browser.publish('/jbrowse/v1/v/tracks/show', [trackConf]);
         },
+
+        /**
+         * Adds a tooltip with some text to a location
+         * @param {*} button Location to attach tooltip
+         * @param {*} tooltipText Text to display in tooltip
+         */
+        addTooltipToButton: function(button, tooltipText) {
+            var tooltip = new Tooltip({
+                label: tooltipText
+            });
+
+            tooltip.addTarget(button);
+        },
+
 
         /**
          * Creates a loading icon in the given location and returns
