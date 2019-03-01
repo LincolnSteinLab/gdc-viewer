@@ -426,7 +426,7 @@ function (
                     dropDown: ssmMenu,
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
-                        alert("Add track with all SSMs from the GDC, with current filters applied");
+                        alert("Add track with all SSMs from the GDC");
                     }
                 });
                 buttonAllSSMs.placeAt(thisB.mutationResultsTab.containerNode);

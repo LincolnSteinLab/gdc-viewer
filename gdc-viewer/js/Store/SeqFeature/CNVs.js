@@ -1,14 +1,10 @@
 define([
     'dojo/_base/declare',
-    'dojo/_base/array',
-    'dojo/request',
     'JBrowse/Store/SeqFeature',
     'JBrowse/Model/SimpleFeature'
 ],
 function(
     declare,
-    array,
-    request,
     SeqFeatureStore,
     SimpleFeature
 ) {

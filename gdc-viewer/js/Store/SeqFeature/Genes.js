@@ -102,7 +102,7 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id symbol name gene_start gene_end gene_chromosome description canonical_transcript_id canonical_transcript_length canonical_transcript_length_genomic canonical_transcript_length_cds  is_cancer_gene_census cytoband biotype numCases: score is_cancer_gene_census } } } } } } }`;
+            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id gene_strand synonyms symbol name gene_start gene_end gene_chromosome description canonical_transcript_id canonical_transcript_length canonical_transcript_length_genomic canonical_transcript_length_cds is_cancer_gene_census cytoband biotype numCases: score is_cancer_gene_census } } } } } } }`;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {
