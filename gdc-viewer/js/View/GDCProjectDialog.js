@@ -57,6 +57,9 @@ function (
             return thisB.dialogContainer;
         },
 
+        /**
+         * Retrieve project information from GDC
+         */
         getProjectInformation: function() {
             var thisB = this;
             var url = thisB.baseGraphQLUrl;
@@ -85,7 +88,18 @@ function (
                 return(response.json());
             }).then(function(response) {
                 dom.empty(thisB.dialogContainer);
-                thisB.createProjectsTable(response);
+                if (response.data) {
+                    thisB.createProjectsTable(response);
+                } else {
+                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.dialogContainer);
+                    var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+                    var hardRefreshButton = new Button({
+                        label: 'Refresh Results',
+                        onClick: function() {
+                            thisB.getProjectInformation();
+                        }
+                    }).placeAt(errorMessageHolder);
+                }
             }).catch(function(err) {
                 console.log(err);
             });
@@ -283,7 +297,7 @@ function (
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};
-            this.set('title', 'GDC Browser');
+            this.set('title', 'GDC Project Browser');
             this.set('content', this._dialogContent());
             this.inherited(arguments);
             focus.focus(this.closeButtonNode);
