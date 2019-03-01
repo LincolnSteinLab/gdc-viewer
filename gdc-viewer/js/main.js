@@ -26,11 +26,17 @@ return declare( JBrowsePlugin,
                 }));
             this.browser.addGlobalMenuItem('gdc', new MenuItem(
                 {
-                    label: 'Project View',
+                    label: 'GDC Projects',
                     iconClass: "dijitIconSearch",
                     onClick: lang.hitch(this, 'createGDCProject')
                 }));
-                this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
+            this.browser.addGlobalMenuItem('gdc', new MenuItem(
+                {
+                    label: 'GDC Primary Sites',
+                    iconClass: "dijitIconSearch",
+                    onClick: lang.hitch(this, 'createGDCProject')
+                }));
+            this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
         }, this);            
     },
 
