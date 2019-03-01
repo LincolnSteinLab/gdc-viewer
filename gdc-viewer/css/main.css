@@ -55,12 +55,12 @@ table.results-table tr:nth-child(odd) {
     flex-direction:row;
 }
 
-.loading-icgc {
+.loading-gdc {
     display: flex;
     justify-content: center;
 }
 
-.loading-icgc > div {
+.loading-gdc > div {
     border: 8px solid #f3f3f3;
     border-radius: 50%;
     border-top: 8px solid #166aa2;

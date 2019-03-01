@@ -435,8 +435,13 @@ function (
                 thisB.addTooltipToButton(buttonAllSSMs, "Add track with all SSMs from the GDC");
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
+                var startResultCount = ((thisB.mutationPage - 1) * thisB.pageSize);
+                if (totalSSMs > 0) {
+                    startResultCount += 1;
+                }
+                var endResultCount = thisB.mutationPage * thisB.pageSize <= totalSSMs ? thisB.mutationPage * thisB.pageSize : totalSSMs;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.mutationPage - 1) * thisB.pageSize) + " to " + thisB.mutationPage * thisB.pageSize + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount + " to " + endResultCount + " of " + totalSSMs }, thisB.mutationResultsTab.containerNode);
                 thisB.createMutationsTable(response, thisB.mutationResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, totalSSMs / thisB.pageSize, 'ssm', thisB.mutationPage);
             }).catch(function(err) {
@@ -568,8 +573,13 @@ function (
                 thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs from the GDC");
 
                 var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
+                var startResultCount = ((thisB.genePage - 1) * thisB.pageSize);
+                if (totalGenes > 0) {
+                    startResultCount += 1;
+                }
+                var endResultCount = thisB.genePage * thisB.pageSize <= totalGenes ? thisB.genePage * thisB.pageSize : totalGenes;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.genePage - 1) * thisB.pageSize) + " to " + thisB.genePage * thisB.pageSize + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount + " to " + endResultCount + " of " + totalGenes }, thisB.geneResultsTab.containerNode);
                 thisB.createGenesTable(response, thisB.geneResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, totalGenes / thisB.pageSize, 'gene', thisB.genePage);
             }).catch(function(err) {
@@ -625,8 +635,13 @@ function (
                 dom.empty(thisB.caseResultsTab.containerNode);
 
                 var totalCases = response.data.exploreCasesTableViewer.explore.cases.hits.total;
+                var startResultCount = ((thisB.casePage - 1) * thisB.pageSize);
+                if (totalCases > 0) {
+                    startResultCount += 1;
+                }
+                var endResultCount = thisB.casePage * thisB.pageSize <= totalCases ? thisB.casePage * thisB.pageSize : totalCases;
 
-                var resultsInfo = dom.create('div', { innerHTML: "Showing " + ((thisB.casePage - 1) * thisB.pageSize) + " to " + thisB.casePage * thisB.pageSize + " of " + totalCases }, thisB.caseResultsTab.containerNode);
+                var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount + " to " + endResultCount + " of " + totalCases }, thisB.caseResultsTab.containerNode);
                 thisB.createDonorsTable(response, thisB.caseResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
             }).catch(function(err) {
@@ -1256,7 +1271,7 @@ function (
          * @param {object} location Place to put the loading icon
          */
         createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-icgc' }, location);
+            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
             var spinner = dom.create('div', {}, loadingIcon);
             return loadingIcon;
         },
