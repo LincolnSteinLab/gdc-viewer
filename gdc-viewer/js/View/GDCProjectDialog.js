@@ -122,39 +122,46 @@ function (
                     var projectRowContentNode = dom.toDom(projectRowContent);
 
                     // Create element to hold buttons
-                    var geneButtonNode = dom.toDom(`<td></td>`);
+                    var projectButtonNode = dom.toDom(`<td></td>`);
 
-                    // Gene Buttons
+                    // Create dropdown button with elements
                     var geneMenu = new Menu({ style: "display: none;"});
+
+                    var menuItemSSM = new MenuItem({
+                        label: "SSMs for Project",
+                        iconClass: "dijitIconNewTask",
+                        onClick: (function(hit) {
+                            return function() {
+                                thisB.addTrack('SimpleSomaticMutations', hit.project_id, 'CanvasVariants');
+                                alert("Adding SSM track for project " + hit.project_id);
+                            }
+                        })(hit)
+                    });
+                    geneMenu.addChild(menuItemSSM);
+
                     var menuItemGene = new MenuItem({
                         label: "Genes for Project",
                         iconClass: "dijitIconNewTask",
-                        onClick: function() {
-                            //thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
-                            alert("Adding Gene track for project " + hit.project_id);
-                        }
+                        onClick: (function(hit) {
+                            return function() {
+                                thisB.addTrack('Genes', hit.project_id, 'CanvasVariants');
+                                alert("Adding Gene track for project " + hit.project_id);
+                            }
+                        })(hit)
                     });
                     geneMenu.addChild(menuItemGene);
 
                     var menuItemCNV = new MenuItem({
                         label: "CNVs for Project",
                         iconClass: "dijitIconNewTask",
-                        onClick: function() {
-                            //thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
-                            alert("Adding CNV track for project " + hit.project_id);
-                        }
+                        onClick: (function(hit) {
+                            return function() {
+                                thisB.addTrack('CNVs', hit.project_id, 'Wiggle/XYPlot');
+                                alert("Adding CNV track for project " + hit.project_id);
+                            }
+                        })(hit)
                     });
                     geneMenu.addChild(menuItemCNV);
-
-                    var menuItemSSM = new MenuItem({
-                        label: "SSMs for Project",
-                        iconClass: "dijitIconNewTask",
-                        onClick: function() {
-                            //thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
-                            alert("Adding SSM track for project " + hit.project_id);
-                        }
-                    });
-                    geneMenu.addChild(menuItemSSM);
 
                     geneMenu.startup();
 
@@ -163,14 +170,16 @@ function (
                         iconClass: "dijitIconNewTask",
                         dropDown: geneMenu
                     });
-                    buttonAllGenes.placeAt(geneButtonNode);
+                    buttonAllGenes.placeAt(projectButtonNode);
                     buttonAllGenes.startup();
+
+                    // Add  tooltips
                     thisB.addTooltipToButton(menuItemGene, "Add track with all genes for the given project");
                     thisB.addTooltipToButton(menuItemCNV, "Add track with all CNVs for the given project");
                     thisB.addTooltipToButton(menuItemSSM, "Add track with all SSMs for the given project");
 
                     // Place buttons in table
-                    dom.place(geneButtonNode, projectRowContentNode);
+                    dom.place(projectButtonNode, projectRowContentNode);
 
                     var row = `<tr></tr>`;
                     var rowNodeHolder = dom.toDom(row);
@@ -199,25 +208,19 @@ function (
         /**
          * Generic function for adding a track of some type
          * @param {*} storeClass 
-         * @param {*} caseId 
-         * @param {*} combinedFacetObject 
+         * @param {*} projectId 
          * @param {*} trackType 
          */
-        addTrack: function (storeClass, caseId, combinedFacetObject, trackType) {
-            if (combinedFacetObject !== undefined) {
-                if (combinedFacetObject === '') {
-                    combinedFacetObject = undefined
-                } else {
-                    combinedFacetObject = JSON.stringify(combinedFacetObject)
-                }
-            }
+        addTrack: function (storeClass, projectId, trackType) {
 
+            var projectFilters = {"op":"in","content":{"field": "cases.project.project_id","value": projectId}};
+            
             var storeConf = {
                 browser: this.browser,
                 refSeq: this.browser.refSeq,
                 type: 'gdc-viewer/Store/SeqFeature/' + storeClass,
-                donor: caseId,
-                filters: combinedFacetObject
+                project: projectId,
+                filters: JSON.stringify(projectFilters)
             };
             var storeName = this.browser.addStoreConfig(null, storeConf);
             var randomId = Math.random().toString(36).substring(7);
@@ -225,10 +228,8 @@ function (
             var key = 'GDC_' + storeClass;
             var label = key + '_' + randomId;
 
-            if (caseId != null && caseId != undefined) {
-                key += '_' + caseId
-                label += '_' + caseId
-            }
+            key += '_' + projectId
+            label += '_' + projectId
 
             var trackConf = {
                 type: 'JBrowse/View/Track/' + trackType,
@@ -237,7 +238,7 @@ function (
                 key: key,
                 metadata: {
                     datatype: storeClass,
-                    donor: caseId
+                    project: projectId
                 }
             };
 
