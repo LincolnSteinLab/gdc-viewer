@@ -679,6 +679,7 @@ function (
                     <th>Gender</th>
                     <th>Genes</th>
                     <th>SSMs</th>
+                    <th>CNVs</th>
                 </tr>
             `;
 
@@ -701,17 +702,9 @@ function (
 
                     // Create Filters for buttons
                     var combinedFilters = thisB.combineAllFilters();
-                    var caseFilter = {"op":"in","content":{"field": "","value": []}};
-                    if (hit.case_id) {
-                        caseFilter.content.field = "cases.case_id";
-                        caseFilter.content.value = hit.case_id;
-                    }
 
                     if (combinedFilters) {
                         combinedFilters = JSON.parse(combinedFilters);
-                        combinedFilters.content.push(caseFilter);
-                    } else {
-                        combinedFilters = Object.assign({}, caseFilter);
                     }
 
                     // Gene Buttons
@@ -784,6 +777,43 @@ function (
 
                     // Place buttons in table
                     dom.place(ssmButtonNode, caseRowContentNode);
+
+                    // Create element to hold buttons
+                    var cnvButtonNode = dom.toDom(`<td></td>`);
+
+                    // CNV Buttons
+                    var cnvMenu = new Menu({ style: "display: none;"});
+                    var menuItemCnvFiltered = new MenuItem({
+                        label: "Filtered CNVs for Donor",
+                        iconClass: "dijitIconNewTask",
+                        onClick: (function(hit, combinedFilters) {
+                            return function() {
+                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'Wiggle/XYPlot');
+                                alert("Adding CNV track for case " +  hit.case_id);
+                            }
+                        })(hit, combinedFilters)
+                    });
+                    cnvMenu.addChild(menuItemCnvFiltered);
+                    cnvMenu.startup();
+
+                    var buttonAllCnvs = new ComboButton({
+                        label: "All CNVs for Donor",
+                        iconClass: "dijitIconNewTask",
+                        dropDown: cnvMenu,
+                        onClick: (function(hit) {
+                            return function() {
+                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'Wiggle/XYPlot');
+                                alert("Adding CNV track for case " +  hit.case_id);
+                            }
+                        })(hit)
+                    });
+                    buttonAllCnvs.placeAt(cnvButtonNode);
+                    buttonAllCnvs.startup();
+                    thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs for the given donor, with current filters applied");
+                    thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs for the given donor");
+
+                    // Place buttons in table
+                    dom.place(cnvButtonNode, caseRowContentNode);
 
                     // Place columns into row
                     var row = `<tr></tr>`;
