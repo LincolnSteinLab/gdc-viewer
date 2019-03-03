@@ -24,6 +24,7 @@ function (
 ) {
     return declare(ActionBarDialog, {
         dialogContainer: undefined,
+
         // GraphQL
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
@@ -75,7 +76,8 @@ function (
             }).then(function(response) {
                 dom.empty(thisB.dialogContainer);
                 if (response.data) {
-                   thisB.createPrimarySiteTable(response);
+                    var aboutMessage = dom.create('h1', { innerHTML: "View Gene, SSM, and CNV tracks filtered by Primary Site" }, thisB.dialogContainer);
+                    thisB.createPrimarySiteTable(response);
                 } else {
                     var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.dialogContainer);
                     var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
