@@ -59,6 +59,8 @@ function (
         mutationAccordion: undefined,
 
         // Each filter object shows the current filters applied for a given type
+        // Note: double underscore is returned by the graphQL calls, though when applying
+        // filters they must be converted to a period
         caseFilters: {
             'primary_site': [],
             'project__project_id': [],
