@@ -3,10 +3,6 @@ define([
     'dojo/dom-construct',
     'dijit/focus',
     'dijit/form/Button',
-    'dijit/form/CheckBox',
-    'dijit/layout/TabContainer',
-    'dijit/layout/AccordionContainer',
-    'dijit/layout/ContentPane',
     'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
@@ -19,10 +15,6 @@ function (
     dom,
     focus,
     Button,
-    CheckBox,
-    TabContainer,
-    AccordionContainer,
-    ContentPane,
     Tooltip,
     Menu,
     MenuItem,
@@ -31,9 +23,10 @@ function (
     ActionBarDialog
 ) {
     return declare(ActionBarDialog, {
-        
-        projectTableHolder: undefined,
         dialogContainer: undefined,
+        page: 1,
+        size: 20,
+
         // GraphQL
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
@@ -57,6 +50,9 @@ function (
             return thisB.dialogContainer;
         },
 
+        /**
+         * Retrieve project information from GDC
+         */
         getProjectInformation: function() {
             var thisB = this;
             var url = thisB.baseGraphQLUrl;
@@ -66,14 +62,14 @@ function (
             thisB.createLoadingIcon(thisB.dialogContainer);
 
             // Create body for GraphQL query
-            var projectQuery = `query Projects($size: Int, $offset: Int, $sort: [Sort]) { projectsViewer: viewer { projects { hits(first: $size, offset: $offset, sort: $sort) { total edges { node { id project_id name disease_type program { name } primary_site summary { case_count } } } } } } }`;
+            var projectQuery = `query Projects($size: Int, $offset: Int, $sort: [Sort]) { projectsViewer: viewer { projects { hits(first: $size, offset: $offset, sort: $sort) { total pageInfo { hasNextPage hasPreviousPage } edges { node { id project_id name disease_type program { name } primary_site summary { case_count } } } } } } }`;
 
             var bodyVal = {
                 query: projectQuery,
                 variables: {
                     "sort": [{"field": "summary.case_count", "order": "desc"}],
-                    "size": 1000,
-                    "offset":0
+                    "size": thisB.size,
+                    "offset": thisB.size * (thisB.page - 1)
                   }
             }
 
@@ -85,7 +81,29 @@ function (
                 return(response.json());
             }).then(function(response) {
                 dom.empty(thisB.dialogContainer);
-                thisB.createProjectsTable(response);
+                if (response.data) {
+                    var aboutMessage = dom.create('h1', { innerHTML: "View Gene, SSM and CNV tracks filtered by Project" }, thisB.dialogContainer);
+                    var totalHits = response.data.projectsViewer.projects.hits.total;
+                    var totalPages = totalHits / thisB.size;
+                    var startIndex = thisB.size * (thisB.page - 1) + 1;
+                    var endIndex = thisB.size * (thisB.page - 1) + thisB.size;
+                    if (endIndex > totalHits) {
+                        endIndex = totalHits;
+                    }
+                    var resultsInfo = dom.create('div', { innerHTML: "Showing " + startIndex + " to " + endIndex + " of " + totalHits }, thisB.dialogContainer);
+
+                    thisB.createProjectsTable(response);
+                    thisB.createPaginationButtons(thisB.dialogContainer, totalPages);
+                } else {
+                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.dialogContainer);
+                    var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+                    var hardRefreshButton = new Button({
+                        label: 'Refresh Results',
+                        onClick: function() {
+                            thisB.getProjectInformation();
+                        }
+                    }).placeAt(errorMessageHolder);
+                }
             }).catch(function(err) {
                 console.log(err);
             });
@@ -269,6 +287,38 @@ function (
         },
 
         /**
+         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
+         * @param {object} holder
+         * @param {integer} pagination
+         */
+        createPaginationButtons: function(holder, totalPages) {
+            var thisB = this;
+
+            var paginationHolder = dom.create('div', { style:"display: flex;justify-content: center;"}, holder);
+            
+            if (thisB.page > 1) {
+                var previousButton = new Button({
+                    label: "Previous",
+                    onClick: function() {
+                        thisB.page -= 1;
+                        thisB.getProjectInformation();
+                    }
+                }, "previousButton").placeAt(paginationHolder);
+
+            }
+
+            if (thisB.page < totalPages) {
+                var nextButton = new Button({
+                    label: "Next",
+                    onClick: function() {
+                        thisB.page += 1;
+                        thisB.getProjectInformation();
+                    }
+                }, "nextButton").placeAt(paginationHolder);
+            }
+        },
+
+        /**
          * Generate a GUID
          */
         guid: function() {
@@ -283,7 +333,7 @@ function (
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};
-            this.set('title', 'GDC Browser');
+            this.set('title', 'GDC Project Browser');
             this.set('content', this._dialogContent());
             this.inherited(arguments);
             focus.focus(this.closeButtonNode);

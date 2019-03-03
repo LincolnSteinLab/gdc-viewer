@@ -3,10 +3,6 @@ define([
     'dojo/dom-construct',
     'dijit/focus',
     'dijit/form/Button',
-    'dijit/form/CheckBox',
-    'dijit/layout/TabContainer',
-    'dijit/layout/AccordionContainer',
-    'dijit/layout/ContentPane',
     'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
@@ -19,10 +15,6 @@ function (
     dom,
     focus,
     Button,
-    CheckBox,
-    TabContainer,
-    AccordionContainer,
-    ContentPane,
     Tooltip,
     Menu,
     MenuItem,
@@ -31,9 +23,8 @@ function (
     ActionBarDialog
 ) {
     return declare(ActionBarDialog, {
-        
-        projectTableHolder: undefined,
         dialogContainer: undefined,
+
         // GraphQL
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
@@ -49,7 +40,7 @@ function (
         _dialogContent: function () {
             var thisB = this;
             // Container holds all results in the dialog
-            thisB.dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '1200px', height: '700px' } });
+            thisB.dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '700px', height: '700px' } });
 
             thisB.getPrimarySiteInformation();
 
@@ -57,6 +48,9 @@ function (
             return thisB.dialogContainer;
         },
 
+        /**
+         * Retrieve primary site information from GDC
+         */
         getPrimarySiteInformation: function() {
             var thisB = this;
             var url = thisB.baseGraphQLUrl;
@@ -70,10 +64,7 @@ function (
 
             var bodyVal = {
                 query: primarySiteQuery,
-                variables: {
-                    "size": 1000,
-                    "offset":0
-                  }
+                variables: {}
             }
 
             fetch(url, {
@@ -84,8 +75,19 @@ function (
                 return(response.json());
             }).then(function(response) {
                 dom.empty(thisB.dialogContainer);
-                console.log(response);
-                thisB.createPrimarySiteTable(response);
+                if (response.data) {
+                    var aboutMessage = dom.create('h1', { innerHTML: "View Gene, SSM, and CNV tracks filtered by Primary Site" }, thisB.dialogContainer);
+                    thisB.createPrimarySiteTable(response);
+                } else {
+                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.dialogContainer);
+                    var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+                    var hardRefreshButton = new Button({
+                        label: 'Refresh Results',
+                        onClick: function() {
+                            thisB.getPrimarySiteInformation();
+                        }
+                    }).placeAt(errorMessageHolder);
+                }
             }).catch(function(err) {
                 console.log(err);
             });
@@ -278,7 +280,7 @@ function (
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};
-            this.set('title', 'GDC Browser');
+            this.set('title', 'GDC Primary Site Browser');
             this.set('content', this._dialogContent());
             this.inherited(arguments);
             focus.focus(this.closeButtonNode);
