@@ -56,6 +56,9 @@ displayColumns =
   + label
   + key
   + datatype
+  + case
+  + project
+  + primarySite
 ```
 
 Note that this will only show preloaded tracks as well as tracks you have added using the Faceted Search Dialog. It does not dynamically create tracks based on what is available from the GDC.
@@ -83,7 +86,8 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
-You can set the max number of genes to return with the size field. It defaults to 500.
+You can set the max number of genes to return with the `size` field. It defaults to 500.
+You can view case specific genes by setting the `case` field.
 
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
@@ -103,7 +107,8 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
-You can set the max number of SSMs to return with the size field. It defaults to 500.
+You can set the max number of SSMs to return with the `size` field. It defaults to 500.
+You can view case specific SSMs by setting the `case` field.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
@@ -125,6 +130,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
 ```
 
-You can set the max number of CNVs to return with the size field. It defaults to 500.
+You can set the max number of CNVs to return with the `size` field. It defaults to 500.
+You can view case specific CNVs by setting the `case` field.
 
 Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
