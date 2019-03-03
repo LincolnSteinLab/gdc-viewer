@@ -3,10 +3,6 @@ define([
     'dojo/dom-construct',
     'dijit/focus',
     'dijit/form/Button',
-    'dijit/form/CheckBox',
-    'dijit/layout/TabContainer',
-    'dijit/layout/AccordionContainer',
-    'dijit/layout/ContentPane',
     'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
@@ -19,10 +15,6 @@ function (
     dom,
     focus,
     Button,
-    CheckBox,
-    TabContainer,
-    AccordionContainer,
-    ContentPane,
     Tooltip,
     Menu,
     MenuItem,
@@ -31,8 +23,6 @@ function (
     ActionBarDialog
 ) {
     return declare(ActionBarDialog, {
-        
-        projectTableHolder: undefined,
         dialogContainer: undefined,
         // GraphQL
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
