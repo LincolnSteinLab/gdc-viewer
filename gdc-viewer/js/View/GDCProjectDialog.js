@@ -23,13 +23,19 @@ function (
     ActionBarDialog
 ) {
     return declare(ActionBarDialog, {
+        // Parent DOM to hold results
         dialogContainer: undefined,
+        // Current page
         page: 1,
+        // Page size
         size: 20,
 
-        // GraphQL
+        // The base URL for GraphQL calls
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
+        /**
+         * Constructor
+         */
         constructor: function () {
             var thisB = this;
 
@@ -111,7 +117,7 @@ function (
 
         /**
          * Creates a table with projects
-         * @param {*} response 
+         * @param {*} response Object returned from GraphQL call
          */
         createProjectsTable: function(response) {
             var thisB = this;
@@ -217,11 +223,11 @@ function (
         /**
          * Adds a tooltip with some text to a location
          * @param {*} button Location to attach tooltip
-         * @param {*} tooltipText Text to display in tooltip
+         * @param {*} text Text to display in tooltip
          */
-        addTooltipToButton: function(button, tooltipText) {
+        addTooltipToButton: function(button, text) {
             var tooltip = new Tooltip({
-                label: tooltipText
+                label: text
             });
 
             tooltip.addTarget(button);
@@ -229,12 +235,11 @@ function (
 
         /**
          * Generic function for adding a track of some type
-         * @param {*} storeClass 
-         * @param {*} projectId 
-         * @param {*} trackType 
+         * @param {*} storeClass the JBrowse store class
+         * @param {*} projectId the project ID to filter by
+         * @param {*} trackType the JBrowse track type
          */
         addTrack: function (storeClass, projectId, trackType) {
-
             var projectFilters = {"op":"in","content":{"field": "cases.project.project_id","value": projectId}};
             
             var storeConf = {
@@ -279,6 +284,7 @@ function (
         /**
          * Creates a loading icon in the given location and returns
          * @param {object} location Place to put the loading icon
+         * @return {object} loading DOM object
          */
         createLoadingIcon: function (location) {
             var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
@@ -288,8 +294,8 @@ function (
 
         /**
          * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
-         * @param {object} holder
-         * @param {integer} pagination
+         * @param {object} holder DOM location to place pagination buttons
+         * @param {integer} totalPages total number of pages
          */
         createPaginationButtons: function(holder, totalPages) {
             var thisB = this;
@@ -320,6 +326,7 @@ function (
 
         /**
          * Generate a GUID
+         * @return {string} GUID
          */
         guid: function() {
             function s4() {
@@ -330,6 +337,11 @@ function (
             return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
+        /**
+         * Show callback for displaying dialog
+         * @param {*} browser 
+         * @param {*} callback 
+         */
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};

@@ -10,18 +10,24 @@ function(
 ) {
     return declare(SeqFeatureStore, {
 
+        /**
+         * Constructor
+         * @param {*} args 
+         */
         constructor: function (args) {
             // Filters to apply to Gene query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            // Size of results
             this.size = args.size !== undefined ? parseInt(args.size) : 500;
+            // Case ID
             this.case = args.case;
         },
 
         /**
          * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} chr Chromosome to filter by
+         * @param {*} start the start position
+         * @param {*} end the end position
          */
         getFilterQuery: function (chr, start, end) {
             var thisB = this;
@@ -40,7 +46,8 @@ function(
          /**
          * Creates a link to a given ID
          * @param {string} link Base URL for link
-         * @param {string} id ID to apped to base URL
+         * @param {string} id ID to append to base URL
+         * @return {string} a tag
          */
         createLinkWithId: function(link, id) {
             return id !== null ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
@@ -50,6 +57,8 @@ function(
          * Creates a link to a given ID and name
          * @param {string} link Base URL for link
          * @param {string} id ID to apped to base URL
+         * @param {string} name text to display for link
+         * @return {string} a tag
          */
         createLinkWithIdAndName: function(link, id, name) {
             return id !== null ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
@@ -59,6 +68,7 @@ function(
          * Returns the end value to be used for querying GDC
          * @param {string} chr Chromosome number (ex. 1)
          * @param {integer} end End location of JBrowse view
+         * @return {int} end position
          */
         getChromosomeEnd: function(chr, end) {
             var chromosomeSizes = {
@@ -97,9 +107,10 @@ function(
 
         /**
          * Creates the query object for graphQL call
-         * @param {*} ref 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} ref chromosome
+         * @param {*} start start position
+         * @param {*} end end position
+         * @return {object} query object
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
@@ -119,6 +130,13 @@ function(
             return bodyVal;
         },
 
+        /**
+         * Get the features to be displayed
+         * @param {*} query 
+         * @param {*} featureCallback 
+         * @param {*} finishCallback 
+         * @param {*} errorCallback 
+         */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
 
@@ -177,9 +195,9 @@ function(
 
         /**
          * Creates the filter for the query to only look at Genes in the given range
-         * @param {*} chr 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} chr chromosome
+         * @param {*} start start position
+         * @param {*} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

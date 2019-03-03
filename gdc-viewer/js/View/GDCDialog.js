@@ -58,9 +58,9 @@ function (
         geneAccordion: undefined,
         mutationAccordion: undefined,
 
-        // Each filter object shows the current filters applied for a given type
-        // Note: double underscore is returned by the graphQL calls, though when applying
-        // filters they must be converted to a period
+        // Each filter obejct shows the current filters applied for a given type
+        // Note: double underscore (__) is returned by the graphQL calls, though when applying
+        // filters they must be converted to a period (.)
         caseFilters: {
             'primary_site': [],
             'project__project_id': [],
@@ -94,9 +94,12 @@ function (
         genePage: 1,
         pageSize: 20,
 
-        // GraphQL
+        // The base URL for GraphQL calls
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
+        /**
+         * Constructor
+         */
         constructor: function () {
             var thisB = this;
 
@@ -106,8 +109,13 @@ function (
             });
         },
         
+        /**
+         * Create a DOM object containing GDC Explore interface
+         * @return {object} DOM object
+         */
         _dialogContent: function () {
             var thisB = this;
+
             // Container holds all results in the dialog
             var dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '1200px', height: '700px' } });
 
@@ -116,8 +124,8 @@ function (
 
             // Creates facets and search results based on current filters
             thisB.refreshContent();
-
             thisB.resize();
+
             return dialogContainer;
         },
 
@@ -180,7 +188,7 @@ function (
         },
 
         /**
-         * Updates all content with current filters
+         * Updates the facets and search results with all current filters
          */
         refreshContent: function() {
             var thisB = this;
@@ -199,7 +207,7 @@ function (
         initializeFacets: function() {
             var thisB = this;
             
-            // Create combined facet object (handles between type key names)
+            // Create combined facet object
             var combinedFilters = thisB.combineAllFilters();
             combinedFilters = combinedFilters ? JSON.parse(combinedFilters) : combinedFilters
 
@@ -216,7 +224,10 @@ function (
             // Create stubs for the accordions for the facets
             thisB.createAccordionStubs();
 
-            // Add loading icons to each of the stubbed accordions
+            // Clear and readd loading icons to each of the stubbed accordions
+            dom.empty(thisB.caseFacetTab.containerNode);
+            dom.empty(thisB.mutationFacetTab.containerNode);
+            dom.empty(thisB.geneFacetTab.containerNode);
             var caseLoading = thisB.createLoadingIcon(thisB.caseFacetTab.containerNode);
             var mutationLoading = thisB.createLoadingIcon(thisB.mutationFacetTab.containerNode);
             var geneLoading = thisB.createLoadingIcon(thisB.geneFacetTab.containerNode);
@@ -259,8 +270,26 @@ function (
                 thisB.createFacet('ssm', thisB.mutationAccordion, response.data.viewer.explore.ssms);
                 thisB.createFacet('gene', thisB.geneAccordion, response.data.viewer.explore.genes);
             } else {
-                console.log('Did no receive expected response from GDC.');
+                thisB.setErrorMessage(thisB.caseAccordion.containerNode);
+                thisB.setErrorMessage(thisB.mutationAccordion.containerNode);
+                thisB.setErrorMessage(thisB.geneAccordion.containerNode);
             }
+        },
+
+        /**
+         * Adds an error message at the given location, along with a button to do a hard reset
+         * @param {*} location 
+         */
+        setErrorMessage(location) {
+            var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, location);
+            var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+            var hardRefreshButton = new Button({
+                label: 'Refresh Results',
+                onClick: function() {
+                    thisB.destroyAccordions();
+                    thisB.refreshContent();
+                }
+            }).placeAt(errorMessageHolder);
         },
 
         /**
@@ -344,6 +373,7 @@ function (
          * Compare function used for sorting facets
          * @param {*} a 
          * @param {*} b 
+         * @return {number}
          */
         compareTermElements: function(a, b) {
             if (a.key < b.key)
@@ -448,6 +478,7 @@ function (
                 thisB.createPaginationButtons(thisB.mutationResultsTab.containerNode, totalSSMs / thisB.pageSize, 'ssm', thisB.mutationPage);
             }).catch(function(err) {
                 console.log(err);
+                thisB.setErrorMessage(thisB.mutationAccordion.containerNode);
             });
         },
 
@@ -586,6 +617,7 @@ function (
                 thisB.createPaginationButtons(thisB.geneResultsTab.containerNode, totalGenes / thisB.pageSize, 'gene', thisB.genePage);
             }).catch(function(err) {
                 console.log(err);
+                thisB.setErrorMessage(thisB.geneAccordion.containerNode);
             });
         },
 
@@ -648,6 +680,7 @@ function (
                 thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
             }).catch(function(err) {
                 console.log(err);
+                thisB.setErrorMessage(thisB.caseAccordion.containerNode);
             });
         },
 
@@ -666,7 +699,7 @@ function (
 
         /**
          * Creates the cases table for the given hits in some location
-         * @param {List<object>} hits array of case hits
+         * @param {object} response the response from the GDC graphQL query
          * @param {object} location dom element to place the table
          */
         createDonorsTable: function(response, location) {
@@ -834,7 +867,7 @@ function (
 
         /**
          * Creates the genes table for the given hits in some location
-         * @param {List<object>} hits array of gene hits
+         * @param {object} response the response from the GDC graphQL query
          * @param {object} location dom element to place the table
          */
         createGenesTable: function(response, location) {
@@ -882,13 +915,13 @@ function (
 
         /**
          * Returns HTML for consequences of a mutation
-         * @param {*} hits 
+         * @param {List<object>} consequences list of consequence objects
          */
-        getMutationConsequences: function(hits) {
+        getMutationConsequences: function(consequences) {
             var result = '';
-            for (var hitId in hits) {
+            for (var hitId in consequences) {
                 var consequenceSpan = '<span>';
-                var hit = hits[hitId];
+                var hit = consequences[hitId];
                 var consequence = hit.node.transcript.consequence_type;
                 var aa_change = hit.node.transcript.aa_change;
                 var geneSymbol = hit.node.transcript.gene.symbol;
@@ -905,13 +938,13 @@ function (
 
         /**
          * Returns HTML for impact of a mutation
-         * @param {*} hits 
+         * @param {List<object} consequences list of consequence objects
          */
-        getMutationImpact: function(hits) {
+        getMutationImpact: function(consequences) {
             var result = '';
-            for (var hitId in hits) {
+            for (var hitId in consequences) {
                 var impactSpan = '<span>';
-                var hit = hits[hitId];
+                var hit = consequences[hitId];
                 var polyphen_impact = hit.node.transcript.annotation.polyphen_impact;
                 var polyphen_score = hit.node.transcript.annotation.polyphen_score;
                 var sift_impact = hit.node.transcript.annotation.sift_impact;
@@ -939,7 +972,7 @@ function (
 
         /**
          * Creates the mutations table for the given hits in some location
-         * @param {List<object>} hits array of mutation hits
+         * @param {object} response response from the GDC graphql
          * @param {object} location dom element to place the table
          */
         createMutationsTable: function(response, location) {
@@ -985,8 +1018,10 @@ function (
 
         /**
          * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
-         * @param {object} holder
-         * @param {integer} pagination
+         * @param {object} holder DOM location to place pagination buttons
+         * @param {integer} totalPages the total number of pages for the given query results
+         * @param {string} type the type of results to create pagination button for
+         * @param {integer} pageNum the current page
          */
         createPaginationButtons: function(holder, totalPages, type, pageNum) {
             var thisB = this;
@@ -1051,7 +1086,8 @@ function (
 
         /**
          * Calculate the 'from' parameter for the URL call
-         * @param {integer} page current page
+         * @param {number} page current page
+         * @return {number} start index
          */
         getStartIndex: function(page) {
             var thisB = this;
@@ -1061,6 +1097,7 @@ function (
         /**
          * Retrieves the filters of some type
          * @param {string} type The type of accordion
+         * @return {object} selected filter object
          */
         getFiltersForType: function(type) {
             var thisB = this;
@@ -1080,15 +1117,16 @@ function (
          * @param {string} facet name of the facet
          * @param {string} term name of option within facet
          * @param {object} filters list of filters to check
+         * @return {boolean} is the facet selected
          */
         isChecked: function(facet, term, filters) {
             return filters[facet] && filters[facet].indexOf(term) > -1;
         },
 
         /**
-         * Updates the pagination for search results
+         * Reset the pagination for search results
          */
-        updatePagination: function() {
+        resetPagination: function() {
             var thisB = this;
             thisB.casePage = 1;
             thisB.genePage = 1;
@@ -1107,7 +1145,8 @@ function (
 
         /**
          * Converts a filter object to one that can be passed to the GDC API
-         * @param {*} filters
+         * @param {object} filters the filter object to be converted to GDC style filters
+         * @return {string} encoded GDC filter string 
          */
         convertFilterObjectToGDCFilter: function(filters) {
             var gdcFilters = {"op":"and","content":[]};
@@ -1131,6 +1170,7 @@ function (
 
         /**
          * Combines all three types of filters into one encoded filter string
+         * @return {object} combined filter object
          */
         combineAllFilters: function() {
             var thisB = this;
@@ -1204,22 +1244,14 @@ function (
             var node = dom.toDom(prettyFacetString);
             dom.place(node, location);
 
-            // Add hard refresh button
-            var hardRefreshButton = new Button({
-                label: 'Reset',
-                onClick: function() {
-                    thisB.destroyAccordions();
-                    thisB.refreshContent();
-                }
-            }).placeAt(location);
-
             thisB.addTooltipToButton(hardRefreshButton, "Manually refresh all content based on current filters");
 
         },
 
         /**
          * Pretty prints a facet name
-         * @param {*} facetName 
+         * @param {string} facetName facet name to be altered
+         * @return {string} pretty facet name
          */
         prettyFacetName: function (facetName) {
             var splitName = facetName.split('__')
@@ -1244,17 +1276,17 @@ function (
                 thisB.mutationFilters[key] = []
             }
 
-            thisB.updatePagination();
+            thisB.resetPagination();
             thisB.destroyAccordions();
             thisB.refreshContent();
         },
 
         /**
-         * Generic function for adding a track of some type
-         * @param {*} storeClass 
-         * @param {*} caseId 
-         * @param {*} combinedFacetObject 
-         * @param {*} trackType 
+         * Generic function for adding a track of some type and store class
+         * @param {string} storeClass the JBrowse store class
+         * @param {number} caseId unique case ID
+         * @param {object} combinedFacetObject facet object with all three types combined
+         * @param {string} trackType the JBrowse track type
          */
         addTrack: function (storeClass, caseId, combinedFacetObject, trackType) {
             if (combinedFacetObject !== undefined) {
@@ -1308,7 +1340,7 @@ function (
 
         /**
          * Creates a loading icon in the given location and returns
-         * @param {object} location Place to put the loading icon
+         * @param {object} location DOM location to place loading icon
          */
         createLoadingIcon: function (location) {
             var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
@@ -1318,6 +1350,7 @@ function (
 
         /**
          * Generate a GUID
+         * @return {string} GUID
          */
         guid: function() {
             function s4() {
@@ -1328,6 +1361,11 @@ function (
             return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
+        /**
+         * Show callback for displaying dialog
+         * @param {*} browser 
+         * @param {*} callback 
+         */
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};
@@ -1336,6 +1374,5 @@ function (
             this.inherited(arguments);
             focus.focus(this.closeButtonNode);
         }
-        
     });
 });
