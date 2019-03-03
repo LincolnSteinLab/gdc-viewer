@@ -13,7 +13,7 @@ function(
             // Filters to apply to CNV query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
             this.size = args.size !== undefined ? parseInt(args.size) : 500;
-            this.donor = args.donor;
+            this.case = args.case;
         },
 
         /**
@@ -161,8 +161,8 @@ function(
         getLocationFilters: function(chr, start, end) {
             var thisB = this;
             var locationFilter = {"op":"and","content":[{"op":">=","content":{"field":"cnvs.start_position","value":start}},{"op":"<=","content":{"field":"cnvs.end_position","value":end}},{"op":"=","content":{"field":"cnvs.chromosome","value":[chr]}}]};
-            if (thisB.donor) {
-                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.donor}};
+            if (thisB.case) {
+                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.case}};
                 locationFilter.content.push(caseFilter);
             }
             return(locationFilter);

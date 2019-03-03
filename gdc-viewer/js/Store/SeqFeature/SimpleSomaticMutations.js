@@ -15,7 +15,7 @@ function(
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
             this.size = args.size !== undefined ? parseInt(args.size) : 500;
-            this.donor = args.donor;
+            this.case = args.case;
         },
 
         /**
@@ -219,8 +219,6 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
-            console.log('get features from chr ' + ref + ': ' + start + ' - ' + end);
-
             var url = 'https://api.gdc.cancer.gov/v0/graphql/SsmsTable';
             const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
@@ -272,8 +270,8 @@ function(
         getLocationFilters: function(chr, start, end) {
             var thisB = this;
             var locationFilter = {"op":"and","content":[{"op":">=","content":{"field":"ssms.start_position","value":start}},{"op":"<=","content":{"field":"ssms.end_position","value":end}},{"op":"=","content":{"field":"ssms.chromosome","value":['chr'+chr]}}]};
-            if (thisB.donor) {
-                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.donor}};
+            if (thisB.case) {
+                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.case}};
                 locationFilter.content.push(caseFilter);
             }
             return(locationFilter);

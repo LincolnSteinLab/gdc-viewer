@@ -1267,7 +1267,7 @@ function (
                 browser: this.browser,
                 refSeq: this.browser.refSeq,
                 type: 'gdc-viewer/Store/SeqFeature/' + storeClass,
-                donor: caseId,
+                case: caseId,
                 filters: combinedFacetObject
             };
             var storeName = this.browser.addStoreConfig(null, storeConf);
@@ -1288,7 +1288,7 @@ function (
                 key: key,
                 metadata: {
                     datatype: storeClass,
-                    donor: caseId
+                    case: caseId
                 }
             };
 
