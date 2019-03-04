@@ -119,6 +119,9 @@ function (
             // Container holds all results in the dialog
             var dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '1200px', height: '700px' } });
 
+            // Create the header section
+            thisB.createHeaderSection(dialogContainer);
+
             // Create the scaffolding to hold everything
             thisB.createScaffolding(dialogContainer);
 
@@ -127,6 +130,20 @@ function (
             thisB.resize();
 
             return dialogContainer;
+        },
+
+        /**
+         * Add a header section with a title
+         * @param {object} container DOM object to place header
+         */
+        createHeaderSection: function(container) {
+            var thisB = this;
+
+            var headerSection = dom.create('div', { style: "display: flex; flex-direction: row; justify-content: flex-start; align-items: center;" }, container);
+            var logoSection = dom.create('div', { style: "flex-grow: 3" }, headerSection);
+
+            var titleSection = dom.create('div', { style: "flex-grow: 5" }, headerSection);
+            var aboutMessage = dom.create('h1', { innerHTML: "Explore data available on the GDC Data Portal" }, titleSection);
         },
 
         /**
