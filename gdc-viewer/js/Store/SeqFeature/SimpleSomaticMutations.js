@@ -11,18 +11,25 @@ function(
     SimpleFeature
 ) {
     return declare(SeqFeatureStore, {
+        /**
+         * Constructor
+         * @param {*} args 
+         */
         constructor: function (args) {
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            // Size of results
             this.size = args.size !== undefined ? parseInt(args.size) : 500;
+            // Case ID
             this.case = args.case;
         },
 
         /**
          * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} chr chromsome
+         * @param {*} start start position
+         * @param {*} end end position
+         * @return {object} query object
          */
         getFilterQuery: function (chr, start, end) {
             var thisB = this;
@@ -41,8 +48,9 @@ function(
 
         /**
          * Creates a link to a given ID
-         * @param {string} link Base URL for link
+         * @param {string} link base URL for link
          * @param {string} id ID to apped to base URL
+         * @return {string} a tag
          */
         createLinkWithId: function(link, id) {
             return id !== null ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
@@ -50,8 +58,10 @@ function(
 
         /**
          * Creates a link to a given ID and name
-         * @param {string} link Base URL for link
+         * @param {string} link base URL for link
          * @param {string} id ID to apped to base URL
+         * @param {string} name text to display
+         * @return {string} a tag
          */
         createLinkWithIdAndName: function(link, id, name) {
             return id !== null ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
@@ -74,17 +84,29 @@ function(
             return cosmicLinks.join(", ");
         },
 
+        /**
+         * Converts an int representation of strand to a string
+         * @param {number} strand 
+         * @return {string} + or -
+         */
         convertIntToStrand: function(strand) {
             return strand == 1 ? '+' : '-'
         },
 
+        /**
+         * Pretty version of score
+         * @param {*} label text to display
+         * @param {*} score score value
+         * @return {string} pretty score
+         */
         prettyScore: function(label, score) {
             return label != null && score != null ? label + ' (' + score + ')' : 'n/a';
         },
 
         /**
          * Creates a table of consequences for a mutation
-         * @param {List<Consequence>} consequences 
+         * @param {List<object>} consequences list of consequence objects
+         * @return {string} consequence table
          */
         createConsequencesTable: function(consequences) {
             var thisB = this;
@@ -138,7 +160,8 @@ function(
 
         /**
          * Prints text to avoid undefined/null
-         * @param {*} text 
+         * @param {string} text text to display
+         * @return {string} pretty text
          */
         prettyText: function(text) {
             return text ? text : 'n/a';
@@ -147,7 +170,8 @@ function(
         /**
          * Returns the end value to be used for querying GDC
          * @param {string} chr Chromosome number (ex. 1)
-         * @param {integer} end End location of JBrowse view
+         * @param {number} end End location of JBrowse view
+         * @return {number} chromsome end position
          */
         getChromosomeEnd: function(chr, end) {
             var chromosomeSizes = {
@@ -186,9 +210,9 @@ function(
 
         /**
          * Creates the query object for graphQL call
-         * @param {*} ref 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} ref chromosome
+         * @param {*} start start position
+         * @param {*} end end position
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
@@ -210,6 +234,13 @@ function(
             return bodyVal;
         },
 
+        /**
+         * Get the features to be displayed
+         * @param {*} query 
+         * @param {*} featureCallback 
+         * @param {*} finishCallback 
+         * @param {*} errorCallback 
+         */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
 
@@ -263,9 +294,9 @@ function(
 
         /**
          * Creates the filter for the query to only look at SSMs in the given range
-         * @param {*} chr 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} chr chromsome
+         * @param {*} start start position
+         * @param {*} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

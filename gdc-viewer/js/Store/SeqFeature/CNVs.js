@@ -9,18 +9,24 @@ function(
     SimpleFeature
 ) {
     return declare(SeqFeatureStore, {
+        /**
+         * Constructor
+         * @param {*} args 
+         */
         constructor: function (args) {
             // Filters to apply to CNV query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
+            // Size of results
             this.size = args.size !== undefined ? parseInt(args.size) : 500;
+            // Case ID
             this.case = args.case;
         },
 
         /**
          * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} chr chromosome to filter by
+         * @param {*} start start position
+         * @param {*} end end position
          */
         getFilterQuery: function (chr, start, end) {
             var thisB = this;
@@ -41,6 +47,7 @@ function(
          * Returns the end value to be used for querying GDC
          * @param {string} chr Chromosome number (ex. 1)
          * @param {integer} end End location of JBrowse view
+         * @return {int} end position
          */
         getChromosomeEnd: function(chr, end) {
             var chromosomeSizes = {
@@ -79,7 +86,8 @@ function(
 
         /**
          * Converts the CNV change string to a numeric value
-         * @param {*} cnvChange Gain or Loss
+         * @param {string} cnvChange Gain or Loss
+         * @return {number} 1 for gain or -1 for loss
          */
         convertCNVChangeToScore: function(cnvChange) {
             cnvChange = cnvChange.toLowerCase();
@@ -92,9 +100,10 @@ function(
 
         /**
          * Creates the query object for graphQL call
-         * @param {*} ref 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} ref chromosome
+         * @param {*} start start position
+         * @param {*} end end position
+         * @return {object} query object
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
@@ -113,6 +122,13 @@ function(
             return bodyVal;
         },
 
+        /**
+         * Get the features to be displayed
+         * @param {*} query 
+         * @param {*} featureCallback 
+         * @param {*} finishCallback 
+         * @param {*} errorCallback 
+         */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
 
@@ -154,9 +170,9 @@ function(
         
         /**
          * Creates the filter for the query to only look at CNVs in the given range
-         * @param {*} chr 
-         * @param {*} start 
-         * @param {*} end 
+         * @param {*} chr chromosome
+         * @param {*} start start position
+         * @param {*} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

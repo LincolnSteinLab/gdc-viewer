@@ -23,11 +23,15 @@ function (
     ActionBarDialog
 ) {
     return declare(ActionBarDialog, {
+        // Parent DOM to hold results
         dialogContainer: undefined,
 
-        // GraphQL
+        // The base URL for GraphQL calls
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
+        /**
+         * Constructor
+         */
         constructor: function () {
             var thisB = this;
 
@@ -37,23 +41,27 @@ function (
             });
         },
         
+        /**
+         * Create a DOM object containing GDC primary site interface
+         * @return {object} DOM object
+         */
         _dialogContent: function () {
             var thisB = this;
             // Container holds all results in the dialog
             thisB.dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '700px', height: '700px' } });
 
+            // Update the primary site table
             thisB.getPrimarySiteInformation();
-
             thisB.resize();
+
             return thisB.dialogContainer;
         },
 
         /**
-         * Retrieve primary site information from GDC
+         * Retrieve primary site information from GDC and display as a table
          */
         getPrimarySiteInformation: function() {
             var thisB = this;
-            var url = thisB.baseGraphQLUrl;
 
             // Clear current results
             dom.empty(thisB.dialogContainer);
@@ -61,13 +69,12 @@ function (
 
             // Create body for GraphQL query
             var primarySiteQuery = `query primarySiteQuery { viewer { repository { cases { aggregations { primary_site { buckets { doc_count key } } } } } } }`;
-
             var bodyVal = {
                 query: primarySiteQuery,
                 variables: {}
             }
 
-            fetch(url, {
+            fetch(thisB.baseGraphQLUrl, {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: JSON.stringify(bodyVal)
@@ -95,7 +102,7 @@ function (
 
         /**
          * Creates a table with primary sites
-         * @param {*} response 
+         * @param {*} response object returned by graphQL call
          */
         createPrimarySiteTable: function(response) {
             var thisB = this;
@@ -194,12 +201,11 @@ function (
 
         /**
          * Generic function for adding a track of some type
-         * @param {*} storeClass 
-         * @param {*} primarySite 
-         * @param {*} trackType 
+         * @param {string} storeClass the JBrowse store class
+         * @param {string} primarySite the primary site to filter by
+         * @param {string} trackType the JBrowse track type
          */
         addTrack: function (storeClass, primarySite, trackType) {
-
             var primarySiteFilters = {"op":"in","content":{"field": "cases.primary_site","value": primarySite}};
             
             var storeConf = {
@@ -244,20 +250,20 @@ function (
         /**
          * Adds a tooltip with some text to a location
          * @param {*} button Location to attach tooltip
-         * @param {*} tooltipText Text to display in tooltip
+         * @param {*} text Text to display in tooltip
          */
-        addTooltipToButton: function(button, tooltipText) {
+        addTooltipToButton: function(button, text) {
             var tooltip = new Tooltip({
-                label: tooltipText
+                label: text
             });
 
             tooltip.addTarget(button);
         },
 
-
         /**
          * Creates a loading icon in the given location and returns
          * @param {object} location Place to put the loading icon
+         * @return {object} loading icon
          */
         createLoadingIcon: function (location) {
             var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
@@ -267,6 +273,7 @@ function (
 
         /**
          * Generate a GUID
+         * @return {string} GUID
          */
         guid: function() {
             function s4() {
@@ -277,6 +284,11 @@ function (
             return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
+        /**
+         * Show callback for displaying dialog
+         * @param {*} browser 
+         * @param {*} callback 
+         */
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};
