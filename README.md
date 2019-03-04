@@ -74,6 +74,17 @@ Note that this will only show preloaded tracks as well as tracks you have added 
 All SeqFeatures support filters as they are defined in the [GDC API Documentation](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query).
 Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, SSM filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
 
+The following shows a filter for cases by ethnicity:
+{
+  "op":"in",
+  "content":{
+    "field":"cases.demographic.ethnicity",
+    "value":[
+      "hispanic or latino"
+    ]
+  }
+}
+
 ## Genes
 A simple view of all of the genes seen across all cases.
 

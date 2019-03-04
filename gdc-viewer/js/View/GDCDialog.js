@@ -298,6 +298,7 @@ function (
          * @param {*} location 
          */
         setErrorMessage(location) {
+            var thisB = this;
             var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, location);
             var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
             var hardRefreshButton = new Button({
