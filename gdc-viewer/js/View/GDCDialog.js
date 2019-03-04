@@ -290,6 +290,7 @@ function (
                     thisB.refreshContent();
                 }
             }).placeAt(errorMessageHolder);
+            thisB.addTooltipToButton(hardRefreshButton, "Manually refresh all content based on current filters");
         },
 
         /**
@@ -1243,9 +1244,6 @@ function (
             }
             var node = dom.toDom(prettyFacetString);
             dom.place(node, location);
-
-            thisB.addTooltipToButton(hardRefreshButton, "Manually refresh all content based on current filters");
-
         },
 
         /**
