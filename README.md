@@ -31,9 +31,16 @@ bin/prepare-refseqs.pl --fasta Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
 Note that you can specify multiple fast in one command by doing `--fasta fasta1.fa.gz --fasta fasta2.fa.gz ...`
 
 ## 4. Adding new tracks
-We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse.
+We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`.
 
-To access the GDC dialog, choose `GDC` in the menu and select `Search GDC`. You'll see a dialog with two sections. These are similar to the Exploration section of the GDC portal. The facets section allows you to apply facets to the search results present on the results section of the dialog. Note the three tabs in each section that represent the endpoints available from the GDC. Currently facets in one endpoint only impact the results of the corresponing search result endpoint, though this should be changed in the future to mimic the Exploration page on the GDC website.
+### A. Explore GDC
+This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
+
+### B. View GDC Projects
+This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
+
+### C. View GDC Primary Sites
+This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
 
 ## 5. Run JBrowse
 You'll have to run the following commands:
@@ -44,7 +51,6 @@ utils/jb_run.js -p 3000
 ```
 
 JBrowse should now be running with the GDC Plugin working!
-
 
 # JBrowse configuration
 ## Faceted Track Selector
@@ -61,12 +67,23 @@ displayColumns =
   + primarySite
 ```
 
-Note that this will only show preloaded tracks as well as tracks you have added using the Faceted Search Dialog. It does not dynamically create tracks based on what is available from the GDC.
+Note that this will only show preloaded tracks as well as tracks you have added using the various dialogs. It does not dynamically create tracks based on what is available from the GDC.
 
 # Available Store SeqFeature
 ## A note on filters
 All SeqFeatures support filters as they are defined in the [GDC API Documentation](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query).
 Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, SSM filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
+
+The following shows a filter for cases by ethnicity:
+{
+  "op":"in",
+  "content":{
+    "field":"cases.demographic.ethnicity",
+    "value":[
+      "hispanic or latino"
+    ]
+  }
+}
 
 ## Genes
 A simple view of all of the genes seen across all cases.

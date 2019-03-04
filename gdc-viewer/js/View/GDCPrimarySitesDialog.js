@@ -25,6 +25,7 @@ function (
     return declare(ActionBarDialog, {
         // Parent DOM to hold results
         dialogContainer: undefined,
+        resultsContainer: undefined,
 
         // The base URL for GraphQL calls
         baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
@@ -50,11 +51,24 @@ function (
             // Container holds all results in the dialog
             thisB.dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '700px', height: '700px' } });
 
+            // Create header section
+            thisB.createHeaderSection();
+
             // Update the primary site table
+            thisB.resultsContainer = dom.create('div', { style: { width: '100%', height: '100%' } }, thisB.dialogContainer);
             thisB.getPrimarySiteInformation();
             thisB.resize();
 
             return thisB.dialogContainer;
+        },
+
+        /**
+         * Add a header section with a title
+         */
+        createHeaderSection: function() {
+            var thisB = this;
+            var headerSection = dom.create('div', { style: "margin-bottom: 5px;" }, thisB.dialogContainer);
+            var aboutMessage = dom.create('h1', { innerHTML: "View primary sites available on the GDC Data Portal" }, headerSection);
         },
 
         /**
@@ -64,8 +78,8 @@ function (
             var thisB = this;
 
             // Clear current results
-            dom.empty(thisB.dialogContainer);
-            thisB.createLoadingIcon(thisB.dialogContainer);
+            dom.empty(thisB.resultsContainer);
+            thisB.createLoadingIcon(thisB.resultsContainer);
 
             // Create body for GraphQL query
             var primarySiteQuery = `query primarySiteQuery { viewer { repository { cases { aggregations { primary_site { buckets { doc_count key } } } } } } }`;
@@ -81,12 +95,11 @@ function (
             }).then(function(response) {
                 return(response.json());
             }).then(function(response) {
-                dom.empty(thisB.dialogContainer);
+                dom.empty(thisB.resultsContainer);
                 if (response.data) {
-                    var aboutMessage = dom.create('h1', { innerHTML: "View Gene, SSM, and CNV tracks filtered by Primary Site" }, thisB.dialogContainer);
                     thisB.createPrimarySiteTable(response);
                 } else {
-                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.dialogContainer);
+                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.resultsContainer);
                     var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
                     var hardRefreshButton = new Button({
                         label: 'Refresh Results',
@@ -196,7 +209,7 @@ function (
                 }
             }
             dom.place(rowsHolderNode, tableNode);
-            dom.place(tableNode, thisB.dialogContainer);
+            dom.place(tableNode, thisB.resultsContainer);
         },
 
         /**
