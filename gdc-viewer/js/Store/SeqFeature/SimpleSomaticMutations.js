@@ -269,17 +269,17 @@ function(
                             data: {
                                 'start': variant.start_position,
                                 'end': variant.end_position,
-                                'GDC': thisB.createLinkWithId(GDC_LINK, variant.ssm_id),
+                                'gdc': thisB.createLinkWithId(GDC_LINK, variant.ssm_id),
                                 'type': variant.mutation_type,
-                                'Subtype': variant.mutation_subtype,
-                                'Genomic DNA Change': variant.genomic_dna_change,
-                                'COSMIC': thisB.createCOSMICLinks(variant.cosmic_id),
-                                'Reference Allele': variant.reference_allele,
-                                'Tumour Allele': variant.tumor_allele,
-                                'NCBI Build': variant.ncbi_build,
-                                'Chromosome': variant.chromosome,
-                                'Gene AA Change': variant.gene_aa_change,
-                                'Consequences': thisB.createConsequencesTable(variant.consequence.hits.edges)
+                                'subtype': variant.mutation_subtype,
+                                'genomic dna change': variant.genomic_dna_change,
+                                'cosmic': thisB.createCOSMICLinks(variant.cosmic_id),
+                                'reference allele': variant.reference_allele,
+                                'tumour allele': variant.tumor_allele,
+                                'ncbi build': variant.ncbi_build,
+                                'chromosome': variant.chromosome,
+                                'gene aa change': variant.gene_aa_change,
+                                'consequences': thisB.createConsequencesTable(variant.consequence.hits.edges)
                             }
                         }
                         featureCallback(new SimpleFeature(variantFeature));
