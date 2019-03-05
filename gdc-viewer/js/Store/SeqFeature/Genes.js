@@ -236,7 +236,6 @@ function(
          */
         createProjectTable: function(response) {
             var thisB = this;
-            var thisB = this;
             var thStyle = 'border: 1px solid #e6e6e6; padding: .2rem .2rem;';
             var headerRow = `
                 <tr style=\"background-color: #f2f2f2\">
@@ -281,7 +280,7 @@ function(
          * @param {List<string>} list 
          */
         printList: function(list) {
-            var listTag = '<ul style="list-style: none; padding: 0px;">';
+            var listTag = '<ul>';
             for (item of list) {
                 listTag += '<li>' + item + '</li>';
             }

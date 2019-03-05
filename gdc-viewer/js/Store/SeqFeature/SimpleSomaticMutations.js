@@ -11,6 +11,9 @@ function(
     SimpleFeature
 ) {
     return declare(SeqFeatureStore, {
+        projects: undefined,
+        mutations: undefined,
+
         /**
          * Constructor
          * @param {*} args 
@@ -19,7 +22,7 @@ function(
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
             // Size of results
-            this.size = args.size !== undefined ? parseInt(args.size) : 500;
+            this.size = args.size !== undefined ? parseInt(args.size) : 2;
             // Case ID
             this.case = args.case;
         },
@@ -209,6 +212,149 @@ function(
         },
 
         /**
+         * Gets the general project information for all projects available on the GDC
+         */
+        getProjectData: function() {
+            var thisB = this;
+            return new Promise(function(resolve, reject) {
+                var url = 'https://api.gdc.cancer.gov/v0/graphql';
+                var bodyVal = {
+                    query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
+                    variables: {
+                        "count": 100
+                    }
+                }
+                fetch(url, {
+                    method: 'post',
+                    headers: { 'X-Requested-With': null },
+                    body: JSON.stringify(bodyVal)
+                }).then(function(response) {
+                    return(response.json());
+                }).then(function(response) {
+                    resolve(response);
+                }).catch(function(error) {
+                    reject(error);
+                });
+            });
+        },
+
+
+
+        /**
+         * Creates a mutation feature with the given gene object
+         * @param {*} mutation 
+         * @param {*} featureCallback 
+         */
+        createMutationFeature: function(mutation, featureCallback) {
+            var thisB = this;
+            return new Promise(function(resolve, reject) {
+                var mutationId = mutation.ssm_id;
+                var url = 'https://api.gdc.cancer.gov/v0/graphql';
+                var bodyVal = {
+                    query: `query projectsTable($ssmTested: FiltersArgument, $caseAggsFilter: FiltersArgument) { viewer { explore { cases { filtered: aggregations(filters: $caseAggsFilter) { project__project_id { buckets { doc_count key } } } total: aggregations(filters: $ssmTested) { project__project_id { buckets { doc_count key } } } } } } }`,
+                    variables: {
+                        "ssmTested": { "op":"and", "content":[ { "op":"in", "content":{ "field":"cases.available_variation_data", "value":[ "ssm" ] } } ] } ,
+                        "caseAggsFilter": { "op":"and", "content":[ { "op":"in", "content":{ "field":"ssms.ssm_id", "value":[ mutationId ] } }, { "op":"in", "content":{ "field":"cases.available_variation_data", "value":[ "ssm" ] } } ] }
+                    }
+                }
+                fetch(url, {
+                    method: 'post',
+                    headers: { 'X-Requested-With': null },
+                    body: JSON.stringify(bodyVal)
+                }).then(function(response) {
+                    return(response.json());
+                }).then(function(response) {
+                    const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
+                    variantFeature = {
+                        id: mutation.ssm_id,
+                        data: {
+                            'start': mutation.start_position,
+                            'end': mutation.end_position,
+                            'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                            'type': mutation.mutation_type,
+                            'subtype': mutation.mutation_subtype,
+                            'genomic dna change': mutation.genomic_dna_change,
+                            'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id),
+                            'reference allele': mutation.reference_allele,
+                            'tumour allele': mutation.tumor_allele,
+                            'ncbi build': mutation.ncbi_build,
+                            'chromosome': mutation.chromosome,
+                            'gene aa change': mutation.gene_aa_change,
+                            'consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
+                            'projects': thisB.createProjectTable(response)
+                        }
+                    }
+                    featureCallback(new SimpleFeature(variantFeature));
+                    resolve();
+                }).catch(function(error) {
+                    reject(error);
+                });
+            });
+        },
+
+        /**
+         * Finds the corresponding project doc_count in a list of projects
+         */
+        findProjectByKey: function(projects, key) {
+            var project = projects.find(project => project.key === key);
+            return project ? project.doc_count : 0;
+        },
+
+        /**
+         * Creates a project table that shows the distribution of a gene across projects
+         * @param {*} response 
+         */
+        createProjectTable: function(response) {
+            var thisB = this;
+            var thStyle = 'border: 1px solid #e6e6e6; padding: .2rem .2rem;';
+            var headerRow = `
+                <tr style=\"background-color: #f2f2f2\">
+                    <th style="${thStyle}">Project</th>
+                    <th style="${thStyle}">Disease Type</th>
+                    <th style="${thStyle}">Site</th>
+                    <th style="${thStyle}"># SSM Affected Cases</th> 
+                </tr>
+            `;
+
+            var table = '<table style="width: 560px; border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
+
+            var count = 0;
+            for (project of response.data.viewer.explore.cases.filtered.project__project_id.buckets) {
+                var trStyle = '';
+                if (count % 2 != 0) {
+                    trStyle = 'style=\"background-color: #f2f2f2\"';
+                }
+                var projectInfo = thisB.projects.find(x => x.node.project_id === project.key);
+                var row = `<tr ${trStyle}>
+                    <td style="${thStyle}"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
+                    <td style="${thStyle}">${thisB.printList(projectInfo.node.disease_type)}</td>
+                    <td style="${thStyle}">${thisB.printList(projectInfo.node.primary_site)}</td>
+                    <td style="${thStyle}">${project.doc_count} / ${thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key)}</td>
+                    </tr>
+                `;
+                
+                table += row;
+                count++;
+            }
+
+            table += '</table>';
+            return table;
+        },
+
+        /**
+         * Convert a list of strings to a HTML list
+         * @param {List<string>} list 
+         */
+        printList: function(list) {
+            var listTag = '<ul>';
+            for (item of list) {
+                listTag += '<li>' + item + '</li>';
+            }
+            listTag += '</ul>';
+            return listTag;
+        },
+
+        /**
          * Creates the query object for graphQL call
          * @param {*} ref chromosome
          * @param {*} start start position
@@ -251,40 +397,30 @@ function(
             end = thisB.getChromosomeEnd(ref, end);
 
             var url = 'https://api.gdc.cancer.gov/v0/graphql/SsmsTable';
-            const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
 
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
-            fetch(url, {
-                method: 'post',
-                headers: { 'X-Requested-With': null },
-                body: bodyVal
+            thisB.mutations = [];
+
+            thisB.getProjectData().then(function(response) {
+                thisB.projects = response.data.projectsViewer.projects.hits.edges;
+                return fetch(url, {
+                    method: 'post',
+                    headers: { 'X-Requested-With': null },
+                    body: bodyVal
+                });
             }).then(function(response) {
                 return(response.json());
             }).then(function(response) {
                 if (response.data) {
-                    for (var hitId in response.data.viewer.explore.ssms.hits.edges) {
-                        var variant = response.data.viewer.explore.ssms.hits.edges[hitId].node;
-                        variantFeature = {
-                            id: variant.ssm_id,
-                            data: {
-                                'start': variant.start_position,
-                                'end': variant.end_position,
-                                'gdc': thisB.createLinkWithId(GDC_LINK, variant.ssm_id),
-                                'type': variant.mutation_type,
-                                'subtype': variant.mutation_subtype,
-                                'genomic dna change': variant.genomic_dna_change,
-                                'cosmic': thisB.createCOSMICLinks(variant.cosmic_id),
-                                'reference allele': variant.reference_allele,
-                                'tumour allele': variant.tumor_allele,
-                                'ncbi build': variant.ncbi_build,
-                                'chromosome': variant.chromosome,
-                                'gene aa change': variant.gene_aa_change,
-                                'consequences': thisB.createConsequencesTable(variant.consequence.hits.edges)
-                            }
-                        }
-                        featureCallback(new SimpleFeature(variantFeature));
+                    var promiseArray = [];
+                    thisB.mutations = response.data.viewer.explore.ssms.hits.edges;
+                    for (var hitId in thisB.mutations) {
+                        var mutation = thisB.mutations[hitId].node;
+                        promiseArray.push(thisB.createMutationFeature(mutation, featureCallback));
                     }
-                    finishCallback();
+                    Promise.all(promiseArray).then(function(result) {
+                        finishCallback();
+                    });
                 }
             }).catch(function(err) {
                 console.log(err);
