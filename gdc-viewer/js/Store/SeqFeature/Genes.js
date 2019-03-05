@@ -20,7 +20,7 @@ function(
             // Filters to apply to Gene query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
             // Size of results
-            this.size = args.size !== undefined ? parseInt(args.size) : 100;
+            this.size = args.size !== undefined ? parseInt(args.size) : 20;
             // Case ID
             this.case = args.case;
         },
@@ -116,7 +116,7 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id gene_strand synonyms symbol name gene_start gene_end gene_chromosome description canonical_transcript_id canonical_transcript_length canonical_transcript_length_genomic canonical_transcript_length_cds is_cancer_gene_census cytoband biotype numCases: score is_cancer_gene_census } } } } } } }`;
+            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id gene_strand synonyms symbol name gene_start gene_end gene_chromosome description canonical_transcript_id external_db_ids { hgnc omim_gene uniprotkb_swissprot entrez_gene } biotype numCases: score is_cancer_gene_census } } } } } } }`;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {
@@ -191,7 +191,10 @@ function(
                 }).then(function(response) {
                     const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
                     const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
-
+                    const NCBI_LINK = 'http://www.ncbi.nlm.nih.gov/gene/';
+                    const UNI_LINK = 'http://www.uniprot.org/uniprot/';
+                    const HGNC_LINK = 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/';
+                    const OMIM_LINK = 'https://www.omim.org/entry/';
                     geneFeature = {
                         id: gene.gene_id,
                         data: {
@@ -202,14 +205,14 @@ function(
                             'gene name': gene.name,
                             'symbol': gene.symbol,
                             'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id),
-                            'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
-                            'biotype': gene.biotype,
+                            'type': gene.biotype,
                             'synonyms': gene.synonyms,
                             'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
-                            'canonical transcript length': gene.canonical_transcript_length,
-                            'cytoband': gene.cytoband,
-                            'canonical transcript length genomic': gene.canonical_transcript_length_genomic,
-                            'canonical transcript length cds': gene.canonical_transcript_length_cds,
+                            'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
+                            'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
+                            'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
+                            'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
+                            'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
                             'is cancer gene census': gene.is_cancer_gene_census,
                             'projects': thisB.createProjectTable(response)
                         }

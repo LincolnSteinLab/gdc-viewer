@@ -42,6 +42,9 @@ return declare( JBrowsePlugin,
         }, this);            
     },
 
+    /**
+     * Create the dialog for exploring the GDC
+     */
     createGDCExplore: function () {
         var searchDialog = new GDCDialog(
             {
@@ -56,6 +59,9 @@ return declare( JBrowsePlugin,
         );
     },
 
+    /**
+     * Create the dialog for viewing GDC projects
+     */
     createGDCProject: function () {
         var searchDialog = new GDCProjectDialog(
             {
@@ -70,6 +76,9 @@ return declare( JBrowsePlugin,
         );
     },
 
+    /**
+     * Create the dialog for viewing GDC primary sites
+     */
     createGDCPrimarySites: function () {
         var searchDialog = new GDCPrimarySitesDialog(
             {
