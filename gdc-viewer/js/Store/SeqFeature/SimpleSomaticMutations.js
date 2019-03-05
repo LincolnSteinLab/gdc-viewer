@@ -429,6 +429,15 @@ function(
         },
 
         /**
+         * Stub for getParser
+         */
+        getParser: function() {
+            return new Promise(function(resolve, reject) {
+                resolve({'getMetadata': function() {}});
+            });
+        },
+
+        /**
          * Creates the filter for the query to only look at SSMs in the given range
          * @param {*} chr chromsome
          * @param {*} start start position

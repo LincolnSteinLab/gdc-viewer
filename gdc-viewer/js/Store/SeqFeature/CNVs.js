@@ -167,6 +167,15 @@ function(
                 errorCallback('Error contacting GDC Portal');
             });
         },
+
+        /**
+         * Stub for getParser
+         */
+        getParser: function() {
+            return new Promise(function(resolve, reject) {
+                resolve({'getMetadata': function() {}});
+            });
+        },
         
         /**
          * Creates the filter for the query to only look at CNVs in the given range

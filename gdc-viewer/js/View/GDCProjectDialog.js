@@ -281,7 +281,8 @@ function (
                 metadata: {
                     datatype: storeClass,
                     project: projectId
-                }
+                },
+                unsafePopup: true
             };
 
             if (storeClass === 'CNVs') {

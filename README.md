@@ -95,6 +95,7 @@ storeClass=gdc-viewer/Store/SeqFeature/Genes
 type=JBrowse/View/Track/CanvasVariants
 key=GDC Genes
 metadata.datatype=Gene
+unsafePopup=true
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
@@ -116,6 +117,7 @@ storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
 type=JBrowse/View/Track/CanvasVariants
 key=GDC SSM
 metadata.datatype=SSM
+unsafePopup=true
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
@@ -139,6 +141,7 @@ key=GDC CNV
 metadata.datatype=CNV
 autoscale=local
 bicolor_pivot=0
+unsafePopup=true
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.

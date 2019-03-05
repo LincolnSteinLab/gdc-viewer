@@ -1339,7 +1339,8 @@ function (
                 metadata: {
                     datatype: storeClass,
                     case: caseId
-                }
+                },
+                unsafePopup: true
             };
 
             if (storeClass === 'CNVs') {

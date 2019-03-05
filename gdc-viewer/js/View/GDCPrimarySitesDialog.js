@@ -245,7 +245,8 @@ function (
                 metadata: {
                     datatype: storeClass,
                     primarySite: primarySite
-                }
+                },
+                unsafePopup: true
             };
 
             if (storeClass === 'CNVs') {
