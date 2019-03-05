@@ -156,7 +156,7 @@ function (
                     var hit = response.data.projectsViewer.projects.hits.edges[hitId].node;
 
                     var projectRowContent = `
-                            <td>${hit.project_id}</td>
+                            <td><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${hit.project_id}">${hit.project_id}</a></td>
                             <td>${hit.disease_type}</td>
                             <td>${hit.primary_site}</td>
                             <td>${hit.program.name}</td>
