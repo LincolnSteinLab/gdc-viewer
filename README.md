@@ -104,7 +104,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
-You can set the max number of genes to return with the `size` field. It defaults to 500.
+You can set the max number of genes to return with the `size` field. It defaults to 100.
 You can view case specific genes by setting the `case` field.
 
 ## SSMs
@@ -126,7 +126,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
-You can set the max number of SSMs to return with the `size` field. It defaults to 500.
+You can set the max number of SSMs to return with the `size` field. It defaults to 100.
 You can view case specific SSMs by setting the `case` field.
 
 ## CNVs

@@ -22,7 +22,7 @@ function(
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
             // Size of results
-            this.size = args.size !== undefined ? parseInt(args.size) : 2;
+            this.size = args.size !== undefined ? parseInt(args.size) : 100;
             // Case ID
             this.case = args.case;
         },
