@@ -103,7 +103,7 @@ function(
          * @return {string} pretty score
          */
         prettyScore: function(label, score) {
-            return label != null && score != null ? label + ' (' + score + ')' : 'n/a';
+            return label && score ? label + ' (' + score + ')' : 'n/a';
         },
 
         /**
@@ -270,17 +270,17 @@ function(
                         data: {
                             'start': mutation.start_position,
                             'end': mutation.end_position,
-                            'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
-                            'type': mutation.mutation_type,
-                            'subtype': mutation.mutation_subtype,
-                            'genomic dna change': mutation.genomic_dna_change,
-                            'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id),
-                            'reference allele': mutation.reference_allele,
-                            'tumour allele': mutation.tumor_allele,
-                            'ncbi build': mutation.ncbi_build,
-                            'chromosome': mutation.chromosome,
-                            'gene aa change': mutation.gene_aa_change,
-                            'consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
+                            'about': {
+                                'mutation type': mutation.mutation_type,
+                                'subtype': mutation.mutation_subtype,
+                                'dna change': mutation.genomic_dna_change,
+                                'reference allele': mutation.reference_allele,
+                            },
+                            'external references': {
+                                'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                                'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
+                            },
+                            'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
                             'projects': thisB.createProjectTable(response)
                         }
                     }
@@ -362,7 +362,7 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var ssmQuery = `query ssmResultsTableQuery( $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id start_position end_position mutation_type cosmic_id reference_allele tumor_allele ncbi_build chromosome gene_aa_change score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact hgvsc } consequence_type gene { gene_id symbol } aa_change transcript_id } id } } } } } } } } } } }`;
+            var ssmQuery = `query ssmResultsTableQuery( $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id start_position end_position mutation_type cosmic_id reference_allele ncbi_build score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact hgvsc } consequence_type gene { gene_id symbol } aa_change transcript_id } id } } } } } } } } } } }`;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {

@@ -201,19 +201,23 @@ function(
                             'start': gene.gene_start,
                             'end': gene.gene_end,
                             'strand': gene.gene_strand,
+                            'about': {
+                                'biotype': gene.biotype,
+                                'gene name': gene.name,
+                                'symbol': gene.symbol,
+                                'synonyms': gene.synonyms,
+                                'is cancer gene census': gene.is_cancer_gene_census
+                            },
                             'gene description': gene.description,
-                            'gene name': gene.name,
-                            'symbol': gene.symbol,
-                            'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id),
-                            'type': gene.biotype,
-                            'synonyms': gene.synonyms,
-                            'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
-                            'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
-                            'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
-                            'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
-                            'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
-                            'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
-                            'is cancer gene census': gene.is_cancer_gene_census,
+                            'external references': {
+                                'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
+                                'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
+                                'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
+                                'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
+                                'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
+                                'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
+                                'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
+                            },
                             'projects': thisB.createProjectTable(response)
                         }
                     }
