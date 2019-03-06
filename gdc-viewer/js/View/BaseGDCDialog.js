@@ -15,6 +15,9 @@ function (
     ActionBarDialog
 ) {
     return declare(ActionBarDialog, {
+        // The base URL for GraphQL calls
+        baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
+        
         /**
          * Constructor
          */

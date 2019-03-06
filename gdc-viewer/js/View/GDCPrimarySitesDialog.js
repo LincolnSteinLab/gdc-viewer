@@ -6,7 +6,6 @@ define([
     'dijit/Menu',
     'dijit/MenuItem',
     'dijit/form/ComboButton',
-    'dojo/aspect',
     './BaseGDCDialog'
 
 ],
@@ -18,7 +17,6 @@ function (
     Menu,
     MenuItem,
     ComboButton,
-    aspect,
     BaseGDCDialog
 ) {
     return declare(BaseGDCDialog, {
@@ -26,21 +24,6 @@ function (
         dialogContainer: undefined,
         resultsContainer: undefined,
 
-        // The base URL for GraphQL calls
-        baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
-
-        /**
-         * Constructor
-         */
-        constructor: function () {
-            var thisB = this;
-
-            aspect.after(this, 'hide', function () {
-                focus.curNode && focus.curNode.blur();
-                setTimeout(function () { thisB.destroyRecursive(); }, 500);
-            });
-        },
-        
         /**
          * Create a DOM object containing GDC primary site interface
          * @return {object} DOM object
