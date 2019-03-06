@@ -3,26 +3,22 @@ define([
     'dojo/dom-construct',
     'dijit/focus',
     'dijit/form/Button',
-    'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
     'dijit/form/ComboButton',
-    'dojo/aspect',
-    'JBrowse/View/Dialog/WithActionBar'
+    './BaseGDCDialog'
 ],
 function (
     declare,
     dom,
     focus,
     Button,
-    Tooltip,
     Menu,
     MenuItem,
     ComboButton,
-    aspect,
-    ActionBarDialog
+    BaseGDCDialog
 ) {
-    return declare(ActionBarDialog, {
+    return declare(BaseGDCDialog, {
         // Parent DOM to hold results
         dialogContainer: undefined,
         resultsContainer: undefined,
@@ -32,21 +28,6 @@ function (
         // Page size
         size: 20,
 
-        // The base URL for GraphQL calls
-        baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
-
-        /**
-         * Constructor
-         */
-        constructor: function () {
-            var thisB = this;
-
-            aspect.after(this, 'hide', function () {
-                focus.curNode && focus.curNode.blur();
-                setTimeout(function () { thisB.destroyRecursive(); }, 500);
-            });
-        },
-        
         _dialogContent: function () {
             var thisB = this;
             // Container holds all results in the dialog
@@ -156,7 +137,7 @@ function (
                     var hit = response.data.projectsViewer.projects.hits.edges[hitId].node;
 
                     var projectRowContent = `
-                            <td>${hit.project_id}</td>
+                            <td><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${hit.project_id}">${hit.project_id}</a></td>
                             <td>${hit.disease_type}</td>
                             <td>${hit.primary_site}</td>
                             <td>${hit.program.name}</td>
@@ -236,19 +217,6 @@ function (
         },
 
         /**
-         * Adds a tooltip with some text to a location
-         * @param {*} button Location to attach tooltip
-         * @param {*} text Text to display in tooltip
-         */
-        addTooltipToButton: function(button, text) {
-            var tooltip = new Tooltip({
-                label: text
-            });
-
-            tooltip.addTarget(button);
-        },
-
-        /**
          * Generic function for adding a track of some type
          * @param {*} storeClass the JBrowse store class
          * @param {*} projectId the project ID to filter by
@@ -281,7 +249,8 @@ function (
                 metadata: {
                     datatype: storeClass,
                     project: projectId
-                }
+                },
+                unsafePopup: true
             };
 
             if (storeClass === 'CNVs') {
@@ -294,17 +263,6 @@ function (
             trackConf.store = storeName;
             this.browser.publish('/jbrowse/v1/v/tracks/new', [trackConf]);
             this.browser.publish('/jbrowse/v1/v/tracks/show', [trackConf]);
-        },
-
-        /**
-         * Creates a loading icon in the given location and returns
-         * @param {object} location Place to put the loading icon
-         * @return {object} loading DOM object
-         */
-        createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
-            var spinner = dom.create('div', {}, loadingIcon);
-            return loadingIcon;
         },
 
         /**
@@ -336,19 +294,6 @@ function (
                     }
                 }, "nextButton").placeAt(paginationHolder);
             }
-        },
-
-        /**
-         * Generate a GUID
-         * @return {string} GUID
-         */
-        guid: function() {
-            function s4() {
-              return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-            }
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
         /**

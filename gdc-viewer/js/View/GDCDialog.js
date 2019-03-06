@@ -7,12 +7,10 @@ define([
     'dijit/layout/TabContainer',
     'dijit/layout/AccordionContainer',
     'dijit/layout/ContentPane',
-    'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
     'dijit/form/ComboButton',
-    'dojo/aspect',
-    'JBrowse/View/Dialog/WithActionBar'
+    './BaseGDCDialog'
 ],
 function (
     declare,
@@ -23,14 +21,12 @@ function (
     TabContainer,
     AccordionContainer,
     ContentPane,
-    Tooltip,
     Menu,
     MenuItem,
     ComboButton,
-    aspect,
-    ActionBarDialog
+    BaseGDCDialog
 ) {
-    return declare(ActionBarDialog, {
+    return declare(BaseGDCDialog, {
         // Available types
         types: ['case', 'ssm', 'gene'],
 
@@ -94,21 +90,6 @@ function (
         genePage: 1,
         pageSize: 20,
 
-        // The base URL for GraphQL calls
-        baseGraphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
-
-        /**
-         * Constructor
-         */
-        constructor: function () {
-            var thisB = this;
-
-            aspect.after(this, 'hide', function () {
-                focus.curNode && focus.curNode.blur();
-                setTimeout(function () { thisB.destroyRecursive(); }, 500);
-            });
-        },
-        
         /**
          * Create a DOM object containing GDC Explore interface
          * @return {object} DOM object
@@ -701,19 +682,6 @@ function (
                 console.log(err);
                 thisB.setErrorMessage(thisB.caseAccordion.containerNode);
             });
-        },
-
-        /**
-         * Adds a tooltip with some text to a location
-         * @param {*} button Location to attach tooltip
-         * @param {*} tooltipText Text to display in tooltip
-         */
-        addTooltipToButton: function(button, tooltipText) {
-            var tooltip = new Tooltip({
-                label: tooltipText
-            });
-
-            tooltip.addTarget(button);
         },
 
         /**
@@ -1339,7 +1307,8 @@ function (
                 metadata: {
                     datatype: storeClass,
                     case: caseId
-                }
+                },
+                unsafePopup: true
             };
 
             if (storeClass === 'CNVs') {
@@ -1352,29 +1321,6 @@ function (
             trackConf.store = storeName;
             this.browser.publish('/jbrowse/v1/v/tracks/new', [trackConf]);
             this.browser.publish('/jbrowse/v1/v/tracks/show', [trackConf]);
-        },
-
-        /**
-         * Creates a loading icon in the given location and returns
-         * @param {object} location DOM location to place loading icon
-         */
-        createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
-            var spinner = dom.create('div', {}, loadingIcon);
-            return loadingIcon;
-        },
-
-        /**
-         * Generate a GUID
-         * @return {string} GUID
-         */
-        guid: function() {
-            function s4() {
-              return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-            }
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
         /**
