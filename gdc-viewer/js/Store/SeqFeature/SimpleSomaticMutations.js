@@ -13,6 +13,7 @@ function(
     return declare(SeqFeatureStore, {
         projects: undefined,
         mutations: undefined,
+        graphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
         /**
          * Constructor
@@ -56,7 +57,7 @@ function(
          * @return {string} a tag
          */
         createLinkWithId: function(link, id) {
-            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
+            return id ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
         },
 
         /**
@@ -67,7 +68,7 @@ function(
          * @return {string} a tag
          */
         createLinkWithIdAndName: function(link, id, name) {
-            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
+            return id ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
         },
 
         /**
@@ -217,14 +218,13 @@ function(
         getProjectData: function() {
             var thisB = this;
             return new Promise(function(resolve, reject) {
-                var url = 'https://api.gdc.cancer.gov/v0/graphql';
                 var bodyVal = {
                     query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
                     variables: {
                         "count": 100
                     }
                 }
-                fetch(url, {
+                fetch(thisB.graphQLUrl, {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
                     body: JSON.stringify(bodyVal)
@@ -249,7 +249,6 @@ function(
             var thisB = this;
             return new Promise(function(resolve, reject) {
                 var mutationId = mutation.ssm_id;
-                var url = 'https://api.gdc.cancer.gov/v0/graphql';
                 var bodyVal = {
                     query: `query projectsTable($ssmTested: FiltersArgument, $caseAggsFilter: FiltersArgument) { viewer { explore { cases { filtered: aggregations(filters: $caseAggsFilter) { project__project_id { buckets { doc_count key } } } total: aggregations(filters: $ssmTested) { project__project_id { buckets { doc_count key } } } } } } }`,
                     variables: {
@@ -257,7 +256,7 @@ function(
                         "caseAggsFilter": { "op":"and", "content":[ { "op":"in", "content":{ "field":"ssms.ssm_id", "value":[ mutationId ] } }, { "op":"in", "content":{ "field":"cases.available_variation_data", "value":[ "ssm" ] } } ] }
                     }
                 }
-                fetch(url, {
+                fetch(thisB.graphQLUrl, {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
                     body: JSON.stringify(bodyVal)
@@ -396,14 +395,12 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
-            var url = 'https://api.gdc.cancer.gov/v0/graphql/SsmsTable';
-
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
             thisB.mutations = [];
 
             thisB.getProjectData().then(function(response) {
                 thisB.projects = response.data.projectsViewer.projects.hits.edges;
-                return fetch(url, {
+                return fetch(thisB.graphQLUrl + '/SsmsTable', {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
                     body: bodyVal

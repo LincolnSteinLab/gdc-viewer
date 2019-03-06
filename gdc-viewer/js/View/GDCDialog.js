@@ -7,12 +7,11 @@ define([
     'dijit/layout/TabContainer',
     'dijit/layout/AccordionContainer',
     'dijit/layout/ContentPane',
-    'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
     'dijit/form/ComboButton',
     'dojo/aspect',
-    'JBrowse/View/Dialog/WithActionBar'
+    './BaseGDCDialog'
 ],
 function (
     declare,
@@ -23,14 +22,13 @@ function (
     TabContainer,
     AccordionContainer,
     ContentPane,
-    Tooltip,
     Menu,
     MenuItem,
     ComboButton,
     aspect,
-    ActionBarDialog
+    BaseGDCDialog
 ) {
-    return declare(ActionBarDialog, {
+    return declare(BaseGDCDialog, {
         // Available types
         types: ['case', 'ssm', 'gene'],
 
@@ -704,19 +702,6 @@ function (
         },
 
         /**
-         * Adds a tooltip with some text to a location
-         * @param {*} button Location to attach tooltip
-         * @param {*} tooltipText Text to display in tooltip
-         */
-        addTooltipToButton: function(button, tooltipText) {
-            var tooltip = new Tooltip({
-                label: tooltipText
-            });
-
-            tooltip.addTarget(button);
-        },
-
-        /**
          * Creates the cases table for the given hits in some location
          * @param {object} response the response from the GDC graphQL query
          * @param {object} location dom element to place the table
@@ -1353,29 +1338,6 @@ function (
             trackConf.store = storeName;
             this.browser.publish('/jbrowse/v1/v/tracks/new', [trackConf]);
             this.browser.publish('/jbrowse/v1/v/tracks/show', [trackConf]);
-        },
-
-        /**
-         * Creates a loading icon in the given location and returns
-         * @param {object} location DOM location to place loading icon
-         */
-        createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
-            var spinner = dom.create('div', {}, loadingIcon);
-            return loadingIcon;
-        },
-
-        /**
-         * Generate a GUID
-         * @return {string} GUID
-         */
-        guid: function() {
-            function s4() {
-              return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-            }
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
         /**

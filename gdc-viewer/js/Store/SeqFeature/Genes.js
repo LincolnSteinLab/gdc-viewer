@@ -11,6 +11,7 @@ function(
     return declare(SeqFeatureStore, {
         projects: undefined,
         genes: undefined,
+        graphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
         /**
          * Constructor
@@ -138,14 +139,13 @@ function(
         getProjectData: function() {
             var thisB = this;
             return new Promise(function(resolve, reject) {
-                var url = 'https://api.gdc.cancer.gov/v0/graphql';
                 var bodyVal = {
                     query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
                     variables: {
                         "count": 100
                     }
                 }
-                fetch(url, {
+                fetch(thisB.graphQLUrl, {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
                     body: JSON.stringify(bodyVal)
@@ -168,7 +168,6 @@ function(
             var thisB = this;
             return new Promise(function(resolve, reject) {
                 var geneId = gene.gene_id;
-                var url = 'https://api.gdc.cancer.gov/v0/graphql';
                 var bodyVal = {
                     query: `query ProjectTable( $caseAggsFilters: FiltersArgument $ssmTested: FiltersArgument $cnvGain: FiltersArgument $cnvLoss: FiltersArgument $cnvTested: FiltersArgument $cnvTestedByGene: FiltersArgument $cnvAll: FiltersArgument $ssmFilters: FiltersArgument ) { viewer { explore { ssms { hits(first: 0, filters: $ssmFilters) { total } } cases { cnvAll: hits(filters: $cnvAll) { total } cnvTestedByGene: hits(filters: $cnvTestedByGene) { total } gain: aggregations(filters: $cnvGain) { project__project_id { buckets { doc_count key } } } loss: aggregations(filters: $cnvLoss) { project__project_id { buckets { doc_count key } } } cnvTotal: aggregations(filters: $cnvTested) { project__project_id { buckets { doc_count key } } } filtered: aggregations(filters: $caseAggsFilters) { project__project_id { buckets { doc_count key } } } total: aggregations(filters: $ssmTested) { project__project_id { buckets { doc_count key } } } } } } }`,
                     variables: {
@@ -182,7 +181,7 @@ function(
                         "ssmFilters": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] }
                     }
                 }
-                fetch(url, {
+                fetch(thisB.graphQLUrl, {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
                     body: JSON.stringify(bodyVal)
@@ -311,14 +310,12 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
-            var url = 'https://api.gdc.cancer.gov/v0/graphql/GenesTable';
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
-
             thisB.genes = [];
 
             thisB.getProjectData().then(function(response) {
                 thisB.projects = response.data.projectsViewer.projects.hits.edges;
-                return fetch(url, {
+                return fetch(thisB.graphQLUrl + '/GenesTable', {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
                     body: bodyVal

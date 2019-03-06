@@ -3,26 +3,24 @@ define([
     'dojo/dom-construct',
     'dijit/focus',
     'dijit/form/Button',
-    'dijit/Tooltip',
     'dijit/Menu',
     'dijit/MenuItem',
     'dijit/form/ComboButton',
     'dojo/aspect',
-    'JBrowse/View/Dialog/WithActionBar'
+    './BaseGDCDialog'
 ],
 function (
     declare,
     dom,
     focus,
     Button,
-    Tooltip,
     Menu,
     MenuItem,
     ComboButton,
     aspect,
-    ActionBarDialog
+    BaseGDCDialog
 ) {
-    return declare(ActionBarDialog, {
+    return declare(BaseGDCDialog, {
         // Parent DOM to hold results
         dialogContainer: undefined,
         resultsContainer: undefined,
@@ -236,19 +234,6 @@ function (
         },
 
         /**
-         * Adds a tooltip with some text to a location
-         * @param {*} button Location to attach tooltip
-         * @param {*} text Text to display in tooltip
-         */
-        addTooltipToButton: function(button, text) {
-            var tooltip = new Tooltip({
-                label: text
-            });
-
-            tooltip.addTarget(button);
-        },
-
-        /**
          * Generic function for adding a track of some type
          * @param {*} storeClass the JBrowse store class
          * @param {*} projectId the project ID to filter by
@@ -298,17 +283,6 @@ function (
         },
 
         /**
-         * Creates a loading icon in the given location and returns
-         * @param {object} location Place to put the loading icon
-         * @return {object} loading DOM object
-         */
-        createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
-            var spinner = dom.create('div', {}, loadingIcon);
-            return loadingIcon;
-        },
-
-        /**
          * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
          * @param {integer} totalPages total number of pages
          */
@@ -337,19 +311,6 @@ function (
                     }
                 }, "nextButton").placeAt(paginationHolder);
             }
-        },
-
-        /**
-         * Generate a GUID
-         * @return {string} GUID
-         */
-        guid: function() {
-            function s4() {
-              return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-            }
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         },
 
         /**
