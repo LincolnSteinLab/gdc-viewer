@@ -209,13 +209,13 @@ function (
             var combinedFilters = thisB.combineAllFilters();
             combinedFilters = combinedFilters ? JSON.parse(combinedFilters) : combinedFilters
 
-            var facetQuery = `query Queries($filters_0:FiltersArgument!,$first_1:Int!,$offset_2:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},diagnoses__vital_status {buckets {doc_count,key}},diagnoses__days_to_death {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first_1,offset:$offset_2,filters:$filters_0,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters_0) {total}},cnvs {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters_0) {total}},ssms {_aggregations:aggregations(filters:$filters_0,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters_0) {total}}}}`;
+            var facetQuery = `query Queries($filters:FiltersArgument!,$first:Int!,$offset:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},diagnoses__vital_status {buckets {doc_count,key}},diagnoses__days_to_death {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first,offset:$offset,filters:$filters,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters) {total}},cnvs {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters) {total}},ssms {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters) {total}}}}`;
             var bodyVal = {
                 query: facetQuery,
                 variables: {
-                    "filters_0": combinedFilters,
-                    "first_1": 20,
-                    "offset_2": 0
+                    "filters": combinedFilters,
+                    "first": 20,
+                    "offset": 0
                   }
             }
 
@@ -303,6 +303,7 @@ function (
             var thisB = this;
             // Add a content pane per facet group
             for (var facet in results._aggregations) {
+                // Ignore some of the facets
                 if (!["diagnoses__age_at_diagnosis", "diagnoses__days_to_death", "case__cnv__cnv_change"].includes(facet)) {
                     var contentPane = new ContentPane({
                         title: thisB.prettyFacetName(facet),
@@ -313,7 +314,9 @@ function (
                     var facetHolder = dom.create('span', { className: "flex-column" });
 
                     if (results._aggregations[facet].buckets && results._aggregations[facet].buckets.length > 0) {
+                        // Alphabetical sort
                         results._aggregations[facet].buckets.sort(thisB.compareTermElements);
+
                         // Add a checkbox per facet option
                         results._aggregations[facet].buckets.forEach((term) => {
                             var facetCheckbox = dom.create('span', { className: "flex-row" }, facetHolder)
@@ -403,7 +406,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.mutationPage);
             var size = thisB.pageSize;
-            var ssmQuery = `query ssmResultsTableQuery( $ssmTested: FiltersArgument $ssmCaseFilter: FiltersArgument $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $ssmCaseFilter) { total } } ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact } consequence_type gene { gene_id symbol } aa_change } id } } } } filteredOccurences: occurrence { hits(first: 0, filters: $ssmCaseFilter) { total } } occurrence { hits(first: 0, filters: $ssmTested) { total } } } } } } } } }`;
+            var ssmQuery = `query ssmResultsTableQuery( $ssmTypeFilter: FiltersArgument $ssmCaseFilters: FiltersArgument $ssmSize: Int $ssmConsequenceFilters: FiltersArgument $ssmOffset: Int $ssmFilters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { cases { hits(first: 0, filters: $ssmTypeFilter) { total } } filteredCases: cases { hits(first: 0, filters: $ssmCaseFilters) { total } } ssms { hits(first: $ssmSize, offset: $ssmOffset, filters: $ssmFilters, score: $score, sort: $sort) { total edges { node { id score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $ssmConsequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact } consequence_type gene { gene_id symbol } aa_change } id } } } } filteredOccurences: occurrence { hits(first: 0, filters: $ssmCaseFilters) { total } } occurrence { hits(first: 0, filters: $ssmTypeFilter) { total } } } } } } } } }`;
             var caseFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["ssm"]}}]}
 
             var combinedFilters = thisB.combineAllFilters();
@@ -415,12 +418,12 @@ function (
             var bodyVal = {
                 query: ssmQuery,
                 variables: {
-                    "ssmTested":{"op":"and","content":[{"op":"in","content":{"field":"cases.available_variation_data","value":["ssm"]}}]},
-                    "ssmCaseFilter": caseFilter,
-                    "ssmsTable_size": parseInt(size),
-                    "consequenceFilters":{"op":"and","content":[{"op":"in","content":{"field":"consequence.transcript.is_canonical","value":["true"]}}]},
-                    "ssmsTable_offset": parseInt(start),
-                    "ssmsTable_filters": combinedFilters,
+                    "ssmTypeFilter":{"op":"and","content":[{"op":"in","content":{"field":"cases.available_variation_data","value":["ssm"]}}]},
+                    "ssmCaseFilters": caseFilter,
+                    "ssmSize": parseInt(size),
+                    "ssmConsequenceFilters":{"op":"and","content":[{"op":"in","content":{"field":"consequence.transcript.is_canonical","value":["true"]}}]},
+                    "ssmOffset": parseInt(start),
+                    "ssmFilters": combinedFilters,
                     "score":"occurrence.case.project.project_id",
                     "sort":[{"field":"_score","order":"desc"},{"field":"_uid","order":"asc"}]
                 }
@@ -502,10 +505,10 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.genePage);
             var size = thisB.pageSize;
-            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String $ssmCase: FiltersArgument $geneCaseFilter: FiltersArgument $ssmTested: FiltersArgument $cnvTested: FiltersArgument $cnvGainFilters: FiltersArgument $cnvLossFilters: FiltersArgument ) { genesTableViewer: viewer { explore { cases { hits(first: 0, filters: $ssmTested) { total } } filteredCases: cases { hits(first: 0, filters: $geneCaseFilter) { total } } cnvCases: cases { hits(first: 0, filters: $cnvTested) { total } } genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id symbol name cytoband biotype numCases: score is_cancer_gene_census ssm_case: case { hits(first: 0, filters: $ssmCase) { total } } cnv_case: case { hits(first: 0, filters: $cnvTested) { total } } case_cnv_gain: case { hits(first: 0, filters: $cnvGainFilters) { total } } case_cnv_loss: case { hits(first: 0, filters: $cnvLossFilters) { total } } } } } } } } }`;
+            var geneQuery = `query geneResultsTableQuery( $genesFilters: FiltersArgument $geneSize: Int $geneOffset: Int $score: String $ssmCase: FiltersArgument $geneCaseFilter: FiltersArgument $ssmTypeFilter: FiltersArgument $cnvTypeFilter: FiltersArgument $cnvGainFilters: FiltersArgument $cnvLossFilters: FiltersArgument ) { genesTableViewer: viewer { explore { cases { hits(first: 0, filters: $ssmTypeFilter) { total } } filteredCases: cases { hits(first: 0, filters: $geneCaseFilter) { total } } cnvCases: cases { hits(first: 0, filters: $cnvTypeFilter) { total } } genes { hits(first: $geneSize, offset: $geneOffset, filters: $genesFilters, score: $score) { total edges { node { gene_id id symbol name cytoband biotype numCases: score is_cancer_gene_census ssm_case: case { hits(first: 0, filters: $ssmCase) { total } } cnv_case: case { hits(first: 0, filters: $cnvTypeFilter) { total } } case_cnv_gain: case { hits(first: 0, filters: $cnvGainFilters) { total } } case_cnv_loss: case { hits(first: 0, filters: $cnvLossFilters) { total } } } } } } } } }`;
 
             var geneFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["ssm"]}}]}
-            var cnvTested = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
+            var cnvTypeFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
             var cnvGainFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
             var cnvLossFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
 
@@ -513,7 +516,7 @@ function (
             if (combinedFilters) {
                 combinedFilters = JSON.parse(combinedFilters);
                 geneFilter.content.push(combinedFilters);
-                cnvTested.content.push(combinedFilters);
+                cnvTypeFilter.content.push(combinedFilters);
                 cnvLossFilter.content.push(combinedFilters);
                 cnvGainFilter.content.push(combinedFilters);
             }
@@ -526,14 +529,14 @@ function (
                 variables: {
                     "cnvGainFilters": cnvGainFilter,
                     "cnvLossFilters": cnvLossFilter,
-                    "cnvTested": cnvTested,
+                    "cnvTypeFilter": cnvTypeFilter,
                     "geneCaseFilter": geneFilter,
-                    "genesTable_filters": combinedFilters,
-                    "genesTable_size": parseInt(size),
-                    "genesTable_offset": parseInt(start),
+                    "genesFilters": combinedFilters,
+                    "geneSize": parseInt(size),
+                    "geneOffset": parseInt(start),
                     "score": "case.project.project_id",
                     "ssmCase": {op: "and", content: [{op: "in", content: {field: "cases.available_variation_data", value: ["ssm"]}}, {op: "NOT", content: {field: "genes.case.ssm.observation.observation_id", value: "MISSING"}}]},
-                    "ssmTested": {op: "and", content: [{op: "in", content: {field: "cases.available_variation_data", value: ["ssm"]}}]}
+                    "ssmTypeFilter": {op: "and", content: [{op: "in", content: {field: "cases.available_variation_data", value: ["ssm"]}}]}
                 }
             }
 
@@ -641,7 +644,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.casePage);
             var size = thisB.pageSize;
-            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $cases_size: Int $cases_offset: Int $cases_score: String $cases_sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $cases_size, offset: $cases_offset, filters: $filters, score: $cases_score, sort: $cases_sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
+            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $casesSize: Int $casesOffset: Int $casesScore: String $sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $casesSize, offset: $casesOffset, filters: $filters, score: $casesScore, sort: $sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
 
             var combinedFilters = thisB.combineAllFilters();
             if (combinedFilters) {
@@ -652,10 +655,10 @@ function (
                 query: caseQuery,
                 variables: {
                     "filters": combinedFilters,
-                    "cases_size": parseInt(size),
-                    "cases_offset": parseInt(start),
-                    "cases_score": "gene.gene_id",
-                    "cases_sort": null
+                    "casesSize": parseInt(size),
+                    "casesOffset": parseInt(start),
+                    "casesScore": "gene.gene_id",
+                    "sort": null
                 }
             }
 

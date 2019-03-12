@@ -1,14 +1,14 @@
 define([
     'dojo/_base/declare',
-    'JBrowse/Store/SeqFeature',
+    './BaseSeqFeature',
     'JBrowse/Model/SimpleFeature'
 ],
 function(
     declare,
-    SeqFeatureStore,
+    BaseSeqFeature,
     SimpleFeature
 ) {
-    return declare(SeqFeatureStore, {
+    return declare(BaseSeqFeature, {
         /**
          * Constructor
          * @param {*} args 
@@ -20,68 +20,6 @@ function(
             this.size = args.size !== undefined ? parseInt(args.size) : 500;
             // Case ID
             this.case = args.case;
-        },
-
-        /**
-         * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr chromosome to filter by
-         * @param {*} start start position
-         * @param {*} end end position
-         */
-        getFilterQuery: function (chr, start, end) {
-            var thisB = this;
-            var resultingFilterQuery = {
-                "op": "and",
-                "content": [
-                    thisB.getLocationFilters(chr, start, end)
-                ]
-            };
-            if (Object.keys(thisB.filters).length > 0) {
-                resultingFilterQuery.content.push(thisB.filters);
-            }
-            
-            return resultingFilterQuery;
-        },
-
-        /**
-         * Returns the end value to be used for querying GDC
-         * @param {string} chr Chromosome number (ex. 1)
-         * @param {integer} end End location of JBrowse view
-         * @return {int} end position
-         */
-        getChromosomeEnd: function(chr, end) {
-            var chromosomeSizes = {
-                '1': 248956422,
-                '2': 242193529,
-                '3': 198295559,
-                '4': 190214555,
-                '5': 181538259,
-                '6': 170805979,
-                '7': 159345973,
-                '8': 146364022,
-                '9': 138394717,
-                '10': 133797422,
-                '11': 135086622,
-                '12': 133275309,
-                '13': 114364328,
-                '14': 107043718,
-                '15': 101991189,
-                '16': 90338345,
-                '17': 83257441,
-                '18': 80373285,
-                '19': 58617616,
-                '20': 64444167,
-                '21': 46709983,
-                '22': 50818468,
-                'x': 156040895,
-                'y': 57227415
-            };
-
-            if (end > chromosomeSizes[chr]) {
-                return chromosomeSizes[chr];
-            } else {
-                return end;
-            }
         },
 
         /**
@@ -107,7 +45,7 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var cnvQuery = `query cnvResults($filters_1: FiltersArgument) { explore { cnvs { hits(filters: $filters_1) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
+            var cnvQuery = `query cnvResults($filters: FiltersArgument) { explore { cnvs { hits(filters: $filters) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {
@@ -115,7 +53,7 @@ function(
                 variables: {
                     "size": thisB.size,
                     "offset": 0,
-                    "filters_1": combinedFilters,
+                    "filters": combinedFilters,
                 }
             }
 
@@ -165,15 +103,6 @@ function(
             }).catch(function(err) {
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
-            });
-        },
-
-        /**
-         * Stub for getParser
-         */
-        getParser: function() {
-            return new Promise(function(resolve, reject) {
-                resolve({'getMetadata': function() {}});
             });
         },
         
