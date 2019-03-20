@@ -115,6 +115,15 @@ function(
         },
 
         /**
+         * 
+         * @param {*} a 
+         * @param {*} b 
+         */
+        getValueWithPercentage: function(a, b) {
+            return a + '/' + b + ' (' + (a / b * 100).toFixed(2) + '%)';
+        },
+
+        /**
          * Stub for getParser
          */
         getParser: function() {

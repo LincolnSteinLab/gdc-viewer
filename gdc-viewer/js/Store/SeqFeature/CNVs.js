@@ -28,12 +28,7 @@ function(
          * @return {number} 1 for gain or -1 for loss
          */
         convertCNVChangeToScore: function(cnvChange) {
-            cnvChange = cnvChange.toLowerCase();
-            if (cnvChange == 'gain') {
-                return 1;
-            } else {
-                return -1;
-            }
+            return cnvChange.toLowerCase() == 'gain' ? 1 : -1;
         },
 
         /**
@@ -77,8 +72,7 @@ function(
             end = thisB.getChromosomeEnd(ref, end);
 
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
-            var url = 'https://api.gdc.cancer.gov/v0/graphql';
-            fetch(url, {
+            fetch(thisB.graphQLUrl, {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: bodyVal

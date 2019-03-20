@@ -234,7 +234,7 @@ function(
                     <td style="${thStyle}"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
                     <td style="${thStyle}">${thisB.printList(projectInfo.node.disease_type)}</td>
                     <td style="${thStyle}">${thisB.printList(projectInfo.node.primary_site)}</td>
-                    <td style="${thStyle}">${project.doc_count} / ${thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key)}</td>
+                    <td style="${thStyle}">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
                     </tr>
                 `;
                 
