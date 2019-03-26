@@ -170,27 +170,33 @@ function(
                     return(response.json());
                 }).then(function(response) {
                     const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
-                    variantFeature = {
-                        id: mutation.ssm_id,
-                        data: {
-                            'start': mutation.start_position,
-                            'end': mutation.end_position,
-                            'about': {
-                                'mutation type': mutation.mutation_type,
-                                'subtype': mutation.mutation_subtype,
-                                'dna change': mutation.genomic_dna_change,
-                                'reference allele': mutation.reference_allele,
-                            },
-                            'external references': {
-                                'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
-                                'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
-                            },
-                            'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
-                            'projects': thisB.createProjectTable(response)
+                    if (response && response.data) {
+                        variantFeature = {
+                            id: mutation.ssm_id,
+                            data: {
+                                'start': mutation.start_position,
+                                'end': mutation.end_position,
+                                'type': 'Simple Somatic Mutation',
+                                'about': {
+                                    'mutation type': mutation.mutation_type,
+                                    'subtype': mutation.mutation_subtype,
+                                    'dna change': mutation.genomic_dna_change,
+                                    'reference allele': mutation.reference_allele,
+                                    'id': mutation.ssm_id
+                                },
+                                'external references': {
+                                    'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                                    'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
+                                },
+                                'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
+                                'projects': thisB.createProjectTable(response)
+                            }
                         }
+                        featureCallback(new SimpleFeature(variantFeature));
+                        resolve();
+                    } else {
+                        reject()
                     }
-                    featureCallback(new SimpleFeature(variantFeature));
-                    resolve();
                 }).catch(function(error) {
                     reject(error);
                 });

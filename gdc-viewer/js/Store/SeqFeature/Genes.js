@@ -111,34 +111,39 @@ function(
                     const UNI_LINK = 'http://www.uniprot.org/uniprot/';
                     const HGNC_LINK = 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/';
                     const OMIM_LINK = 'https://www.omim.org/entry/';
-                    geneFeature = {
-                        id: gene.gene_id,
-                        data: {
-                            'start': gene.gene_start,
-                            'end': gene.gene_end,
-                            'strand': gene.gene_strand,
-                            'about': {
-                                'biotype': gene.biotype,
-                                'gene name': gene.name,
-                                'symbol': gene.symbol,
-                                'synonyms': gene.synonyms,
-                                'is cancer gene census': gene.is_cancer_gene_census
-                            },
-                            'gene description': gene.description,
-                            'external references': {
-                                'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
-                                'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
-                                'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
-                                'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
-                                'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
-                                'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
-                                'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
-                            },
-                            'projects': thisB.createProjectTable(response)
+                    if (response && response.data) {
+                        geneFeature = {
+                            id: gene.gene_id,
+                            data: {
+                                'start': thisB.prettyText(gene.gene_start),
+                                'end': thisB.prettyText(gene.gene_end),
+                                'strand': thisB.prettyText(gene.gene_strand),
+                                'type': 'Gene',
+                                'about': {
+                                    'biotype': thisB.prettyText(gene.biotype),
+                                    'gene name': thisB.prettyText(gene.name),
+                                    'id': thisB.prettyText(gene.gene_id),
+                                    'symbol': thisB.prettyText(gene.symbol),
+                                    'synonyms': thisB.prettyText(gene.synonyms)
+                                },
+                                'gene description': thisB.prettyText(gene.description),
+                                'external references': {
+                                    'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
+                                    'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
+                                    'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
+                                    'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
+                                    'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
+                                    'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
+                                    'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
+                                },
+                                'projects': thisB.createProjectTable(response)
+                            }
                         }
+                        featureCallback(new SimpleFeature(geneFeature));
+                        resolve();
+                    } else {
+                        reject();
                     }
-                    featureCallback(new SimpleFeature(geneFeature));
-                    resolve();
                 }).catch(function(error) {
                     reject(error);
                 });

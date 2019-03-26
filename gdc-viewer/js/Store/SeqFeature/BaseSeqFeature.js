@@ -57,7 +57,7 @@ function(
          * @return {string} pretty text
          */
         prettyText: function(text) {
-            return text ? text : 'n/a';
+            return text && text !== null && text !== undefined ? text : 'n/a';
         },
  
         /**
