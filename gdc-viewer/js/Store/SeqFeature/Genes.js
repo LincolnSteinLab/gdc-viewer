@@ -51,32 +51,6 @@ function(
         },
 
         /**
-         * Gets the general project information for all projects available on the GDC
-         */
-        getProjectData: function() {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                var bodyVal = {
-                    query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
-                    variables: {
-                        "count": 100
-                    }
-                }
-                fetch(thisB.graphQLUrl, {
-                    method: 'post',
-                    headers: { 'X-Requested-With': null },
-                    body: JSON.stringify(bodyVal)
-                }).then(function(response) {
-                    return(response.json());
-                }).then(function(response) {
-                    resolve(response);
-                }).catch(function(error) {
-                    reject(error);
-                });
-            });
-        },
-
-        /**
          * Creates a gene feature with the given gene object
          * @param {object} gene Gene object returned by GDC GraphQL
          * @param {function} featureCallback 
