@@ -33,9 +33,9 @@ function(
 
         /**
          * Creates the query object for graphQL call
-         * @param {*} ref chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} ref chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          * @return {object} query object
          */
         createQuery: function(ref, start, end) {
@@ -57,10 +57,10 @@ function(
 
         /**
          * Get the features to be displayed
-         * @param {*} query 
-         * @param {*} featureCallback 
-         * @param {*} finishCallback 
-         * @param {*} errorCallback 
+         * @param {object} query 
+         * @param {function} featureCallback 
+         * @param {function} finishCallback 
+         * @param {function} errorCallback 
          */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
@@ -102,9 +102,9 @@ function(
         
         /**
          * Creates the filter for the query to only look at CNVs in the given range
-         * @param {*} chr chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} chr chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

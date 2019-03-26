@@ -29,7 +29,7 @@ function(
 
         /**
          * Create an array of links for COSMIC
-         * @param {*} cosmic 
+         * @param {List<object>} cosmic array of cosmic IDs
          */
         createCOSMICLinks: function(cosmic) {
             var thisB = this;
@@ -55,8 +55,8 @@ function(
 
         /**
          * Pretty version of score
-         * @param {*} label text to display
-         * @param {*} score score value
+         * @param {string} label text to display
+         * @param {string} score score value
          * @return {string} pretty score
          */
         prettyScore: function(label, score) {
@@ -148,8 +148,8 @@ function(
 
         /**
          * Creates a mutation feature with the given gene object
-         * @param {*} mutation 
-         * @param {*} featureCallback 
+         * @param {object} mutation 
+         * @param {function} featureCallback 
          */
         createMutationFeature: function(mutation, featureCallback) {
             var thisB = this;
@@ -174,15 +174,15 @@ function(
                         variantFeature = {
                             id: mutation.ssm_id,
                             data: {
-                                'start': mutation.start_position,
-                                'end': mutation.end_position,
+                                'start': thisB.prettyText(mutation.start_position),
+                                'end': thisB.prettyText(mutation.end_position),
                                 'type': 'Simple Somatic Mutation',
                                 'about': {
-                                    'mutation type': mutation.mutation_type,
-                                    'subtype': mutation.mutation_subtype,
-                                    'dna change': mutation.genomic_dna_change,
-                                    'reference allele': mutation.reference_allele,
-                                    'id': mutation.ssm_id
+                                    'mutation type': thisB.prettyText(mutation.mutation_type),
+                                    'subtype': thisB.prettyText(mutation.mutation_subtype),
+                                    'dna change': thisB.prettyText(mutation.genomic_dna_change),
+                                    'reference allele': thisB.prettyText(mutation.reference_allele),
+                                    'id': thisB.prettyText(mutation.ssm_id)
                                 },
                                 'external references': {
                                     'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
@@ -205,6 +205,8 @@ function(
 
         /**
          * Finds the corresponding project doc_count in a list of projects
+         * @param {List<object>} projects  list of project objects
+         * @param {string} key object key to look for
          */
         findProjectByKey: function(projects, key) {
             var project = projects.find(project => project.key === key);
@@ -213,7 +215,7 @@ function(
 
         /**
          * Creates a project table that shows the distribution of a gene across projects
-         * @param {*} response 
+         * @param {object} response 
          */
         createProjectTable: function(response) {
             var thisB = this;
@@ -254,9 +256,9 @@ function(
 
         /**
          * Creates the query object for graphQL call
-         * @param {*} ref chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} ref chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
@@ -280,10 +282,10 @@ function(
 
         /**
          * Get the features to be displayed
-         * @param {*} query 
-         * @param {*} featureCallback 
-         * @param {*} finishCallback 
-         * @param {*} errorCallback 
+         * @param {object} query 
+         * @param {function} featureCallback 
+         * @param {function} finishCallback 
+         * @param {function} errorCallback 
          */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
@@ -326,9 +328,9 @@ function(
 
         /**
          * Creates the filter for the query to only look at SSMs in the given range
-         * @param {*} chr chromsome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} chr chromsome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

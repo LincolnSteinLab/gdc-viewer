@@ -27,9 +27,9 @@ function(
 
         /**
          * Creates the query object for graphQL call
-         * @param {*} ref chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} ref chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          * @return {object} query object
          */
         createQuery: function(ref, start, end) {
@@ -78,8 +78,8 @@ function(
 
         /**
          * Creates a gene feature with the given gene object
-         * @param {*} gene 
-         * @param {*} featureCallback 
+         * @param {object} gene Gene object returned by GDC GraphQL
+         * @param {function} featureCallback 
          */
         createGeneFeature: function(gene, featureCallback) {
             var thisB = this;
@@ -152,6 +152,8 @@ function(
 
         /**
          * Finds the corresponding project doc_count in a list of projects
+         * @param {List<object>} projects 
+         * @param {string} key 
          */
         findProjectByKey: function(projects, key) {
             var project = projects.find(project => project.key === key);
@@ -160,7 +162,7 @@ function(
 
         /**
          * Creates a project table that shows the distribution of a gene across projects
-         * @param {*} response 
+         * @param {object} response 
          */
         createProjectTable: function(response) {
             var thisB = this;
@@ -205,10 +207,10 @@ function(
 
         /**
          * Get the features to be displayed
-         * @param {*} query 
-         * @param {*} featureCallback 
-         * @param {*} finishCallback 
-         * @param {*} errorCallback 
+         * @param {object} query 
+         * @param {function} featureCallback 
+         * @param {function} finishCallback 
+         * @param {function} errorCallback 
          */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
@@ -251,9 +253,9 @@ function(
 
         /**
          * Creates the filter for the query to only look at Genes in the given range
-         * @param {*} chr chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} chr chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

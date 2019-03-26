@@ -32,8 +32,8 @@ function (
 
         /**
          * Adds a tooltip with some text to a location
-         * @param {*} button Location to attach tooltip
-         * @param {*} text Text to display in tooltip
+         * @param {Button} button Location to attach tooltip
+         * @param {string} text Text to display in tooltip
          */
         addTooltipToButton: function(button, text) {
             var tooltip = new Tooltip({

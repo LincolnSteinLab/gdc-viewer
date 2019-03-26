@@ -11,9 +11,9 @@ function(
 
         /**
          * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr chromosome to filter by
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} chr chromosome to filter by
+         * @param {number} start start position
+         * @param {number} end end position
          */
         getFilterQuery: function (chr, start, end) {
             var thisB = this;
@@ -115,12 +115,12 @@ function(
         },
 
         /**
-         * 
-         * @param {*} a 
-         * @param {*} b 
+         * Given a numerator and denominator, creates a pretty score with percentage
+         * @param {number} numerator
+         * @param {number} denominator
          */
-        getValueWithPercentage: function(a, b) {
-            return a + '/' + b + ' (' + (a / b * 100).toFixed(2) + '%)';
+        getValueWithPercentage: function(numerator, denominator) {
+            return numerator + '/' + denominator + ' (' + (numerator / denominator * 100).toFixed(2) + '%)';
         },
 
         /**

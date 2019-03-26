@@ -259,7 +259,7 @@ function (
 
         /**
          * Updates accordions based on the response from GDC
-         * @param {*} response response from GraphQL GDC call
+         * @param {object} response response from GraphQL GDC call
          */
         updateAccordions(response) {
             var thisB = this;
@@ -276,7 +276,7 @@ function (
 
         /**
          * Adds an error message at the given location, along with a button to do a hard reset
-         * @param {*} location 
+         * @param {object} location 
          */
         setErrorMessage(location) {
             var thisB = this;
@@ -295,9 +295,9 @@ function (
         /**
          * Creates a facet of the given type and adds it to the corresponding accordion.
          * Uses results from GDC GraphQL.
-         * @param {*} type case, ssm, or gene
-         * @param {*} accordion accordion to place facets in
-         * @param {*} results response from GraphQL GDC call
+         * @param {string} type case, ssm, or gene
+         * @param {object} accordion accordion to place facets in
+         * @param {object} results response from GraphQL GDC call
          */
         createFacet(type, accordion, results) {
             var thisB = this;
@@ -374,8 +374,8 @@ function (
 
         /**
          * Compare function used for sorting facets
-         * @param {*} a 
-         * @param {*} b 
+         * @param {object} a 
+         * @param {object} b 
          * @return {number}
          */
         compareTermElements: function(a, b) {
@@ -1009,9 +1009,9 @@ function (
         /**
          * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
          * @param {object} holder DOM location to place pagination buttons
-         * @param {integer} totalPages the total number of pages for the given query results
+         * @param {number} totalPages the total number of pages for the given query results
          * @param {string} type the type of results to create pagination button for
-         * @param {integer} pageNum the current page
+         * @param {number} pageNum the current page
          */
         createPaginationButtons: function(holder, totalPages, type, pageNum) {
             var thisB = this;

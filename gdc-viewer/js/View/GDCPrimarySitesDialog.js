@@ -97,7 +97,7 @@ function (
 
         /**
          * Creates a table with primary sites
-         * @param {*} response object returned by graphQL call
+         * @param {object} response object returned by graphQL call
          */
         createPrimarySiteTable: function(response) {
             var thisB = this;
