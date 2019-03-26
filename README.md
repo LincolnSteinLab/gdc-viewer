@@ -22,7 +22,7 @@ Below is an example of these two steps for Chr1.
 Ex. Chromosome 1
 1. Download Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz from the above site.
 ```
-wget http://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
+wget http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
 ```
 2. Setup refeq with the following command
 ```

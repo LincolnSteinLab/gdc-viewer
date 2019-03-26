@@ -1,17 +1,16 @@
 define([
     'dojo/_base/declare',
-    'JBrowse/Store/SeqFeature',
+    './BaseSeqFeature',
     'JBrowse/Model/SimpleFeature'
 ],
 function(
     declare,
-    SeqFeatureStore,
+    BaseSeqFeature,
     SimpleFeature
 ) {
-    return declare(SeqFeatureStore, {
+    return declare(BaseSeqFeature, {
         projects: undefined,
         genes: undefined,
-        graphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
         /**
          * Constructor
@@ -27,105 +26,23 @@ function(
         },
 
         /**
-         * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr Chromosome to filter by
-         * @param {*} start the start position
-         * @param {*} end the end position
-         */
-        getFilterQuery: function (chr, start, end) {
-            var thisB = this;
-            var resultingFilterQuery = {
-                "op": "and",
-                "content": [
-                    thisB.getLocationFilters(chr, start, end)
-                ]
-            };
-            if (Object.keys(thisB.filters).length > 0) {
-                resultingFilterQuery.content.push(thisB.filters);
-            }
-            return(resultingFilterQuery);
-        },
-
-         /**
-         * Creates a link to a given ID
-         * @param {string} link Base URL for link
-         * @param {string} id ID to append to base URL
-         * @return {string} a tag
-         */
-        createLinkWithId: function(link, id) {
-            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
-        },
-
-        /**
-         * Creates a link to a given ID and name
-         * @param {string} link Base URL for link
-         * @param {string} id ID to apped to base URL
-         * @param {string} name text to display for link
-         * @return {string} a tag
-         */
-        createLinkWithIdAndName: function(link, id, name) {
-            return id !== null ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
-        },
-
-        /**
-         * Returns the end value to be used for querying GDC
-         * @param {string} chr Chromosome number (ex. 1)
-         * @param {integer} end End location of JBrowse view
-         * @return {int} end position
-         */
-        getChromosomeEnd: function(chr, end) {
-            var chromosomeSizes = {
-                '1': 248956422,
-                '2': 242193529,
-                '3': 198295559,
-                '4': 190214555,
-                '5': 181538259,
-                '6': 170805979,
-                '7': 159345973,
-                '8': 146364022,
-                '9': 138394717,
-                '10': 133797422,
-                '11': 135086622,
-                '12': 133275309,
-                '13': 114364328,
-                '14': 107043718,
-                '15': 101991189,
-                '16': 90338345,
-                '17': 83257441,
-                '18': 80373285,
-                '19': 58617616,
-                '20': 64444167,
-                '21': 46709983,
-                '22': 50818468,
-                'x': 156040895,
-                'y': 57227415
-            };
-
-            if (end > chromosomeSizes[chr]) {
-                return chromosomeSizes[chr];
-            } else {
-                return end;
-            }
-        },
-
-        /**
          * Creates the query object for graphQL call
-         * @param {*} ref chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} ref chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          * @return {object} query object
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var geneQuery = `query geneResultsTableQuery( $genesTable_filters: FiltersArgument $genesTable_size: Int $genesTable_offset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $genesTable_size, offset: $genesTable_offset, filters: $genesTable_filters, score: $score) { total edges { node { gene_id id gene_strand synonyms symbol name gene_start gene_end gene_chromosome description canonical_transcript_id external_db_ids { hgnc omim_gene uniprotkb_swissprot entrez_gene } biotype numCases: score is_cancer_gene_census } } } } } } }`;
+            var geneQuery = `query geneResultsTableQuery( $geneFilters: FiltersArgument $geneSize: Int $geneOffset: Int $score: String ) { genesTableViewer: viewer { explore { genes { hits(first: $geneSize, offset: $geneOffset, filters: $geneFilters, score: $score) { total edges { node { gene_id id gene_strand synonyms symbol name gene_start gene_end gene_chromosome description canonical_transcript_id external_db_ids { hgnc omim_gene uniprotkb_swissprot entrez_gene } biotype numCases: score is_cancer_gene_census } } } } } } }`;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {
                 query: geneQuery,
                 variables: {
-                    "genesTable_filters": combinedFilters,
-                    "genesTable_size": thisB.size,
-                    "genesTable_offset": 0,
+                    "geneFilters": combinedFilters,
+                    "geneSize": thisB.size,
+                    "geneOffset": 0,
                     "score": "case.project.project_id"
                 }
             }
@@ -134,35 +51,9 @@ function(
         },
 
         /**
-         * Gets the general project information for all projects available on the GDC
-         */
-        getProjectData: function() {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                var bodyVal = {
-                    query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
-                    variables: {
-                        "count": 100
-                    }
-                }
-                fetch(thisB.graphQLUrl, {
-                    method: 'post',
-                    headers: { 'X-Requested-With': null },
-                    body: JSON.stringify(bodyVal)
-                }).then(function(response) {
-                    return(response.json());
-                }).then(function(response) {
-                    resolve(response);
-                }).catch(function(error) {
-                    reject(error);
-                });
-            });
-        },
-
-        /**
          * Creates a gene feature with the given gene object
-         * @param {*} gene 
-         * @param {*} featureCallback 
+         * @param {object} gene Gene object returned by GDC GraphQL
+         * @param {function} featureCallback 
          */
         createGeneFeature: function(gene, featureCallback) {
             var thisB = this;
@@ -194,34 +85,39 @@ function(
                     const UNI_LINK = 'http://www.uniprot.org/uniprot/';
                     const HGNC_LINK = 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/';
                     const OMIM_LINK = 'https://www.omim.org/entry/';
-                    geneFeature = {
-                        id: gene.gene_id,
-                        data: {
-                            'start': gene.gene_start,
-                            'end': gene.gene_end,
-                            'strand': gene.gene_strand,
-                            'about': {
-                                'biotype': gene.biotype,
-                                'gene name': gene.name,
-                                'symbol': gene.symbol,
-                                'synonyms': gene.synonyms,
-                                'is cancer gene census': gene.is_cancer_gene_census
-                            },
-                            'gene description': gene.description,
-                            'external references': {
-                                'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
-                                'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
-                                'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
-                                'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
-                                'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
-                                'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
-                                'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
-                            },
-                            'projects': thisB.createProjectTable(response)
+                    if (response && response.data) {
+                        geneFeature = {
+                            id: gene.gene_id,
+                            data: {
+                                'start': thisB.prettyText(gene.gene_start),
+                                'end': thisB.prettyText(gene.gene_end),
+                                'strand': thisB.prettyText(gene.gene_strand),
+                                'type': 'Gene',
+                                'about': {
+                                    'biotype': thisB.prettyText(gene.biotype),
+                                    'gene name': thisB.prettyText(gene.name),
+                                    'id': thisB.prettyText(gene.gene_id),
+                                    'symbol': thisB.prettyText(gene.symbol),
+                                    'synonyms': thisB.prettyText(gene.synonyms)
+                                },
+                                'gene description': thisB.prettyText(gene.description),
+                                'external references': {
+                                    'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
+                                    'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
+                                    'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
+                                    'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
+                                    'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
+                                    'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
+                                    'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
+                                },
+                                'projects': thisB.createProjectTable(response)
+                            }
                         }
+                        featureCallback(new SimpleFeature(geneFeature));
+                        resolve();
+                    } else {
+                        reject();
                     }
-                    featureCallback(new SimpleFeature(geneFeature));
-                    resolve();
                 }).catch(function(error) {
                     reject(error);
                 });
@@ -230,6 +126,8 @@ function(
 
         /**
          * Finds the corresponding project doc_count in a list of projects
+         * @param {List<object>} projects 
+         * @param {string} key 
          */
         findProjectByKey: function(projects, key) {
             var project = projects.find(project => project.key === key);
@@ -238,7 +136,7 @@ function(
 
         /**
          * Creates a project table that shows the distribution of a gene across projects
-         * @param {*} response 
+         * @param {object} response 
          */
         createProjectTable: function(response) {
             var thisB = this;
@@ -267,9 +165,9 @@ function(
                     <td style="${thStyle}"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
                     <td style="${thStyle}">${thisB.printList(projectInfo.node.disease_type)}</td>
                     <td style="${thStyle}">${thisB.printList(projectInfo.node.primary_site)}</td>
-                    <td style="${thStyle}">${project.doc_count} / ${thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key)}</td>
-                    <td style="${thStyle}">${thisB.findProjectByKey(response.data.viewer.explore.cases.gain.project__project_id.buckets, project.key)} / ${thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key)}</td>
-                    <td style="${thStyle}">${thisB.findProjectByKey(response.data.viewer.explore.cases.loss.project__project_id.buckets, project.key)} / ${thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key)}</td>
+                    <td style="${thStyle}">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
+                    <td style="${thStyle}">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.gain.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
+                    <td style="${thStyle}">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.loss.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
                     </tr>
                 `;
                 
@@ -282,24 +180,11 @@ function(
         },
 
         /**
-         * Convert a list of strings to a HTML list
-         * @param {List<string>} list 
-         */
-        printList: function(list) {
-            var listTag = '<ul>';
-            for (item of list) {
-                listTag += '<li>' + item + '</li>';
-            }
-            listTag += '</ul>';
-            return listTag;
-        },
-
-        /**
          * Get the features to be displayed
-         * @param {*} query 
-         * @param {*} featureCallback 
-         * @param {*} finishCallback 
-         * @param {*} errorCallback 
+         * @param {object} query 
+         * @param {function} featureCallback 
+         * @param {function} finishCallback 
+         * @param {function} errorCallback 
          */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
@@ -341,19 +226,10 @@ function(
         },
 
         /**
-         * Stub for getParser
-         */
-        getParser: function() {
-            return new Promise(function(resolve, reject) {
-                resolve({'getMetadata': function() {}});
-            });
-        },
-
-        /**
          * Creates the filter for the query to only look at Genes in the given range
-         * @param {*} chr chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} chr chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

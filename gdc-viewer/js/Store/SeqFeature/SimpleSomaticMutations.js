@@ -1,19 +1,18 @@
 define([
     'dojo/_base/declare',
     'dojo/_base/array',
-    'JBrowse/Store/SeqFeature',
+    './BaseSeqFeature',
     'JBrowse/Model/SimpleFeature'
 ],
 function(
     declare,
     array,
-    SeqFeatureStore,
+    BaseSeqFeature,
     SimpleFeature
 ) {
-    return declare(SeqFeatureStore, {
+    return declare(BaseSeqFeature, {
         projects: undefined,
         mutations: undefined,
-        graphQLUrl: 'https://api.gdc.cancer.gov/v0/graphql',
 
         /**
          * Constructor
@@ -29,51 +28,8 @@ function(
         },
 
         /**
-         * Creates a combined filter query based on the location and any filters passed
-         * @param {*} chr chromsome
-         * @param {*} start start position
-         * @param {*} end end position
-         * @return {object} query object
-         */
-        getFilterQuery: function (chr, start, end) {
-            var thisB = this;
-            var resultingFilterQuery = {
-                "op": "and",
-                "content": [
-                    thisB.getLocationFilters(chr, start, end)
-                ]
-            };
-            if (Object.keys(thisB.filters).length > 0) {
-                resultingFilterQuery.content.push(thisB.filters);
-            }
-            
-            return resultingFilterQuery;
-        },
-
-        /**
-         * Creates a link to a given ID
-         * @param {string} link base URL for link
-         * @param {string} id ID to apped to base URL
-         * @return {string} a tag
-         */
-        createLinkWithId: function(link, id) {
-            return id ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
-        },
-
-        /**
-         * Creates a link to a given ID and name
-         * @param {string} link base URL for link
-         * @param {string} id ID to apped to base URL
-         * @param {string} name text to display
-         * @return {string} a tag
-         */
-        createLinkWithIdAndName: function(link, id, name) {
-            return id ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
-        },
-
-        /**
          * Create an array of links for COSMIC
-         * @param {*} cosmic 
+         * @param {List<object>} cosmic array of cosmic IDs
          */
         createCOSMICLinks: function(cosmic) {
             var thisB = this;
@@ -99,8 +55,8 @@ function(
 
         /**
          * Pretty version of score
-         * @param {*} label text to display
-         * @param {*} score score value
+         * @param {string} label text to display
+         * @param {string} score score value
          * @return {string} pretty score
          */
         prettyScore: function(label, score) {
@@ -163,87 +119,9 @@ function(
         },
 
         /**
-         * Prints text to avoid undefined/null
-         * @param {string} text text to display
-         * @return {string} pretty text
-         */
-        prettyText: function(text) {
-            return text ? text : 'n/a';
-        },
- 
-        /**
-         * Returns the end value to be used for querying GDC
-         * @param {string} chr Chromosome number (ex. 1)
-         * @param {number} end End location of JBrowse view
-         * @return {number} chromsome end position
-         */
-        getChromosomeEnd: function(chr, end) {
-            var chromosomeSizes = {
-                '1': 248956422,
-                '2': 242193529,
-                '3': 198295559,
-                '4': 190214555,
-                '5': 181538259,
-                '6': 170805979,
-                '7': 159345973,
-                '8': 146364022,
-                '9': 138394717,
-                '10': 133797422,
-                '11': 135086622,
-                '12': 133275309,
-                '13': 114364328,
-                '14': 107043718,
-                '15': 101991189,
-                '16': 90338345,
-                '17': 83257441,
-                '18': 80373285,
-                '19': 58617616,
-                '20': 64444167,
-                '21': 46709983,
-                '22': 50818468,
-                'x': 156040895,
-                'y': 57227415
-            };
-
-            if (end > chromosomeSizes[chr]) {
-                return chromosomeSizes[chr];
-            } else {
-                return end;
-            }
-        },
-
-        /**
-         * Gets the general project information for all projects available on the GDC
-         */
-        getProjectData: function() {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                var bodyVal = {
-                    query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
-                    variables: {
-                        "count": 100
-                    }
-                }
-                fetch(thisB.graphQLUrl, {
-                    method: 'post',
-                    headers: { 'X-Requested-With': null },
-                    body: JSON.stringify(bodyVal)
-                }).then(function(response) {
-                    return(response.json());
-                }).then(function(response) {
-                    resolve(response);
-                }).catch(function(error) {
-                    reject(error);
-                });
-            });
-        },
-
-
-
-        /**
          * Creates a mutation feature with the given gene object
-         * @param {*} mutation 
-         * @param {*} featureCallback 
+         * @param {object} mutation 
+         * @param {function} featureCallback 
          */
         createMutationFeature: function(mutation, featureCallback) {
             var thisB = this;
@@ -264,27 +142,33 @@ function(
                     return(response.json());
                 }).then(function(response) {
                     const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
-                    variantFeature = {
-                        id: mutation.ssm_id,
-                        data: {
-                            'start': mutation.start_position,
-                            'end': mutation.end_position,
-                            'about': {
-                                'mutation type': mutation.mutation_type,
-                                'subtype': mutation.mutation_subtype,
-                                'dna change': mutation.genomic_dna_change,
-                                'reference allele': mutation.reference_allele,
-                            },
-                            'external references': {
-                                'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
-                                'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
-                            },
-                            'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
-                            'projects': thisB.createProjectTable(response)
+                    if (response && response.data) {
+                        variantFeature = {
+                            id: mutation.ssm_id,
+                            data: {
+                                'start': thisB.prettyText(mutation.start_position),
+                                'end': thisB.prettyText(mutation.end_position),
+                                'type': 'Simple Somatic Mutation',
+                                'about': {
+                                    'mutation type': thisB.prettyText(mutation.mutation_type),
+                                    'subtype': thisB.prettyText(mutation.mutation_subtype),
+                                    'dna change': thisB.prettyText(mutation.genomic_dna_change),
+                                    'reference allele': thisB.prettyText(mutation.reference_allele),
+                                    'id': thisB.prettyText(mutation.ssm_id)
+                                },
+                                'external references': {
+                                    'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                                    'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
+                                },
+                                'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
+                                'projects': thisB.createProjectTable(response)
+                            }
                         }
+                        featureCallback(new SimpleFeature(variantFeature));
+                        resolve();
+                    } else {
+                        reject()
                     }
-                    featureCallback(new SimpleFeature(variantFeature));
-                    resolve();
                 }).catch(function(error) {
                     reject(error);
                 });
@@ -293,6 +177,8 @@ function(
 
         /**
          * Finds the corresponding project doc_count in a list of projects
+         * @param {List<object>} projects  list of project objects
+         * @param {string} key object key to look for
          */
         findProjectByKey: function(projects, key) {
             var project = projects.find(project => project.key === key);
@@ -301,7 +187,7 @@ function(
 
         /**
          * Creates a project table that shows the distribution of a gene across projects
-         * @param {*} response 
+         * @param {object} response 
          */
         createProjectTable: function(response) {
             var thisB = this;
@@ -328,7 +214,7 @@ function(
                     <td style="${thStyle}"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
                     <td style="${thStyle}">${thisB.printList(projectInfo.node.disease_type)}</td>
                     <td style="${thStyle}">${thisB.printList(projectInfo.node.primary_site)}</td>
-                    <td style="${thStyle}">${project.doc_count} / ${thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key)}</td>
+                    <td style="${thStyle}">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
                     </tr>
                 `;
                 
@@ -341,23 +227,10 @@ function(
         },
 
         /**
-         * Convert a list of strings to a HTML list
-         * @param {List<string>} list 
-         */
-        printList: function(list) {
-            var listTag = '<ul>';
-            for (item of list) {
-                listTag += '<li>' + item + '</li>';
-            }
-            listTag += '</ul>';
-            return listTag;
-        },
-
-        /**
          * Creates the query object for graphQL call
-         * @param {*} ref chromosome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} ref chromosome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
@@ -381,10 +254,10 @@ function(
 
         /**
          * Get the features to be displayed
-         * @param {*} query 
-         * @param {*} featureCallback 
-         * @param {*} finishCallback 
-         * @param {*} errorCallback 
+         * @param {object} query 
+         * @param {function} featureCallback 
+         * @param {function} finishCallback 
+         * @param {function} errorCallback 
          */
         getFeatures: function(query, featureCallback, finishCallback, errorCallback) {
             var thisB = this;
@@ -426,19 +299,10 @@ function(
         },
 
         /**
-         * Stub for getParser
-         */
-        getParser: function() {
-            return new Promise(function(resolve, reject) {
-                resolve({'getMetadata': function() {}});
-            });
-        },
-
-        /**
          * Creates the filter for the query to only look at SSMs in the given range
-         * @param {*} chr chromsome
-         * @param {*} start start position
-         * @param {*} end end position
+         * @param {string} chr chromsome
+         * @param {number} start start position
+         * @param {number} end end position
          */
         getLocationFilters: function(chr, start, end) {
             var thisB = this;

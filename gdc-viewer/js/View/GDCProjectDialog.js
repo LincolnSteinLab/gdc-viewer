@@ -113,7 +113,7 @@ function (
 
         /**
          * Creates a table with projects
-         * @param {*} response Object returned from GraphQL call
+         * @param {object} response Object returned from GraphQL call
          */
         createProjectsTable: function(response) {
             var thisB = this;
@@ -218,9 +218,9 @@ function (
 
         /**
          * Generic function for adding a track of some type
-         * @param {*} storeClass the JBrowse store class
-         * @param {*} projectId the project ID to filter by
-         * @param {*} trackType the JBrowse track type
+         * @param {string} storeClass the JBrowse store class
+         * @param {string} projectId the project ID to filter by
+         * @param {string} trackType the JBrowse track type
          */
         addTrack: function (storeClass, projectId, trackType) {
             var projectFilters = {"op":"in","content":{"field": "cases.project.project_id","value": projectId}};
@@ -267,7 +267,7 @@ function (
 
         /**
          * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
-         * @param {integer} totalPages total number of pages
+         * @param {number} totalPages total number of pages
          */
         createPaginationButtons: function(totalPages) {
             var thisB = this;
