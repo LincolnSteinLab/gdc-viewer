@@ -228,12 +228,41 @@ function (
                     datatype: storeClass,
                     primarySite: primarySite
                 },
-                unsafePopup: true
+                unsafePopup: true,
+                menuTemplate : [ 
+                    {   
+                     label : "View details",
+                   }
+               ] 
             };
 
             if (storeClass === 'CNVs') {
                 trackConf.autoscale = 'local';
                 trackConf.bicolor_pivot = 0;
+            } else if (storeClass === 'Genes') {
+                trackConf.menuTemplate.push(
+                    {   
+                        label : "Highlight this Gene",
+                    },
+                    {
+                        label : "View gene on GDC",
+                        iconClass : "dijitIconSearch",
+                        action: "newWindow",
+                        url : function(track, feature) { return "https://portal.gdc.cancer.gov/genes/" + feature.get('about')['id'] }
+                    }
+                );
+            } else if (storeClass === 'SimpleSomaticMutations') {
+                trackConf.menuTemplate.push(
+                    {   
+                        label : "Highlight this Simple Somatic Mutation",
+                    },
+                    {
+                        label : "View SSM on GDC",
+                        iconClass : "dijitIconSearch",
+                        action: "newWindow",
+                        url : function(track, feature) { return "https://portal.gdc.cancer.gov/ssms/" + feature.get('about')['id'] }
+                    }
+                );
             }
 
             console.log("Adding track of type " + trackType + " and store class " + storeClass + ": " + key + " (" + label + ")");
