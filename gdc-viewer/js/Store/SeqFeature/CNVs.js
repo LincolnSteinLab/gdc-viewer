@@ -1,3 +1,6 @@
+/**
+ * Store SeqFeature for GDC Copy Number Variants
+ */
 define([
     'dojo/_base/declare',
     './BaseSeqFeature',

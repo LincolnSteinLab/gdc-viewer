@@ -1,3 +1,6 @@
+/**
+ * Store SeqFeature for GDC Simple Somatic Mutations
+ */
 define([
     'dojo/_base/declare',
     'dojo/_base/array',

@@ -1,3 +1,6 @@
+/**
+ * Base class for some Store SeqFeature for GDC
+ */
 define([
     'dojo/_base/declare',
     'JBrowse/Store/SeqFeature'

@@ -1,3 +1,6 @@
+/**
+ * A base class for GDC dialogs
+ */
 define([
     'dojo/_base/declare',
     'dojo/dom-construct',

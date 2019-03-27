@@ -1,3 +1,6 @@
+/**
+ * A Dialog for adding complex GDC tracks using a faceted search
+ */
 define([
     'dojo/_base/declare',
     'dojo/dom-construct',

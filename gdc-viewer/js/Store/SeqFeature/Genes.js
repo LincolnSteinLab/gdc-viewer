@@ -1,3 +1,6 @@
+/**
+ * Store SeqFeature for GDC Genes
+ */
 define([
     'dojo/_base/declare',
     './BaseSeqFeature',

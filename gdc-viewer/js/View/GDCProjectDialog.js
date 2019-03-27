@@ -1,3 +1,6 @@
+/**
+ * A Dialog for adding GDC tracks by project
+ */
 define([
     'dojo/_base/declare',
     'dojo/dom-construct',
