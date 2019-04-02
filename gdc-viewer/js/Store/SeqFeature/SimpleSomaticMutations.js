@@ -127,32 +127,29 @@ function(
          */
         createMutationFeature: function(mutation, featureCallback) {
             var thisB = this;
-            return new Promise(function(resolve, reject) {
-                const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
-                variantFeature = {
-                    id: mutation.ssm_id,
-                    data: {
-                        'start': thisB.prettyText(mutation.start_position),
-                        'end': thisB.prettyText(mutation.end_position),
-                        'type': 'Simple Somatic Mutation',
-                        'projects': mutation.ssm_id,
-                        'about': {
-                            'mutation type': thisB.prettyText(mutation.mutation_type),
-                            'subtype': thisB.prettyText(mutation.mutation_subtype),
-                            'dna change': thisB.prettyText(mutation.genomic_dna_change),
-                            'reference allele': thisB.prettyText(mutation.reference_allele),
-                            'id': thisB.prettyText(mutation.ssm_id)
-                        },
-                        'external references': {
-                            'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
-                            'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
-                        },
-                        'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
-                    }
+            const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
+            variantFeature = {
+                id: mutation.ssm_id,
+                data: {
+                    'start': thisB.prettyText(mutation.start_position),
+                    'end': thisB.prettyText(mutation.end_position),
+                    'type': 'Simple Somatic Mutation',
+                    'projects': mutation.ssm_id,
+                    'about': {
+                        'mutation type': thisB.prettyText(mutation.mutation_type),
+                        'subtype': thisB.prettyText(mutation.mutation_subtype),
+                        'dna change': thisB.prettyText(mutation.genomic_dna_change),
+                        'reference allele': thisB.prettyText(mutation.reference_allele),
+                        'id': thisB.prettyText(mutation.ssm_id)
+                    },
+                    'external references': {
+                        'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                        'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
+                    },
+                    'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
                 }
-                featureCallback(new SSMFeature(variantFeature));
-                resolve();
-            });
+            }
+            featureCallback(new SSMFeature(variantFeature));
         },
 
         /**
@@ -197,9 +194,11 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
+            // Create the body for the SSM request
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
             thisB.mutations = [];
 
+            // Fetch SSMs and create features
             fetch(thisB.graphQLUrl + '/SsmsTable', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
@@ -208,15 +207,14 @@ function(
                 return(response.json());
             }).then(function(response) {
                 if (response.data) {
-                    var promiseArray = [];
                     thisB.mutations = response.data.viewer.explore.ssms.hits.edges;
                     for (var hitId in thisB.mutations) {
                         var mutation = thisB.mutations[hitId].node;
-                        promiseArray.push(thisB.createMutationFeature(mutation, featureCallback));
+                        thisB.createMutationFeature(mutation, featureCallback);
                     }
-                    Promise.all(promiseArray).then(function(result) {
-                        finishCallback();
-                    });
+                    finishCallback();
+                } else {
+                    errorCallback('Error contacting GDC Portal');
                 }
             }).catch(function(err) {
                 console.log(err);
