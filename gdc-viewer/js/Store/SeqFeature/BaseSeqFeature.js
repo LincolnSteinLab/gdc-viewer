@@ -1,3 +1,6 @@
+/**
+ * Base class for some Store SeqFeature for GDC
+ */
 define([
     'dojo/_base/declare',
     'JBrowse/Store/SeqFeature'
@@ -99,54 +102,6 @@ function(
             } else {
                 return end;
             }
-        },
-
-        /**
-         * Convert a list of strings to a HTML list
-         * @param {List<string>} list 
-         */
-        printList: function(list) {
-            var listTag = '<ul>';
-            for (item of list) {
-                listTag += '<li>' + item + '</li>';
-            }
-            listTag += '</ul>';
-            return listTag;
-        },
-
-        /**
-         * Given a numerator and denominator, creates a pretty score with percentage
-         * @param {number} numerator
-         * @param {number} denominator
-         */
-        getValueWithPercentage: function(numerator, denominator) {
-            return numerator + '/' + denominator + ' (' + (numerator / denominator * 100).toFixed(2) + '%)';
-        },
-
-        /**
-         * Gets the general project information for all projects available on the GDC
-         */
-        getProjectData: function() {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                var bodyVal = {
-                    query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
-                    variables: {
-                        "count": 100
-                    }
-                }
-                fetch(thisB.graphQLUrl, {
-                    method: 'post',
-                    headers: { 'X-Requested-With': null },
-                    body: JSON.stringify(bodyVal)
-                }).then(function(response) {
-                    return(response.json());
-                }).then(function(response) {
-                    resolve(response);
-                }).catch(function(error) {
-                    reject(error);
-                });
-            });
         },
 
         /**

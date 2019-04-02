@@ -1,17 +1,19 @@
+/**
+ * Store SeqFeature for GDC Simple Somatic Mutations
+ */
 define([
     'dojo/_base/declare',
     'dojo/_base/array',
     './BaseSeqFeature',
-    'JBrowse/Model/SimpleFeature'
+    '../../Model/SSMFeature'
 ],
 function(
     declare,
     array,
     BaseSeqFeature,
-    SimpleFeature
+    SSMFeature
 ) {
     return declare(BaseSeqFeature, {
-        projects: undefined,
         mutations: undefined,
 
         /**
@@ -22,7 +24,7 @@ function(
             // Filters to apply to SSM query
             this.filters = args.filters !== undefined ? JSON.parse(args.filters) : [];
             // Size of results
-            this.size = args.size !== undefined ? parseInt(args.size) : 20;
+            this.size = args.size !== undefined ? parseInt(args.size) : 100;
             // Case ID
             this.case = args.case;
         },
@@ -126,104 +128,31 @@ function(
         createMutationFeature: function(mutation, featureCallback) {
             var thisB = this;
             return new Promise(function(resolve, reject) {
-                var mutationId = mutation.ssm_id;
-                var bodyVal = {
-                    query: `query projectsTable($ssmTested: FiltersArgument, $caseAggsFilter: FiltersArgument) { viewer { explore { cases { filtered: aggregations(filters: $caseAggsFilter) { project__project_id { buckets { doc_count key } } } total: aggregations(filters: $ssmTested) { project__project_id { buckets { doc_count key } } } } } } }`,
-                    variables: {
-                        "ssmTested": { "op":"and", "content":[ { "op":"in", "content":{ "field":"cases.available_variation_data", "value":[ "ssm" ] } } ] } ,
-                        "caseAggsFilter": { "op":"and", "content":[ { "op":"in", "content":{ "field":"ssms.ssm_id", "value":[ mutationId ] } }, { "op":"in", "content":{ "field":"cases.available_variation_data", "value":[ "ssm" ] } } ] }
+                const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
+                variantFeature = {
+                    id: mutation.ssm_id,
+                    data: {
+                        'start': thisB.prettyText(mutation.start_position),
+                        'end': thisB.prettyText(mutation.end_position),
+                        'type': 'Simple Somatic Mutation',
+                        'projects': mutation.ssm_id,
+                        'about': {
+                            'mutation type': thisB.prettyText(mutation.mutation_type),
+                            'subtype': thisB.prettyText(mutation.mutation_subtype),
+                            'dna change': thisB.prettyText(mutation.genomic_dna_change),
+                            'reference allele': thisB.prettyText(mutation.reference_allele),
+                            'id': thisB.prettyText(mutation.ssm_id)
+                        },
+                        'external references': {
+                            'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                            'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
+                        },
+                        'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
                     }
                 }
-                fetch(thisB.graphQLUrl, {
-                    method: 'post',
-                    headers: { 'X-Requested-With': null },
-                    body: JSON.stringify(bodyVal)
-                }).then(function(response) {
-                    return(response.json());
-                }).then(function(response) {
-                    const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
-                    if (response && response.data) {
-                        variantFeature = {
-                            id: mutation.ssm_id,
-                            data: {
-                                'start': thisB.prettyText(mutation.start_position),
-                                'end': thisB.prettyText(mutation.end_position),
-                                'type': 'Simple Somatic Mutation',
-                                'about': {
-                                    'mutation type': thisB.prettyText(mutation.mutation_type),
-                                    'subtype': thisB.prettyText(mutation.mutation_subtype),
-                                    'dna change': thisB.prettyText(mutation.genomic_dna_change),
-                                    'reference allele': thisB.prettyText(mutation.reference_allele),
-                                    'id': thisB.prettyText(mutation.ssm_id)
-                                },
-                                'external references': {
-                                    'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
-                                    'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
-                                },
-                                'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
-                                'projects': thisB.createProjectTable(response)
-                            }
-                        }
-                        featureCallback(new SimpleFeature(variantFeature));
-                        resolve();
-                    } else {
-                        reject()
-                    }
-                }).catch(function(error) {
-                    reject(error);
-                });
+                featureCallback(new SSMFeature(variantFeature));
+                resolve();
             });
-        },
-
-        /**
-         * Finds the corresponding project doc_count in a list of projects
-         * @param {List<object>} projects  list of project objects
-         * @param {string} key object key to look for
-         */
-        findProjectByKey: function(projects, key) {
-            var project = projects.find(project => project.key === key);
-            return project ? project.doc_count : 0;
-        },
-
-        /**
-         * Creates a project table that shows the distribution of a gene across projects
-         * @param {object} response 
-         */
-        createProjectTable: function(response) {
-            var thisB = this;
-            var thStyle = 'border: 1px solid #e6e6e6; padding: .2rem .2rem;';
-            var headerRow = `
-                <tr style=\"background-color: #f2f2f2\">
-                    <th style="${thStyle}">Project</th>
-                    <th style="${thStyle}">Disease Type</th>
-                    <th style="${thStyle}">Site</th>
-                    <th style="${thStyle}"># SSM Affected Cases</th> 
-                </tr>
-            `;
-
-            var table = '<table style="width: 560px; border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
-
-            var count = 0;
-            for (project of response.data.viewer.explore.cases.filtered.project__project_id.buckets) {
-                var trStyle = '';
-                if (count % 2 != 0) {
-                    trStyle = 'style=\"background-color: #f2f2f2\"';
-                }
-                var projectInfo = thisB.projects.find(x => x.node.project_id === project.key);
-                var row = `<tr ${trStyle}>
-                    <td style="${thStyle}"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
-                    <td style="${thStyle}">${thisB.printList(projectInfo.node.disease_type)}</td>
-                    <td style="${thStyle}">${thisB.printList(projectInfo.node.primary_site)}</td>
-                    <td style="${thStyle}">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
-                    </tr>
-                `;
-                
-                table += row;
-                count++;
-            }
-
-            table += '</table>';
-            return table;
         },
 
         /**
@@ -271,13 +200,10 @@ function(
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
             thisB.mutations = [];
 
-            thisB.getProjectData().then(function(response) {
-                thisB.projects = response.data.projectsViewer.projects.hits.edges;
-                return fetch(thisB.graphQLUrl + '/SsmsTable', {
-                    method: 'post',
-                    headers: { 'X-Requested-With': null },
-                    body: bodyVal
-                });
+            fetch(thisB.graphQLUrl + '/SsmsTable', {
+                method: 'post',
+                headers: { 'X-Requested-With': null },
+                body: bodyVal
             }).then(function(response) {
                 return(response.json());
             }).then(function(response) {

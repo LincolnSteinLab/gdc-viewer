@@ -1,3 +1,6 @@
+/**
+ * A Dialog for adding complex GDC tracks using a faceted search
+ */
 define([
     'dojo/_base/declare',
     'dojo/dom-construct',
@@ -1277,11 +1280,7 @@ function (
          */
         addTrack: function (storeClass, caseId, combinedFacetObject, trackType) {
             if (combinedFacetObject !== undefined) {
-                if (combinedFacetObject === '') {
-                    combinedFacetObject = undefined
-                } else {
-                    combinedFacetObject = JSON.stringify(combinedFacetObject)
-                }
+                combinedFacetObject = combinedFacetObject === '' ? undefined : JSON.stringify(combinedFacetObject);
             }
 
             var storeConf = {
@@ -1323,6 +1322,7 @@ function (
                 trackConf.autoscale = 'local';
                 trackConf.bicolor_pivot = 0;
             } else if (storeClass === 'Genes') {
+                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-" + value +  "'></div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Gene",
@@ -1334,7 +1334,9 @@ function (
                         url : function(track, feature) { return "https://portal.gdc.cancer.gov/genes/" + feature.get('about')['id'] }
                     }
                 );
+
             } else if (storeClass === 'SimpleSomaticMutations') {
+                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-" + value +  "'></div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Simple Somatic Mutation",
