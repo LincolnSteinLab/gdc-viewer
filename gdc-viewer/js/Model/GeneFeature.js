@@ -1,5 +1,5 @@
 /**
- * Simple implementation of a feature object.
+ * Simple implementation of a Gene feature object.
  */
 define([
     'JBrowse/Util'

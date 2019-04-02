@@ -1,5 +1,5 @@
 /**
- * Simple implementation of a feature object.
+ * Simple implementation of an SSM feature object.
  */
 define([
     'JBrowse/Util'

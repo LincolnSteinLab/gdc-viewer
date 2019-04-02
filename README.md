@@ -96,6 +96,7 @@ type=JBrowse/View/Track/CanvasVariants
 key=GDC Genes
 metadata.datatype=Gene
 unsafePopup=true
+fmtDetailValue_projects=function(value) { return "<div id='projects-" + value +  "'></div>";}
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
@@ -104,7 +105,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
-You can set the max number of genes to return with the `size` field. It defaults to 20.
+You can set the max number of genes to return with the `size` field. It defaults to 100.
 You can view case specific genes by setting the `case` field.
 
 ## SSMs
@@ -118,6 +119,7 @@ type=JBrowse/View/Track/CanvasVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
+fmtDetailValue_projects=function(value) { return "<div id='projects-" + value +  "'></div>";}
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
@@ -126,7 +128,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
-You can set the max number of SSMs to return with the `size` field. It defaults to 20.
+You can set the max number of SSMs to return with the `size` field. It defaults to 100.
 You can view case specific SSMs by setting the `case` field.
 
 ## CNVs
