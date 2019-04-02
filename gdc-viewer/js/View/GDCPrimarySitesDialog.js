@@ -255,6 +255,7 @@ function (
                     }
                 );
             } else if (storeClass === 'SimpleSomaticMutations') {
+                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-" + value +  "'></div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Simple Somatic Mutation",

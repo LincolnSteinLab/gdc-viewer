@@ -1280,11 +1280,7 @@ function (
          */
         addTrack: function (storeClass, caseId, combinedFacetObject, trackType) {
             if (combinedFacetObject !== undefined) {
-                if (combinedFacetObject === '') {
-                    combinedFacetObject = undefined
-                } else {
-                    combinedFacetObject = JSON.stringify(combinedFacetObject)
-                }
+                combinedFacetObject = combinedFacetObject === '' ? undefined : JSON.stringify(combinedFacetObject);
             }
 
             var storeConf = {
@@ -1337,7 +1333,9 @@ function (
                         url : function(track, feature) { return "https://portal.gdc.cancer.gov/genes/" + feature.get('about')['id'] }
                     }
                 );
+
             } else if (storeClass === 'SimpleSomaticMutations') {
+                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-" + value +  "'></div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Simple Somatic Mutation",
