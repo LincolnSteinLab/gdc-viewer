@@ -106,6 +106,7 @@ function(
          * @param {function} featureCallback 
          */
         createCNVFeature: function(cnv, featureCallback) {
+            var thisB = this;
             cnvFeature = {
                 id: cnv.id,
                 data: {
