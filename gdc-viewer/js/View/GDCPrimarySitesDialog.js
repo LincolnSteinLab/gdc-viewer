@@ -243,7 +243,7 @@ function (
                 trackConf.autoscale = 'local';
                 trackConf.bicolor_pivot = 0;
             } else if (storeClass === 'Genes') {
-                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-gdc-" + value +  "'></div" };
+                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Gene",
@@ -256,7 +256,7 @@ function (
                     }
                 );
             } else if (storeClass === 'SimpleSomaticMutations') {
-                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-gdc-" + value +  "'></div" };
+                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Simple Somatic Mutation",

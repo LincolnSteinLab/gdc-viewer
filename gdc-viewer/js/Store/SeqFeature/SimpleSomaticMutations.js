@@ -213,6 +213,7 @@ function(
                     }
                     finishCallback();
                 } else {
+                    console.log(err);
                     errorCallback('Error contacting GDC Portal');
                 }
             }).catch(function(err) {
