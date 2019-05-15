@@ -74,7 +74,10 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
+            // Create the body for the CNV request
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
+
+            // Fetch CNVs and create features
             fetch(thisB.graphQLUrl, {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
@@ -85,22 +88,34 @@ function(
                 if (response.data) {
                     for (var hitId in response.data.explore.cnvs.hits.edges) {
                         var cnv = response.data.explore.cnvs.hits.edges[hitId].node;
-                        cnvFeature = {
-                            id: cnv.id,
-                            data: {
-                                'start': cnv.start_position,
-                                'end': cnv.end_position,
-                                'score': thisB.convertCNVChangeToScore(cnv.cnv_change)
-                            }
-                        }
-                        featureCallback(new SimpleFeature(cnvFeature));
+                        thisB.createCNVFeature(cnv, featureCallback);
                     }
                     finishCallback();
+                } else {
+                    errorCallback('Error contacting GDC Portal');
                 }
             }).catch(function(err) {
                 console.log(err);
                 errorCallback('Error contacting GDC Portal');
             });
+        },
+
+        /**
+         * Creates a CNV feature with the given gene object
+         * @param {object} cnv 
+         * @param {function} featureCallback 
+         */
+        createCNVFeature: function(cnv, featureCallback) {
+            var thisB = this;
+            cnvFeature = {
+                id: cnv.id,
+                data: {
+                    'start': cnv.start_position,
+                    'end': cnv.end_position,
+                    'score': thisB.convertCNVChangeToScore(cnv.cnv_change)
+                }
+            }
+            featureCallback(new SimpleFeature(cnvFeature));
         },
         
         /**

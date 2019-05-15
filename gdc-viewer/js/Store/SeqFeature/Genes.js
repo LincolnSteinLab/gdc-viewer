@@ -60,43 +60,40 @@ function(
          */
         createGeneFeature: function(gene, featureCallback) {
             var thisB = this;
-            return new Promise(function(resolve, reject) {
-                const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
-                const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
-                const NCBI_LINK = 'http://www.ncbi.nlm.nih.gov/gene/';
-                const UNI_LINK = 'http://www.uniprot.org/uniprot/';
-                const HGNC_LINK = 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/';
-                const OMIM_LINK = 'https://www.omim.org/entry/';
-                    geneFeature = {
-                        id: gene.gene_id,
-                        data: {
-                            'start': thisB.prettyText(gene.gene_start),
-                            'end': thisB.prettyText(gene.gene_end),
-                            'strand': thisB.prettyText(gene.gene_strand),
-                            'type': 'Gene',
-                            'about': {
-                                'biotype': thisB.prettyText(gene.biotype),
-                                'gene name': thisB.prettyText(gene.name),
-                                'id': thisB.prettyText(gene.gene_id),
-                                'symbol': thisB.prettyText(gene.symbol),
-                                'synonyms': thisB.prettyText(gene.synonyms)
-                            },
-                            'gene description': thisB.prettyText(gene.description),
-                            'external references': {
-                                'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
-                                'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
-                                'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
-                                'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
-                                'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
-                                'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
-                                'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
-                            },
-                            'projects': gene.gene_id
-                        }
-                    }
-                    featureCallback(new GeneFeature(geneFeature));
-                    resolve();
-            });
+            const ENSEMBL_LINK = 'http://www.ensembl.org/id/';
+            const GDC_LINK = 'https://portal.gdc.cancer.gov/genes/';
+            const NCBI_LINK = 'http://www.ncbi.nlm.nih.gov/gene/';
+            const UNI_LINK = 'http://www.uniprot.org/uniprot/';
+            const HGNC_LINK = 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/';
+            const OMIM_LINK = 'https://www.omim.org/entry/';
+            geneFeature = {
+                id: gene.gene_id,
+                data: {
+                    'start': thisB.prettyText(gene.gene_start),
+                    'end': thisB.prettyText(gene.gene_end),
+                    'strand': thisB.prettyText(gene.gene_strand),
+                    'type': 'Gene',
+                    'about': {
+                        'biotype': thisB.prettyText(gene.biotype),
+                        'gene name': thisB.prettyText(gene.name),
+                        'id': thisB.prettyText(gene.gene_id),
+                        'symbol': thisB.prettyText(gene.symbol),
+                        'synonyms': thisB.prettyText(gene.synonyms)
+                    },
+                    'gene description': thisB.prettyText(gene.description),
+                    'external references': {
+                        'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
+                        'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
+                        'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),
+                        'omim': thisB.createLinkWithId(OMIM_LINK, gene.external_db_ids.omim_gene),
+                        'ensembl': thisB.createLinkWithId(ENSEMBL_LINK, gene.gene_id),
+                        'canonical transcript id': thisB.createLinkWithId(ENSEMBL_LINK, gene.canonical_transcript_id),
+                        'gdc': thisB.createLinkWithId(GDC_LINK, gene.gene_id)
+                    },
+                    'projects': gene.gene_id
+                }
+            }
+            featureCallback(new GeneFeature(geneFeature));
         },
 
         /**
@@ -115,9 +112,11 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
+            // Create the body for the Gene request
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
             thisB.genes = [];
 
+            // Fetch Genes and create features
             fetch(thisB.graphQLUrl + '/GenesTable', {
                     method: 'post',
                     headers: { 'X-Requested-With': null },
@@ -126,15 +125,14 @@ function(
                 return(response.json());
             }).then(function(response) {
                 if (response.data) {
-                    var promiseArray = [];
                     thisB.genes = response.data.genesTableViewer.explore.genes.hits.edges;
                     for (var hitId in thisB.genes) {
                         var gene = thisB.genes[hitId].node;
-                        promiseArray.push(thisB.createGeneFeature(gene, featureCallback));
+                        thisB.createGeneFeature(gene, featureCallback);
                     }
-                    Promise.all(promiseArray).then(function(result) {
-                        finishCallback();
-                    });
+                    finishCallback();
+                } else {
+                    errorCallback('Error contacting GDC Portal');
                 }
             }).catch(function(err) {
                 console.log(err);

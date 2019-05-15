@@ -62,7 +62,7 @@ function(
          * @return {string} pretty score
          */
         prettyScore: function(label, score) {
-            return label && score ? label + ' (' + score + ')' : 'n/a';
+            return label && score ? label + ' (' + score + ')' : '';
         },
 
         /**
@@ -127,32 +127,29 @@ function(
          */
         createMutationFeature: function(mutation, featureCallback) {
             var thisB = this;
-            return new Promise(function(resolve, reject) {
-                const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
-                variantFeature = {
-                    id: mutation.ssm_id,
-                    data: {
-                        'start': thisB.prettyText(mutation.start_position),
-                        'end': thisB.prettyText(mutation.end_position),
-                        'type': 'Simple Somatic Mutation',
-                        'projects': mutation.ssm_id,
-                        'about': {
-                            'mutation type': thisB.prettyText(mutation.mutation_type),
-                            'subtype': thisB.prettyText(mutation.mutation_subtype),
-                            'dna change': thisB.prettyText(mutation.genomic_dna_change),
-                            'reference allele': thisB.prettyText(mutation.reference_allele),
-                            'id': thisB.prettyText(mutation.ssm_id)
-                        },
-                        'external references': {
-                            'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
-                            'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
-                        },
-                        'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
-                    }
+            const GDC_LINK = 'https://portal.gdc.cancer.gov/ssms/';
+            variantFeature = {
+                id: mutation.ssm_id,
+                data: {
+                    'start': thisB.prettyText(mutation.start_position),
+                    'end': thisB.prettyText(mutation.end_position),
+                    'type': 'Simple Somatic Mutation',
+                    'projects': mutation.ssm_id,
+                    'about': {
+                        'mutation type': thisB.prettyText(mutation.mutation_type),
+                        'subtype': thisB.prettyText(mutation.mutation_subtype),
+                        'dna change': thisB.prettyText(mutation.genomic_dna_change),
+                        'reference allele': thisB.prettyText(mutation.reference_allele),
+                        'id': thisB.prettyText(mutation.ssm_id)
+                    },
+                    'external references': {
+                        'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
+                        'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
+                    },
+                    'mutation consequences': thisB.createConsequencesTable(mutation.consequence.hits.edges),
                 }
-                featureCallback(new SSMFeature(variantFeature));
-                resolve();
-            });
+            }
+            featureCallback(new SSMFeature(variantFeature));
         },
 
         /**
@@ -163,14 +160,13 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var ssmQuery = `query ssmResultsTableQuery( $ssmsTable_size: Int $consequenceFilters: FiltersArgument $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id start_position end_position mutation_type cosmic_id reference_allele ncbi_build score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $consequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact hgvsc } consequence_type gene { gene_id symbol } aa_change transcript_id } id } } } } } } } } } } }`;
+            var ssmQuery = `query ssmResultsTableQuery( $ssmsTable_size: Int $ssmsTable_offset: Int $ssmsTable_filters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { ssms { hits(first: $ssmsTable_size, offset: $ssmsTable_offset, filters: $ssmsTable_filters, score: $score, sort: $sort) { total edges { node { id start_position end_position mutation_type cosmic_id reference_allele ncbi_build score genomic_dna_change mutation_subtype ssm_id consequence { hits { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact hgvsc } consequence_type gene { gene_id symbol gene_strand } aa_change transcript_id } id } } } } } } } } } } }`;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {
                 query: ssmQuery,
                 variables: {
                     "ssmsTable_size": thisB.size,
-                    "consequenceFilters":{"op":"and","content":[{"op":"in","content":{"field":"consequence.transcript.is_canonical","value":["true"]}}]},
                     "ssmsTable_offset": 0,
                     "ssmsTable_filters": combinedFilters,
                     "score":"occurrence.case.project.project_id",
@@ -197,9 +193,11 @@ function(
             var ref = query.ref.replace(/chr/, '');
             end = thisB.getChromosomeEnd(ref, end);
 
+            // Create the body for the SSM request
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
             thisB.mutations = [];
 
+            // Fetch SSMs and create features
             fetch(thisB.graphQLUrl + '/SsmsTable', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
@@ -208,15 +206,15 @@ function(
                 return(response.json());
             }).then(function(response) {
                 if (response.data) {
-                    var promiseArray = [];
                     thisB.mutations = response.data.viewer.explore.ssms.hits.edges;
                     for (var hitId in thisB.mutations) {
                         var mutation = thisB.mutations[hitId].node;
-                        promiseArray.push(thisB.createMutationFeature(mutation, featureCallback));
+                        thisB.createMutationFeature(mutation, featureCallback);
                     }
-                    Promise.all(promiseArray).then(function(result) {
-                        finishCallback();
-                    });
+                    finishCallback();
+                } else {
+                    console.log(err);
+                    errorCallback('Error contacting GDC Portal');
                 }
             }).catch(function(err) {
                 console.log(err);

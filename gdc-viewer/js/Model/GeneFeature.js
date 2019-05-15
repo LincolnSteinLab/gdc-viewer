@@ -85,9 +85,9 @@ get: function(name) {
         }).then(function(response) {
             return(response.json());
         }).then(function(response) {
-            document.getElementById('projects-' + geneId).innerHTML = thisB.createProjectTable(response);
+            document.getElementById('projects-gdc-' + geneId).innerHTML = thisB.createProjectTable(response);
         }).catch(function(err) {
-            document.getElementById('projects-' + geneId).innerHTML = 'Error creating projects table';
+            document.getElementById('projects-gdc-' + geneId).innerHTML = 'Error creating projects table';
         });
         return geneId;
     } else {
