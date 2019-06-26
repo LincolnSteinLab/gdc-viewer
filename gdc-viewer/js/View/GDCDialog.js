@@ -713,8 +713,10 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
+            var hasHits = false;
             if (response.data) {
                 for (var hitId in response.data.exploreCasesTableViewer.explore.cases.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.exploreCasesTableViewer.explore.cases.hits.edges[hitId].node;
 
                     var caseRowContent = `
@@ -851,6 +853,18 @@ function (
 
                 }
             }
+
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No cases found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
+            }
+
             // Place rows into table
             dom.place(rowsHolderNode, tableNode);
 
@@ -880,8 +894,11 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
+            var hasHits = false;
+
             if (response.data) {
                 for (var hitId in response.data.genesTableViewer.explore.genes.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.genesTableViewer.explore.genes.hits.edges[hitId].node;
 
                     var caseRowContent = `
@@ -901,6 +918,17 @@ function (
                     dom.place(rowNodeHolder, rowsHolderNode);
 
                 }
+            }
+
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No genes found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
             }
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
@@ -984,8 +1012,10 @@ function (
             `;
 
             var rowsHolderNode = dom.toDom(rowsHolder);
+            var hasHits = false;
             if (response.data) {
                 for (var hitId in response.data.viewer.explore.ssms.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.viewer.explore.ssms.hits.edges[hitId];
 
                     var caseRowContent = `
@@ -1005,6 +1035,17 @@ function (
 
                 }
             }
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No mutations found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
+            }
+
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
         },
