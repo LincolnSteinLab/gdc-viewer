@@ -78,10 +78,10 @@ function(
                         'gene name': thisB.prettyText(gene.name),
                         'id': thisB.prettyText(gene.gene_id),
                         'symbol': thisB.prettyText(gene.symbol),
-                        'synonyms': thisB.prettyText(gene.synonyms)
+                        'synonyms': thisB.prettyText(gene.synonyms),
+                        'description': thisB.prettyText(gene.description)
                     },
-                    'gene description': thisB.prettyText(gene.description),
-                    'external references': {
+                    'references': {
                         'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
                         'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
                         'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),

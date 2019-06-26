@@ -60,7 +60,16 @@ function(
          * @return {string} pretty text
          */
         prettyText: function(text) {
-            return text && text !== null && text !== undefined ? text : 'n/a';
+            if (text && text !== null && text !== undefined && typeof text !== 'undefined') {
+                if (Array.isArray(text)) {
+                    return text.join(', ');
+                } else if (typeof text == 'number') {
+                    return text;
+                } else {
+                    return text.toString();
+                }
+            }
+            return 'n/a';
         },
  
         /**
