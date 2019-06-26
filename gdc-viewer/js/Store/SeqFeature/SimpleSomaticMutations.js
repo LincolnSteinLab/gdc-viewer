@@ -40,10 +40,14 @@ function(
             const COSMIC_LINK = 'https://cancer.sanger.ac.uk/cosmic/mutation/overview?id=';
             array.forEach(cosmic, function(cosmicId) {
                 var cosmicIdNoPrefix = cosmicId.replace('COSM', '');
+                cosmicIdNoPrefix = cosmicIdNoPrefix.replace('COSN', '');
                 cosmicLinks.push(thisB.createLinkWithId(COSMIC_LINK, cosmicIdNoPrefix));
             });
-
-            return cosmicLinks.join(", ");
+            if (cosmicLinks.length > 0) {
+                return cosmicLinks.join(", ");
+            } else {
+                return 'n/a';
+            }
         },
 
         /**
@@ -74,20 +78,19 @@ function(
             var thisB = this;
             const TRANSCRIPT_LINK = 'http://may2015.archive.ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=';
             const GENES_LINK = 'https://portal.gdc.cancer.gov/genes/';
-            var thStyle = 'border: 1px solid #e6e6e6; padding: .2rem .2rem;';
             var headerRow = `
                 <tr style=\"background-color: #f2f2f2\">
-                    <th style="${thStyle}">Gene</th>
-                    <th style="${thStyle}">AA Change</th>
-                    <th style="${thStyle}">Consequence</th>
-                    <th style="${thStyle}">Coding DNA Change</th> 
-                    <th style="${thStyle}">Impact</th>
-                    <th style="${thStyle}">Gene Strand</th>
-                    <th style="${thStyle}">Transcript(s)</th>
+                    <th class="gdc-popup-table-header">Gene</th>
+                    <th class="gdc-popup-table-header">AA Change</th>
+                    <th class="gdc-popup-table-header">Consequence</th>
+                    <th class="gdc-popup-table-header">Coding DNA Change</th> 
+                    <th class="gdc-popup-table-header">Impact</th>
+                    <th class="gdc-popup-table-header">Gene Strand</th>
+                    <th class="gdc-popup-table-header">Transcript(s)</th>
                 </tr>
             `;
 
-            var consequenceTable = '<table style="width: 560px; border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
+            var consequenceTable = '<table class="gdc-popup-table" style="border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
 
             var count = 0;
             for (consequence of consequences) {
@@ -96,24 +99,32 @@ function(
                     trStyle = 'style=\"background-color: #f2f2f2\"';
                 }
                 var consequenceRow = `<tr ${trStyle}>
-                    <td style="${thStyle}">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.node.transcript.gene.gene_id, consequence.node.transcript.gene.symbol)}</td>
-                    <td style="${thStyle}">${thisB.prettyText(consequence.node.transcript.aa_change)}</td>
-                    <td style="${thStyle}">${thisB.prettyText(consequence.node.transcript.consequence_type)}</td>
-                    <td style="${thStyle}">${thisB.prettyText(consequence.node.transcript.annotation.hgvsc)}</td>
-                    <td style="${thStyle}">
+                    <td class="gdc-popup-table-header">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.node.transcript.gene.gene_id, consequence.node.transcript.gene.symbol)}</td>
+                    <td class="gdc-popup-table-header">${thisB.prettyText(consequence.node.transcript.aa_change)}</td>
+                    <td class="gdc-popup-table-header">${thisB.prettyText(consequence.node.transcript.consequence_type)}</td>
+                    <td class="gdc-popup-table-header">${thisB.prettyText(consequence.node.transcript.annotation.hgvsc)}</td>
+                    <td class="gdc-popup-table-header">
                         <ul style="list-style: none;">
                             <li>VEP: ${consequence.node.transcript.annotation.vep_impact}</li>
                             <li>SIFT: ${thisB.prettyScore(consequence.node.transcript.annotation.sift_impact, consequence.node.transcript.annotation.sift_score)}</li>
                             <li>Polyphen: ${thisB.prettyScore(consequence.node.transcript.annotation.polyphen_impact, consequence.node.transcript.annotation.polyphen_score)}</li>
                         </ul>
                     </td>
-                    <td style="${thStyle}">${thisB.convertIntToStrand(consequence.node.transcript.gene.gene_strand)}</td>
-                    <td style="${thStyle}">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.node.transcript.transcript_id)}${consequence.node.transcript.is_canonical ? ' (C)' : ''}</td>
+                    <td class="gdc-popup-table-header">${thisB.convertIntToStrand(consequence.node.transcript.gene.gene_strand)}</td>
+                    <td class="gdc-popup-table-header">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.node.transcript.transcript_id)}${consequence.node.transcript.is_canonical ? ' (C)' : ''}</td>
                     </tr>
                 `;
                 
                 consequenceTable += consequenceRow;
                 count++;
+            }
+
+            if (consequences.length == 0) {
+                table += `
+                    <tr class="dc-popup-table-header">
+                        <td colspan="7" class="gdc-popup-table-header" style="text-align: center;">No consequences found</td>
+                    </tr>
+                `;
             }
 
             consequenceTable += '</table>';
@@ -142,7 +153,7 @@ function(
                         'reference allele': thisB.prettyText(mutation.reference_allele),
                         'id': thisB.prettyText(mutation.ssm_id)
                     },
-                    'external references': {
+                    'references': {
                         'gdc': thisB.createLinkWithId(GDC_LINK, mutation.ssm_id),
                         'cosmic': thisB.createCOSMICLinks(mutation.cosmic_id)
                     },

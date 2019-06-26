@@ -212,7 +212,7 @@ function (
             var combinedFilters = thisB.combineAllFilters();
             combinedFilters = combinedFilters ? JSON.parse(combinedFilters) : combinedFilters
 
-            var facetQuery = `query Queries($filters:FiltersArgument!,$first:Int!,$offset:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},diagnoses__vital_status {buckets {doc_count,key}},diagnoses__days_to_death {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first,offset:$offset,filters:$filters,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters) {total}},cnvs {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters) {total}},ssms {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters) {total}}}}`;
+            var facetQuery = `query Queries($filters:FiltersArgument!,$first:Int!,$offset:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first,offset:$offset,filters:$filters,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters) {total}},cnvs {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters) {total}},ssms {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters) {total}}}}`;
             var bodyVal = {
                 query: facetQuery,
                 variables: {
@@ -647,7 +647,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.casePage);
             var size = thisB.pageSize;
-            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $casesSize: Int $casesOffset: Int $casesScore: String $sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $casesSize, offset: $casesOffset, filters: $filters, score: $casesScore, sort: $sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
+            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $casesSize: Int $casesOffset: Int $casesScore: String $sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $casesSize, offset: $casesOffset, filters: $filters, score: $casesScore, sort: $sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
 
             var combinedFilters = thisB.combineAllFilters();
             if (combinedFilters) {
@@ -713,8 +713,10 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
+            var hasHits = false;
             if (response.data) {
                 for (var hitId in response.data.exploreCasesTableViewer.explore.cases.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.exploreCasesTableViewer.explore.cases.hits.edges[hitId].node;
 
                     var caseRowContent = `
@@ -851,6 +853,18 @@ function (
 
                 }
             }
+
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No cases found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
+            }
+
             // Place rows into table
             dom.place(rowsHolderNode, tableNode);
 
@@ -880,8 +894,11 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
+            var hasHits = false;
+
             if (response.data) {
                 for (var hitId in response.data.genesTableViewer.explore.genes.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.genesTableViewer.explore.genes.hits.edges[hitId].node;
 
                     var caseRowContent = `
@@ -901,6 +918,17 @@ function (
                     dom.place(rowNodeHolder, rowsHolderNode);
 
                 }
+            }
+
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No genes found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
             }
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
@@ -984,8 +1012,10 @@ function (
             `;
 
             var rowsHolderNode = dom.toDom(rowsHolder);
+            var hasHits = false;
             if (response.data) {
                 for (var hitId in response.data.viewer.explore.ssms.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.viewer.explore.ssms.hits.edges[hitId];
 
                     var caseRowContent = `
@@ -1005,6 +1035,17 @@ function (
 
                 }
             }
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No mutations found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
+            }
+
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
         },

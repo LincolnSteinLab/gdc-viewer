@@ -92,3 +92,37 @@ table.results-table tr:nth-child(odd) {
 .dijitContentPane.dijitAccordionContainer-child.dijitAccordionContainer-dijitContentPane {
     width: 100% !important;
 }
+
+.popup-dialog {
+    width: 80% !important;
+}
+
+.value_container.projects {
+    width: 100% !important;
+}
+
+.value.projects {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+.value_container.mutation_consequences {
+    width: 100% !important;
+}
+
+.value.mutation_consequences {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+.gdc-popup-table {
+    width: 100% !important;
+    padding-left: 1em !important;
+    padding-right:1em !important;
+    padding-top: 0.3em !important;
+}
+
+.gdc-popup-table-header {
+    border: 1px solid #e6e6e6 !important;
+    padding: .2rem .2rem !important;
+}
