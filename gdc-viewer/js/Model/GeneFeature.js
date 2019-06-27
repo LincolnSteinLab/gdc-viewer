@@ -103,16 +103,16 @@ createProjectTable: function(response) {
     var thisB = this;
     var headerRow = `
         <tr style=\"background-color: #f2f2f2\">
-            <th class="gdc-popup-table-header">Project</th>
-            <th class="gdc-popup-table-header">Disease Type</th>
-            <th class="gdc-popup-table-header">Site</th>
-            <th class="gdc-popup-table-header"># SSM Affected Cases</th> 
-            <th class="gdc-popup-table-header"># CNV Gains</th>
-            <th class="gdc-popup-table-header"># CNV Losses</th>
+            <th class="popup-table-header">Project</th>
+            <th class="popup-table-header">Disease Type</th>
+            <th class="popup-table-header">Site</th>
+            <th class="popup-table-header"># SSM Affected Cases</th> 
+            <th class="popup-table-header"># CNV Gains</th>
+            <th class="popup-table-header"># CNV Losses</th>
         </tr>
     `;
 
-    var table = '<table class="gdc-popup-table" style="border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
+    var table = '<table class="popup-table" style="border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
 
     var count = 0;
     var projects = response.data.viewer.explore.cases.filtered.project__project_id.buckets;
@@ -123,12 +123,12 @@ createProjectTable: function(response) {
         }
         var projectInfo = thisB.projects.find(x => x.node.project_id === project.key);
         var row = `<tr ${trStyle}>
-            <td class="gdc-popup-table-header"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
-            <td class="gdc-popup-table-header">${thisB.printList(projectInfo.node.disease_type)}</td>
-            <td class="gdc-popup-table-header">${thisB.printList(projectInfo.node.primary_site)}</td>
-            <td class="gdc-popup-table-header">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
-            <td class="gdc-popup-table-header">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.gain.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
-            <td class="gdc-popup-table-header">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.loss.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
+            <td class="popup-table-header"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
+            <td class="popup-table-header">${thisB.printList(projectInfo.node.disease_type)}</td>
+            <td class="popup-table-header">${thisB.printList(projectInfo.node.primary_site)}</td>
+            <td class="popup-table-header">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
+            <td class="popup-table-header">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.gain.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
+            <td class="popup-table-header">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.loss.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
             </tr>
         `;
         
@@ -139,7 +139,7 @@ createProjectTable: function(response) {
     if (projects.length == 0) {
         table += `
             <tr class="dc-popup-table-header">
-                <td colspan="6" class="gdc-popup-table-header" style="text-align: center;">No projects found</td>
+                <td colspan="6" class="popup-table-header" style="text-align: center;">No projects found</td>
             </tr>
         `;
     }

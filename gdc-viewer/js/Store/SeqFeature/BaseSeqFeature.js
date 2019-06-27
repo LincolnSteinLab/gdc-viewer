@@ -40,7 +40,7 @@ function(
          * @return {string} a tag
          */
         createLinkWithId: function(link, id) {
-            return id ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
+            return this.valueIsDefined(id) ? "<a href='" + link + id + "' target='_blank'>" + id + "</a>" : "n/a";
         },
 
         /**
@@ -51,7 +51,7 @@ function(
          * @return {string} a tag
          */
         createLinkWithIdAndName: function(link, id, name) {
-            return id ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
+            return this.valueIsDefined(id) ? "<a href='" + link + id + "' target='_blank'>" + name + "</a>" : "n/a";
         },
 
         /**
@@ -121,5 +121,14 @@ function(
                 resolve({'getMetadata': function() {}});
             });
         },
+
+        /**
+         * True if value is defined, false otherwise
+         * @param {*} value 
+         */
+        valueIsDefined: function(value) {
+            console.log(value);
+            return value && value !== null && value !== undefined && typeof value !== 'undefined' && value.length > 0;
+        }
     });
 });

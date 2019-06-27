@@ -115,14 +115,40 @@ table.results-table tr:nth-child(odd) {
     padding: 0 !important;
 }
 
-.gdc-popup-table {
+.value_container.annotations {
+    width: 100% !important;
+}
+
+.value.annotations {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+.value_container.feature_sequence {
+    width: 100% !important;
+}
+
+.value.feature_sequence {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+.popup-table {
     width: 100% !important;
     padding-left: 1em !important;
     padding-right:1em !important;
     padding-top: 0.3em !important;
 }
 
-.gdc-popup-table-header {
+.popup-table-header {
     border: 1px solid #e6e6e6 !important;
     padding: .2rem .2rem !important;
+}
+
+.feature-detail {
+    width: 100% !important;
+}
+
+.fastaView > .fasta {
+    width: 80% !important;
 }
