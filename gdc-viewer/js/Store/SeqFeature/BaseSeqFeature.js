@@ -127,7 +127,6 @@ function(
          * @param {*} value 
          */
         valueIsDefined: function(value) {
-            console.log(value);
             return value && value !== null && value !== undefined && typeof value !== 'undefined' && value.length > 0;
         }
     });
