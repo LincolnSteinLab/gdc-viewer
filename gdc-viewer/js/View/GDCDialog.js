@@ -451,7 +451,7 @@ function (
                     label: "Filtered SSMs form GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('SimpleSomaticMutations', undefined, combinedFilters, 'CanvasVariants');
+                        thisB.addTrack('SimpleSomaticMutations', undefined, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
                         alert("Adding track with all SSMs from the GDC, with current filters applied");
                     }
                 });
@@ -463,7 +463,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: ssmMenu,
                     onClick: function() {
-                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
+                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'gdc-viewer/View/Track/SSMTrack');
                         alert("Add track with all SSMs from the GDC");
                     }
                 });
@@ -562,7 +562,7 @@ function (
                     label: "Filtered Genes from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('Genes', undefined, combinedFilters, 'CanvasVariants');
+                        thisB.addTrack('Genes', undefined, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                         alert("Adding track with all genes from the GDC, with current filters applied");
                     }
                 });
@@ -575,7 +575,7 @@ function (
                     dropDown: geneMenu,
                     style: "padding-right: 8px;",
                     onClick: function() {
-                        thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
+                        thisB.addTrack('Genes', undefined, undefined, 'gdc-viewer/View/Track/GeneTrack');
                         alert("Adding track with all genes from the GDC");
                     }
                 });
@@ -590,7 +590,7 @@ function (
                     label: "Filtered CNVs from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, combinedFilters, 'Wiggle/XYPlot');
+                        thisB.addTrack('CNVs', undefined, combinedFilters, 'JBrowse/View/Track/Wiggle/XYPlot');
                         alert("Adding track with all CNVs from the GDC, with current filters applied");
                     }
                 });
@@ -602,7 +602,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: cnvMenu,
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
+                        thisB.addTrack('CNVs', undefined, undefined, 'JBrowse/View/Track/Wiggle/XYPlot');
                         alert("Adding track with all CNVs from the GDC");
                     }
                 });
@@ -744,7 +744,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.case_id, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -758,7 +758,7 @@ function (
                         dropDown: geneMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.case_id, undefined, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.case_id, undefined, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
                         })(hit)
@@ -781,7 +781,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -795,7 +795,7 @@ function (
                         dropDown: ssmMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
                             }
                         })(hit)
@@ -818,7 +818,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -832,7 +832,7 @@ function (
                         dropDown: cnvMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit)
@@ -1343,7 +1343,7 @@ function (
             }
 
             var trackConf = {
-                type: 'JBrowse/View/Track/' + trackType,
+                type: trackType,
                 store: storeName,
                 label: label,
                 key: key,

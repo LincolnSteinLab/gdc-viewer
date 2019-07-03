@@ -142,6 +142,7 @@ function(
             variantFeature = {
                 id: mutation.ssm_id,
                 data: {
+                    'entity_name': mutation.ssm_id,
                     'start': thisB.prettyText(mutation.start_position),
                     'end': thisB.prettyText(mutation.end_position),
                     'type': 'Simple Somatic Mutation',

@@ -69,6 +69,7 @@ function(
             geneFeature = {
                 id: gene.gene_id,
                 data: {
+                    'entity_name': gene.gene_id,
                     'start': thisB.prettyText(gene.gene_start),
                     'end': thisB.prettyText(gene.gene_end),
                     'strand': thisB.prettyText(gene.gene_strand),

@@ -159,7 +159,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations', hit.project_id, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations', hit.project_id, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding SSM track for project " + hit.project_id);
                             }
                         })(hit)
@@ -171,7 +171,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.project_id, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.project_id, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for project " + hit.project_id);
                             }
                         })(hit)
@@ -183,7 +183,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.project_id, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs', hit.project_id, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for project " + hit.project_id);
                             }
                         })(hit)
@@ -245,7 +245,7 @@ function (
             label += '_' + projectId
 
             var trackConf = {
-                type: 'JBrowse/View/Track/' + trackType,
+                type: trackType,
                 store: storeName,
                 label: label,
                 key: key,

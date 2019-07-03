@@ -12,6 +12,10 @@ define(
        domConstruct) {
    return declare([ CanvasFeatures, ExportMixin ], {
 
+        _exportFormats: function() {
+            return [ {name: 'gdc-viewer/View/Export/GFF3', label: 'GFF3', fileExt: 'gff3'}, {name: 'gdc-viewer/View/Export/BED', label: 'BED', fileExt: 'bed'}, { name: 'gdc-viewer/View/Export/TrackConfig', label: 'Track Config', fileExt: 'conf' } ];
+        },
+
         _renderAdditionalTagsDetail: function( track, f, featDiv, container ) {
             var atElement = domConstruct.create(
                 'div',
