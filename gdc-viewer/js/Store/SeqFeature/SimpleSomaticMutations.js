@@ -148,7 +148,6 @@ function(
                     'type': 'Simple Somatic Mutation',
                     'projects': mutation.ssm_id,
                     'about': {
-                        'mutation type': thisB.prettyText(mutation.mutation_type),
                         'subtype': thisB.prettyText(mutation.mutation_subtype),
                         'dna change': thisB.prettyText(mutation.genomic_dna_change),
                         'reference allele': thisB.prettyText(mutation.reference_allele),

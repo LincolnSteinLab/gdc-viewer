@@ -1,11 +1,9 @@
 import gff from '@gmod/gff'
 
 define([ 'dojo/_base/declare',
-         'dojo/_base/lang',
-         'dojo/_base/array',
          'JBrowse/View/Export/GFF3'
        ],
-       function( declare, lang, array, GFF3 ) {
+       function( declare, GFF3 ) {
 
 return declare( GFF3,
 {

@@ -16,31 +16,33 @@ return declare( ExportBase,
    },
 
    _printHeader: function() {
-       var featureArray = [
+       var storeArray = (this.store.config.storeClass).split('/')
+
+       var trackArray = [
             '[tracks.' + this.store.config.label + ']',
             'storeClass=' + this.store.config.storeClass,
             'type=' + this.track.config.type,
             'key=' + this.store.config.key,
-            'metadata.datatype=' + this.store.config.metadata.datatype,
+            'metadata.datatype=' + storeArray[storeArray.length - 1],
             'unsafePopup=true',
         ]
 
         if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/SimpleSomaticMutations' || this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/Genes') {
-            featureArray.push('fmtDetailValue_projects=function(value) { return "<div id=\'projects-gdc-" + value +  "\'>Loading...</div>";}');
+            trackArray.push('fmtDetailValue_projects=function(value) { return "<div id=\'projects-gdc-" + value +  "\'>Loading...</div>";}');
         }
 
         if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/CNVs') {
-            featureArray.push("autoscale=local");
-            featureArray.push("bicolor_pivot=0");
+            trackArray.push("autoscale=local");
+            trackArray.push("bicolor_pivot=0");
         }
 
         if (this.store.filters) {
-            featureArray.push('filters=' + JSON.stringify(this.store.filters))
+            trackArray.push('filters=' + JSON.stringify(this.store.filters))
         }
 
-        var featureString = featureArray.join('\n')
+        var trackString = trackArray.join('\n')
    
-        this.print(featureString)
+        this.print(trackString)
    },
 
    formatFeature: function( feature ) {
