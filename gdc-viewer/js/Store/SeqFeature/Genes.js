@@ -69,17 +69,18 @@ function(
             geneFeature = {
                 id: gene.gene_id,
                 data: {
+                    'entity_name': gene.gene_id,
                     'start': thisB.prettyText(gene.gene_start),
                     'end': thisB.prettyText(gene.gene_end),
                     'strand': thisB.prettyText(gene.gene_strand),
                     'type': 'Gene',
+                    'gene description': thisB.prettyText(gene.description),
                     'about': {
                         'biotype': thisB.prettyText(gene.biotype),
                         'gene name': thisB.prettyText(gene.name),
                         'id': thisB.prettyText(gene.gene_id),
                         'symbol': thisB.prettyText(gene.symbol),
-                        'synonyms': thisB.prettyText(gene.synonyms),
-                        'description': thisB.prettyText(gene.description)
+                        'synonyms': thisB.prettyText(gene.synonyms)
                     },
                     'references': {
                         'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),

@@ -66,7 +66,7 @@ function(
          * @return {string} pretty score
          */
         prettyScore: function(label, score) {
-            return label && score ? label + ' (' + score + ')' : '';
+            return label && score ? label + ' (' + score + ')' : 'n/a';
         },
 
         /**
@@ -80,17 +80,17 @@ function(
             const GENES_LINK = 'https://portal.gdc.cancer.gov/genes/';
             var headerRow = `
                 <tr style=\"background-color: #f2f2f2\">
-                    <th class="gdc-popup-table-header">Gene</th>
-                    <th class="gdc-popup-table-header">AA Change</th>
-                    <th class="gdc-popup-table-header">Consequence</th>
-                    <th class="gdc-popup-table-header">Coding DNA Change</th> 
-                    <th class="gdc-popup-table-header">Impact</th>
-                    <th class="gdc-popup-table-header">Gene Strand</th>
-                    <th class="gdc-popup-table-header">Transcript(s)</th>
+                    <th class="popup-table-header">Gene</th>
+                    <th class="popup-table-header">AA Change</th>
+                    <th class="popup-table-header">Consequence</th>
+                    <th class="popup-table-header">Coding DNA Change</th> 
+                    <th class="popup-table-header">Impact</th>
+                    <th class="popup-table-header">Gene Strand</th>
+                    <th class="popup-table-header">Transcript(s)</th>
                 </tr>
             `;
 
-            var consequenceTable = '<table class="gdc-popup-table" style="border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
+            var consequenceTable = '<table class="popup-table" style="border-collapse: \'collapse\'; border-spacing: 0;">' + headerRow;
 
             var count = 0;
             for (consequence of consequences) {
@@ -99,19 +99,19 @@ function(
                     trStyle = 'style=\"background-color: #f2f2f2\"';
                 }
                 var consequenceRow = `<tr ${trStyle}>
-                    <td class="gdc-popup-table-header">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.node.transcript.gene.gene_id, consequence.node.transcript.gene.symbol)}</td>
-                    <td class="gdc-popup-table-header">${thisB.prettyText(consequence.node.transcript.aa_change)}</td>
-                    <td class="gdc-popup-table-header">${thisB.prettyText(consequence.node.transcript.consequence_type)}</td>
-                    <td class="gdc-popup-table-header">${thisB.prettyText(consequence.node.transcript.annotation.hgvsc)}</td>
-                    <td class="gdc-popup-table-header">
+                    <td class="popup-table-header">${thisB.createLinkWithIdAndName(GENES_LINK, consequence.node.transcript.gene.gene_id, consequence.node.transcript.gene.symbol)}</td>
+                    <td class="popup-table-header">${thisB.prettyText(consequence.node.transcript.aa_change)}</td>
+                    <td class="popup-table-header">${thisB.prettyText(consequence.node.transcript.consequence_type)}</td>
+                    <td class="popup-table-header">${thisB.prettyText(consequence.node.transcript.annotation.hgvsc)}</td>
+                    <td class="popup-table-header">
                         <ul style="list-style: none;">
                             <li>VEP: ${consequence.node.transcript.annotation.vep_impact}</li>
                             <li>SIFT: ${thisB.prettyScore(consequence.node.transcript.annotation.sift_impact, consequence.node.transcript.annotation.sift_score)}</li>
                             <li>Polyphen: ${thisB.prettyScore(consequence.node.transcript.annotation.polyphen_impact, consequence.node.transcript.annotation.polyphen_score)}</li>
                         </ul>
                     </td>
-                    <td class="gdc-popup-table-header">${thisB.convertIntToStrand(consequence.node.transcript.gene.gene_strand)}</td>
-                    <td class="gdc-popup-table-header">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.node.transcript.transcript_id)}${consequence.node.transcript.is_canonical ? ' (C)' : ''}</td>
+                    <td class="popup-table-header">${thisB.convertIntToStrand(consequence.node.transcript.gene.gene_strand)}</td>
+                    <td class="popup-table-header">${thisB.createLinkWithId(TRANSCRIPT_LINK, consequence.node.transcript.transcript_id)}${consequence.node.transcript.is_canonical ? ' (C)' : ''}</td>
                     </tr>
                 `;
                 
@@ -122,7 +122,7 @@ function(
             if (consequences.length == 0) {
                 table += `
                     <tr class="dc-popup-table-header">
-                        <td colspan="7" class="gdc-popup-table-header" style="text-align: center;">No consequences found</td>
+                        <td colspan="7" class="popup-table-header" style="text-align: center;">No consequences found</td>
                     </tr>
                 `;
             }
@@ -142,12 +142,12 @@ function(
             variantFeature = {
                 id: mutation.ssm_id,
                 data: {
+                    'entity_name': mutation.ssm_id,
                     'start': thisB.prettyText(mutation.start_position),
                     'end': thisB.prettyText(mutation.end_position),
                     'type': 'Simple Somatic Mutation',
                     'projects': mutation.ssm_id,
                     'about': {
-                        'mutation type': thisB.prettyText(mutation.mutation_type),
                         'subtype': thisB.prettyText(mutation.mutation_subtype),
                         'dna change': thisB.prettyText(mutation.genomic_dna_change),
                         'reference allele': thisB.prettyText(mutation.reference_allele),
