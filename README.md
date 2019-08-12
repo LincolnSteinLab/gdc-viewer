@@ -115,7 +115,7 @@ Example Track:
 ```
 [tracks.GDC_SSM]
 storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
-type=JBrowse/View/Track/CanvasVariants
+type=gdc-viewer/View/Track/CanvasVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
@@ -138,7 +138,7 @@ Example Track:
 ```
 [tracks.GDC_CNV]
 storeClass=gdc-viewer/Store/SeqFeature/CNVs
-type=JBrowse/View/Track/Wiggle/XYPlot
+type=gdc-viewer/View/Track/Wiggle/XYPlot
 key=GDC CNV
 metadata.datatype=CNV
 autoscale=local
@@ -156,3 +156,11 @@ You can set the max number of CNVs to return with the `size` field. It defaults 
 You can view case specific CNVs by setting the `case` field.
 
 Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
+
+# Export Types
+The following export types are supported by both GDC Genes and SSMs. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
+* BED
+* GFF3
+* Sequin Table
+* CSV
+* Track Config
