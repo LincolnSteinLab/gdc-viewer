@@ -100,18 +100,28 @@ function (
                     thisB.createProjectsTable(response);
                     thisB.createPaginationButtons(totalPages);
                 } else {
-                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.resultsContainer);
-                    var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
-                    var hardRefreshButton = new Button({
-                        label: 'Refresh Results',
-                        onClick: function() {
-                            thisB.getProjectInformation();
-                        }
-                    }).placeAt(errorMessageHolder);
+                    thisB.createHardRefreshMessage(thisB.resultsContainer);
                 }
             }).catch(function(err) {
                 console.log(err);
+                thisB.createHardRefreshMessage(thisB.resultsContainer);
             });
+        },
+
+        /**
+         * Adds a error message to the given location along with a button to hard refresh the results
+         * @param {*} location 
+         */
+        createHardRefreshMessage: function(location) {
+            var thisB = this;
+            var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, location);
+            var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+            var hardRefreshButton = new Button({
+                label: 'Refresh Results',
+                onClick: function() {
+                    thisB.getProjectInformation();
+                }
+            }).placeAt(errorMessageHolder);
         },
 
         /**

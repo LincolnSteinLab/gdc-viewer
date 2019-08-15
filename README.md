@@ -9,8 +9,8 @@ Quick setup of JBrowse - https://github.com/GMOD/jbrowse/#install-jbrowse-from-g
 See [JBrowse - Installing Plugins](https://jbrowse.org/docs/plugins.html) for a general approach to installing plugins.
 
 For installing gdc-viewer plugin:
-1) Copy the gdc-viewer folder into the JBrowse `plugins` directory.
-2) Add 'gdc-viewer' to the array of plugins in the `jbrowse_conf.json`.
+1. Copy the gdc-viewer folder into the JBrowse `plugins` directory.
+2. Add 'gdc-viewer' to the array of plugins in the `jbrowse_conf.json`.
 
 ## 3. Install Reference Sequence Data
 Now setup the reference sequence used. GDC requires the GRCh38 Human reference files, which can be found at http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/. You'll want to download the files of the form `Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz`.
