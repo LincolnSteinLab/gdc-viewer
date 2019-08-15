@@ -1,4 +1,4 @@
-# GDC JBrowse Plugin - Faceted Search and New Store Classes
+# GDC JBrowse Plugin
 A plugin for [JBrowse](https://jbrowse.org/) for viewing [GDC](https://gdc.cancer.gov/) data. For any bugs, issues, or feature recommendations please create an issue through GitHub.
 
 # Installation and Setup
@@ -33,13 +33,13 @@ Note that you can specify multiple fast in one command by doing `--fasta fasta1.
 ## 4. Adding new tracks
 We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`.
 
-### A. Explore GDC
+### A. Explore cases, genes and mutations
 This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
 
-### B. View GDC Projects
+### B. Explore Projects
 This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
 
-### C. View GDC Primary Sites
+### C. Explore Primary Sites
 This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
 
 ## 5. Run JBrowse

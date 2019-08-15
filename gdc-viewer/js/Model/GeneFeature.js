@@ -123,12 +123,12 @@ createProjectTable: function(response) {
         }
         var projectInfo = thisB.projects.find(x => x.node.project_id === project.key);
         var row = `<tr ${trStyle}>
-            <td class="popup-table-header"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
-            <td class="popup-table-header">${thisB.printList(projectInfo.node.disease_type)}</td>
-            <td class="popup-table-header">${thisB.printList(projectInfo.node.primary_site)}</td>
-            <td class="popup-table-header">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
-            <td class="popup-table-header">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.gain.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
-            <td class="popup-table-header">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.loss.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
+            <td class="popup-table-td"><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${project.key}">${project.key}</a></td>
+            <td class="popup-table-td">${thisB.printList(projectInfo.node.disease_type)}</td>
+            <td class="popup-table-td">${thisB.printList(projectInfo.node.primary_site)}</td>
+            <td class="popup-table-td">${thisB.getValueWithPercentage(project.doc_count, thisB.findProjectByKey(response.data.viewer.explore.cases.total.project__project_id.buckets, project.key))}</td>
+            <td class="popup-table-td">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.gain.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
+            <td class="popup-table-td">${thisB.getValueWithPercentage(thisB.findProjectByKey(response.data.viewer.explore.cases.loss.project__project_id.buckets, project.key), thisB.findProjectByKey(response.data.viewer.explore.cases.cnvTotal.project__project_id.buckets, project.key))}</td>
             </tr>
         `;
         
@@ -139,7 +139,7 @@ createProjectTable: function(response) {
     if (projects.length == 0) {
         table += `
             <tr class="dc-popup-table-header">
-                <td colspan="6" class="popup-table-header" style="text-align: center;">No projects found</td>
+                <td colspan="6" class="popup-table-td" style="text-align: center;">No projects found</td>
             </tr>
         `;
     }

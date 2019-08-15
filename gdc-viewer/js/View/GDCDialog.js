@@ -315,7 +315,11 @@ function (
                     });
 
                     var facetHolder = dom.create('span', { className: "flex-column" });
-
+                    // If facet has no terms
+                    if (!results._aggregations[facet].buckets || results._aggregations[facet].buckets.length == 0) {
+                        dom.create('span', { className: "flex-row", innerHTML: "No terms available for the selected facet." }, facetHolder)
+                    }
+                    // If facet has at least one term
                     if (results._aggregations[facet].buckets && results._aggregations[facet].buckets.length > 0) {
                         // Alphabetical sort
                         results._aggregations[facet].buckets.sort(thisB.compareTermElements);
