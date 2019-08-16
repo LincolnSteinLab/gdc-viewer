@@ -22,19 +22,19 @@ return declare( JBrowsePlugin,
         this.browser.afterMilestone('initView', function () {
             this.browser.addGlobalMenuItem('gdc', new MenuItem(
                 {
-                    label: 'Explore GDC',
+                    label: 'Explore cases, genes and mutations',
                     iconClass: "dijitIconSearch",
                     onClick: lang.hitch(this, 'createGDCExplore')
                 }));
             this.browser.addGlobalMenuItem('gdc', new MenuItem(
                 {
-                    label: 'GDC Projects',
+                    label: 'Explore Projects',
                     iconClass: "dijitIconSearch",
                     onClick: lang.hitch(this, 'createGDCProject')
                 }));
             this.browser.addGlobalMenuItem('gdc', new MenuItem(
                 {
-                    label: 'GDC Primary Sites',
+                    label: 'Explore Primary Sites',
                     iconClass: "dijitIconSearch",
                     onClick: lang.hitch(this, 'createGDCPrimarySites')
                 }));

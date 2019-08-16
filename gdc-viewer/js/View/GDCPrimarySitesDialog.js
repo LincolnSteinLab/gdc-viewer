@@ -84,18 +84,28 @@ function (
                 if (response.data) {
                     thisB.createPrimarySiteTable(response);
                 } else {
-                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.resultsContainer);
-                    var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
-                    var hardRefreshButton = new Button({
-                        label: 'Refresh Results',
-                        onClick: function() {
-                            thisB.getPrimarySiteInformation();
-                        }
-                    }).placeAt(errorMessageHolder);
+                    thisB.createHardRefreshMessage(thisB.resultsContainer);
                 }
             }).catch(function(err) {
                 console.log(err);
+                thisB.createHardRefreshMessage(thisB.resultsContainer);
             });
+        },
+
+        /**
+         * Adds a error message to the given location along with a button to hard refresh the results
+         * @param {*} location 
+         */
+        createHardRefreshMessage: function(location) {
+            var thisB = this;
+            var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, location);
+            var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+            var hardRefreshButton = new Button({
+                label: 'Refresh Results',
+                onClick: function() {
+                    thisB.getPrimarySiteInformation();
+                }
+            }).placeAt(errorMessageHolder);
         },
 
         /**
@@ -137,7 +147,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations', hit.key, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations', hit.key, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding SSM track for primary site " + hit.key);
                             }
                         })(hit)
@@ -149,7 +159,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.key, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.key, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for primary site " + hit.key);
                             }
                         })(hit)
@@ -161,7 +171,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.key, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs', hit.key, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for primary site " + hit.key);
                             }
                         })(hit)
@@ -223,7 +233,7 @@ function (
             label += '_' + primarySite
 
             var trackConf = {
-                type: 'JBrowse/View/Track/' + trackType,
+                type: trackType,
                 store: storeName,
                 label: label,
                 key: key,

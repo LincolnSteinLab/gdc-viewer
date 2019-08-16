@@ -69,10 +69,12 @@ function(
             geneFeature = {
                 id: gene.gene_id,
                 data: {
+                    'entity_name': gene.gene_id,
                     'start': thisB.prettyText(gene.gene_start),
                     'end': thisB.prettyText(gene.gene_end),
                     'strand': thisB.prettyText(gene.gene_strand),
                     'type': 'Gene',
+                    'gene description': thisB.prettyText(gene.description),
                     'about': {
                         'biotype': thisB.prettyText(gene.biotype),
                         'gene name': thisB.prettyText(gene.name),
@@ -80,8 +82,7 @@ function(
                         'symbol': thisB.prettyText(gene.symbol),
                         'synonyms': thisB.prettyText(gene.synonyms)
                     },
-                    'gene description': thisB.prettyText(gene.description),
-                    'external references': {
+                    'references': {
                         'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
                         'uniprotkb swiss-prot': thisB.createLinkWithId(UNI_LINK, gene.external_db_ids.uniprotkb_swissprot),
                         'hgnc': thisB.createLinkWithId(HGNC_LINK, gene.external_db_ids.hgnc),

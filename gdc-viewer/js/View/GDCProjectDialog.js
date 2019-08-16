@@ -100,18 +100,28 @@ function (
                     thisB.createProjectsTable(response);
                     thisB.createPaginationButtons(totalPages);
                 } else {
-                    var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, thisB.resultsContainer);
-                    var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
-                    var hardRefreshButton = new Button({
-                        label: 'Refresh Results',
-                        onClick: function() {
-                            thisB.getProjectInformation();
-                        }
-                    }).placeAt(errorMessageHolder);
+                    thisB.createHardRefreshMessage(thisB.resultsContainer);
                 }
             }).catch(function(err) {
                 console.log(err);
+                thisB.createHardRefreshMessage(thisB.resultsContainer);
             });
+        },
+
+        /**
+         * Adds a error message to the given location along with a button to hard refresh the results
+         * @param {*} location 
+         */
+        createHardRefreshMessage: function(location) {
+            var thisB = this;
+            var errorMessageHolder = dom.create('div', { style: 'display: flex; flex-direction: column; align-items: center;' }, location);
+            var errorMessage = dom.create('div', { innerHTML: 'There was an error contacting GDC.' }, errorMessageHolder);
+            var hardRefreshButton = new Button({
+                label: 'Refresh Results',
+                onClick: function() {
+                    thisB.getProjectInformation();
+                }
+            }).placeAt(errorMessageHolder);
         },
 
         /**
@@ -159,7 +169,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations', hit.project_id, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations', hit.project_id, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding SSM track for project " + hit.project_id);
                             }
                         })(hit)
@@ -171,7 +181,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.project_id, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.project_id, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for project " + hit.project_id);
                             }
                         })(hit)
@@ -183,7 +193,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.project_id, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs', hit.project_id, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for project " + hit.project_id);
                             }
                         })(hit)
@@ -245,7 +255,7 @@ function (
             label += '_' + projectId
 
             var trackConf = {
-                type: 'JBrowse/View/Track/' + trackType,
+                type: trackType,
                 store: storeName,
                 label: label,
                 key: key,

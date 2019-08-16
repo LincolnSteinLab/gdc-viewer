@@ -212,7 +212,7 @@ function (
             var combinedFilters = thisB.combineAllFilters();
             combinedFilters = combinedFilters ? JSON.parse(combinedFilters) : combinedFilters
 
-            var facetQuery = `query Queries($filters:FiltersArgument!,$first:Int!,$offset:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},diagnoses__vital_status {buckets {doc_count,key}},diagnoses__days_to_death {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first,offset:$offset,filters:$filters,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters) {total}},cnvs {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters) {total}},ssms {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters) {total}}}}`;
+            var facetQuery = `query Queries($filters:FiltersArgument!,$first:Int!,$offset:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first,offset:$offset,filters:$filters,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters) {total}},cnvs {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters) {total}},ssms {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters) {total}}}}`;
             var bodyVal = {
                 query: facetQuery,
                 variables: {
@@ -315,7 +315,11 @@ function (
                     });
 
                     var facetHolder = dom.create('span', { className: "flex-column" });
-
+                    // If facet has no terms
+                    if (!results._aggregations[facet].buckets || results._aggregations[facet].buckets.length == 0) {
+                        dom.create('span', { className: "flex-row", innerHTML: "No terms available for the selected facet." }, facetHolder)
+                    }
+                    // If facet has at least one term
                     if (results._aggregations[facet].buckets && results._aggregations[facet].buckets.length > 0) {
                         // Alphabetical sort
                         results._aggregations[facet].buckets.sort(thisB.compareTermElements);
@@ -451,7 +455,7 @@ function (
                     label: "Filtered SSMs form GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('SimpleSomaticMutations', undefined, combinedFilters, 'CanvasVariants');
+                        thisB.addTrack('SimpleSomaticMutations', undefined, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
                         alert("Adding track with all SSMs from the GDC, with current filters applied");
                     }
                 });
@@ -463,7 +467,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: ssmMenu,
                     onClick: function() {
-                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'CanvasVariants');
+                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'gdc-viewer/View/Track/SSMTrack');
                         alert("Add track with all SSMs from the GDC");
                     }
                 });
@@ -562,7 +566,7 @@ function (
                     label: "Filtered Genes from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('Genes', undefined, combinedFilters, 'CanvasVariants');
+                        thisB.addTrack('Genes', undefined, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                         alert("Adding track with all genes from the GDC, with current filters applied");
                     }
                 });
@@ -575,7 +579,7 @@ function (
                     dropDown: geneMenu,
                     style: "padding-right: 8px;",
                     onClick: function() {
-                        thisB.addTrack('Genes', undefined, undefined, 'CanvasVariants');
+                        thisB.addTrack('Genes', undefined, undefined, 'gdc-viewer/View/Track/GeneTrack');
                         alert("Adding track with all genes from the GDC");
                     }
                 });
@@ -590,7 +594,7 @@ function (
                     label: "Filtered CNVs from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, combinedFilters, 'Wiggle/XYPlot');
+                        thisB.addTrack('CNVs', undefined, combinedFilters, 'JBrowse/View/Track/Wiggle/XYPlot');
                         alert("Adding track with all CNVs from the GDC, with current filters applied");
                     }
                 });
@@ -602,7 +606,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: cnvMenu,
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, undefined, 'Wiggle/XYPlot');
+                        thisB.addTrack('CNVs', undefined, undefined, 'JBrowse/View/Track/Wiggle/XYPlot');
                         alert("Adding track with all CNVs from the GDC");
                     }
                 });
@@ -647,7 +651,7 @@ function (
             // Create body for GraphQL query
             var start = thisB.getStartIndex(thisB.casePage);
             var size = thisB.pageSize;
-            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $casesSize: Int $casesOffset: Int $casesScore: String $sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $casesSize, offset: $casesOffset, filters: $filters, score: $casesScore, sort: $sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis vital_status days_to_death id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
+            var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $casesSize: Int $casesOffset: Int $casesScore: String $sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $casesSize, offset: $casesOffset, filters: $filters, score: $casesScore, sort: $sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
 
             var combinedFilters = thisB.combineAllFilters();
             if (combinedFilters) {
@@ -713,8 +717,10 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
+            var hasHits = false;
             if (response.data) {
                 for (var hitId in response.data.exploreCasesTableViewer.explore.cases.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.exploreCasesTableViewer.explore.cases.hits.edges[hitId].node;
 
                     var caseRowContent = `
@@ -742,7 +748,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('Genes', hit.case_id, combinedFilters, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.case_id, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -756,7 +762,7 @@ function (
                         dropDown: geneMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.case_id, undefined, 'CanvasVariants');
+                                thisB.addTrack('Genes', hit.case_id, undefined, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
                         })(hit)
@@ -779,7 +785,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -793,7 +799,7 @@ function (
                         dropDown: ssmMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'CanvasVariants');
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
                             }
                         })(hit)
@@ -816,7 +822,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -830,7 +836,7 @@ function (
                         dropDown: cnvMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'Wiggle/XYPlot');
+                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'JBrowse/View/Track/Wiggle/XYPlot');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit)
@@ -851,6 +857,18 @@ function (
 
                 }
             }
+
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No cases found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
+            }
+
             // Place rows into table
             dom.place(rowsHolderNode, tableNode);
 
@@ -880,8 +898,11 @@ function (
 
             var rowsHolderNode = dom.toDom(rowsHolder);
 
+            var hasHits = false;
+
             if (response.data) {
                 for (var hitId in response.data.genesTableViewer.explore.genes.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.genesTableViewer.explore.genes.hits.edges[hitId].node;
 
                     var caseRowContent = `
@@ -901,6 +922,17 @@ function (
                     dom.place(rowNodeHolder, rowsHolderNode);
 
                 }
+            }
+
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No genes found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
             }
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
@@ -984,8 +1016,10 @@ function (
             `;
 
             var rowsHolderNode = dom.toDom(rowsHolder);
+            var hasHits = false;
             if (response.data) {
                 for (var hitId in response.data.viewer.explore.ssms.hits.edges) {
+                    hasHits = true;
                     var hit = response.data.viewer.explore.ssms.hits.edges[hitId];
 
                     var caseRowContent = `
@@ -1005,6 +1039,17 @@ function (
 
                 }
             }
+            if (!hasHits) {
+                var noResultsHtml = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No mutations found</td>
+                    </tr>
+                `;
+
+                var noResultsRow = dom.toDom(noResultsHtml);
+                dom.place(noResultsRow, rowsHolderNode);
+            }
+
             dom.place(rowsHolderNode, tableNode);
             dom.place(tableNode, location);
         },
@@ -1302,7 +1347,7 @@ function (
             }
 
             var trackConf = {
-                type: 'JBrowse/View/Track/' + trackType,
+                type: trackType,
                 store: storeName,
                 label: label,
                 key: key,
