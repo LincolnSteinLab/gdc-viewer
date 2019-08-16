@@ -10,6 +10,11 @@ table.results-table td {
     padding: .2rem .4rem;
 }
 
+table.results-table th {
+    border: 1px solid #b3b3b3;
+    padding: .2rem .4rem;
+}
+
 table.results-table tr:nth-child(odd) {
     background-color: #f2f2f2;
 }
@@ -141,6 +146,11 @@ table.results-table tr:nth-child(odd) {
 }
 
 .popup-table-header {
+    border: 1px solid #b3b3b3 !important;
+    padding: .2rem .2rem !important;
+}
+
+.popup-table-td {
     border: 1px solid #e6e6e6 !important;
     padding: .2rem .2rem !important;
 }
