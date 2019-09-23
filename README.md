@@ -96,7 +96,6 @@ type=JBrowse/View/Track/CanvasVariants
 key=GDC Genes
 metadata.datatype=Gene
 unsafePopup=true
-fmtDetailValue_projects=function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div>";}
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
@@ -119,7 +118,6 @@ type=gdc-viewer/View/Track/CanvasVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
-fmtDetailValue_projects=function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div>";}
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
