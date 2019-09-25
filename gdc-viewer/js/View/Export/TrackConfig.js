@@ -24,10 +24,16 @@ return declare( ExportBase,
             'type=' + this.track.config.type,
             'key=' + this.track.key,
             'metadata.datatype=' + storeArray[storeArray.length - 1],
-            'unsafePopup=true',
-            'case=' + this.store.case,
-            'size=' + this.store.size
+            'unsafePopup=true'
         ]
+
+        if (this.store.case) {
+            trackArray.push('case=' + this.store.case)
+        }
+
+        if (this.store.size) {
+            trackArray.push('size=' + this.store.size)
+        }
 
         if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
             trackArray.push("autoscale=local");
