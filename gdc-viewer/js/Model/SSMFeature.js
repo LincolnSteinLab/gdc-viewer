@@ -79,9 +79,9 @@ get: function(name) {
         }).then(function(response) {
             return(response.json());
         }).then(function(response) {
-            document.getElementById('projects-gdc-' + mutationId).innerHTML = thisB.createProjectTable(response);
+            document.getElementsByClassName('value projects')[0].innerHTML = thisB.createProjectTable(response);
         }).catch(function(err) {
-            document.getElementById('projects-gdc-' + mutationId).innerHTML = 'Error creating projects table';
+            document.getElementsByClassName('value projects')[0].innerHTML = 'Error creating projects table';
         });
         return mutationId;
     } else {

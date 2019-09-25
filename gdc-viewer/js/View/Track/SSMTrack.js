@@ -18,7 +18,7 @@ define(
                 {name: 'gdc-viewer/View/Export/BED', label: 'BED', fileExt: 'bed'},
                 {name: 'gdc-viewer/View/Export/CSV', label: 'CSV', fileExt: 'csv'},
                 {name: 'icgc-viewer/View/Export/SequinTable', label: 'Sequin Table', fileExt: 'sqn'},
-                {name: 'gdc-viewer/View/Export/TrackConfig', label: 'Track Config INI', fileExt: 'conf'},
+                {name: 'gdc-viewer/View/Export/TrackConfig', label: 'Track Config', fileExt: 'conf'},
                 {name: 'gdc-viewer/View/Export/TrackConfigJson', label: 'Track Config JSON', fileExt: 'json'}];
         },
 
