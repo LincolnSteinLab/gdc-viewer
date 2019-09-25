@@ -25,6 +25,8 @@ return declare( ExportBase,
             'key=' + this.track.key,
             'metadata.datatype=' + storeArray[storeArray.length - 1],
             'unsafePopup=true',
+            'case=' + this.store.case,
+            'size=' + this.store.size
         ]
 
         if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {

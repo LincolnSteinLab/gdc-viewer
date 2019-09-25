@@ -26,7 +26,9 @@ return declare( ExportBase,
             'metadata': {
                 'datatype': storeArray[storeArray.length - 1]
             },
-            'unsafePopup': true
+            'unsafePopup': true,
+            'case': this.store.case,
+            'size': this.store.size
         }
 
         if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
