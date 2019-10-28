@@ -1,23 +1,23 @@
 define(
     [
         "dojo/_base/declare",
-        "JBrowse/View/Track/CanvasFeatures",
+        "JBrowse/View/Track/HTMLFeatures",
         'JBrowse/View/Track/_ExportMixin',
         'dojo/dom-construct'
     ],
    function(
        declare,
-       CanvasFeatures,
+       HTMLFeatures,
        ExportMixin,
        domConstruct) {
-   return declare([ CanvasFeatures, ExportMixin ], {
+   return declare([ HTMLFeatures, ExportMixin ], {
 
         _exportFormats: function() {
             return [
                 {name: 'gdc-viewer/View/Export/GFF3', label: 'GFF3', fileExt: 'gff3'},
                 {name: 'gdc-viewer/View/Export/BED', label: 'BED', fileExt: 'bed'},
                 {name: 'gdc-viewer/View/Export/CSV', label: 'CSV', fileExt: 'csv'},
-                {name: 'icgc-viewer/View/Export/SequinTable', label: 'Sequin Table', fileExt: 'sqn'},
+                {name: 'gdc-viewer/View/Export/SequinTable', label: 'Sequin Table', fileExt: 'sqn'},
                 {name: 'gdc-viewer/View/Export/TrackConfig', label: 'Track Config', fileExt: 'conf'},
                 {name: 'gdc-viewer/View/Export/TrackConfigJson', label: 'Track Config JSON', fileExt: 'json'}
             ];

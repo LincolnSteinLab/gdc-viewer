@@ -1055,7 +1055,7 @@ function (
         },
 
         /**
-         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
+         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the GDC response
          * @param {object} holder DOM location to place pagination buttons
          * @param {number} totalPages the total number of pages for the given query results
          * @param {string} type the type of results to create pagination button for
