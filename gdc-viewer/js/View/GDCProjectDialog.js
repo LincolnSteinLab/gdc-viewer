@@ -308,7 +308,7 @@ function (
         },
 
         /**
-         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
+         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the GDC response
          * @param {number} totalPages total number of pages
          */
         createPaginationButtons: function(totalPages) {

@@ -92,7 +92,7 @@ Example Track:
 ```
 [tracks.GDC_Genes]
 storeClass=gdc-viewer/Store/SeqFeature/Genes
-type=JBrowse/View/Track/CanvasVariants
+type=JBrowse/View/Track/GeneTrack
 key=GDC Genes
 metadata.datatype=Gene
 unsafePopup=true
@@ -114,7 +114,7 @@ Example Track:
 ```
 [tracks.GDC_SSM]
 storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
-type=gdc-viewer/View/Track/CanvasVariants
+type=gdc-viewer/View/Track/SSMVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
