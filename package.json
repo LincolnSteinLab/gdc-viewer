@@ -1,0 +1,32 @@
+{
+  "name": "gdc-viewer-jbrowse-plugin",
+  "version": "0.1.1",
+  "description": "A JBrowse plugin for viewing GDC data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agduncan94/gdc-viewer.git"
+  },
+  "keywords": [
+    "gdc",
+    "cancer",
+    "genome",
+    "jbrowse",
+    "browser"
+  ],
+  "author": "Andrew Duncan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/agduncan94/gdc-viewer/issues"
+  },
+  "jbrowsePlugin": {
+    "name": "ICGCViewer"
+  },
+  "homepage": "https://github.com/agduncan94/gdc-viewer#readme",
+  "devDependencies": {
+    "cypress": "^3.5.0"
+  }
+}
