@@ -16,22 +16,26 @@ return declare( ExportBase,
    },
 
    _printHeader: function() {
-       var storeArray = (this.store.config.storeClass).split('/')
+       var storeArray = (this.store.config.type).split('/')
 
        var trackArray = [
-            '[tracks.' + this.store.config.label + ']',
-            'storeClass=' + this.store.config.storeClass,
+            '[tracks.' + this.track.labelHTML + ']',
+            'storeClass=' + this.store.config.type,
             'type=' + this.track.config.type,
-            'key=' + this.store.config.key,
+            'key=' + this.track.key,
             'metadata.datatype=' + storeArray[storeArray.length - 1],
-            'unsafePopup=true',
+            'unsafePopup=true'
         ]
 
-        if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/SimpleSomaticMutations' || this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/Genes') {
-            trackArray.push('fmtDetailValue_projects=function(value) { return "<div id=\'projects-gdc-" + value +  "\'>Loading...</div>";}');
+        if (this.store.case) {
+            trackArray.push('case=' + this.store.case)
         }
 
-        if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/CNVs') {
+        if (this.store.size) {
+            trackArray.push('size=' + this.store.size)
+        }
+
+        if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
             trackArray.push("autoscale=local");
             trackArray.push("bicolor_pivot=0");
         }

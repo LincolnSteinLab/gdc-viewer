@@ -92,11 +92,10 @@ Example Track:
 ```
 [tracks.GDC_Genes]
 storeClass=gdc-viewer/Store/SeqFeature/Genes
-type=JBrowse/View/Track/CanvasVariants
+type=JBrowse/View/Track/GeneTrack
 key=GDC Genes
 metadata.datatype=Gene
 unsafePopup=true
-fmtDetailValue_projects=function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div>";}
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
@@ -115,11 +114,10 @@ Example Track:
 ```
 [tracks.GDC_SSM]
 storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
-type=gdc-viewer/View/Track/CanvasVariants
+type=gdc-viewer/View/Track/SSMVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
-fmtDetailValue_projects=function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div>";}
 ```
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.

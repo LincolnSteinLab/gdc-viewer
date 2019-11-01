@@ -234,7 +234,7 @@ function (
             var geneLoading = thisB.createLoadingIcon(thisB.geneFacetTab.containerNode);
 
             // Update the accordions with results from the GDC
-            fetch(thisB.baseGraphQLUrl, {
+            fetch(thisB.baseGraphQLUrl + '/facets', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: JSON.stringify(bodyVal)
@@ -1055,7 +1055,7 @@ function (
         },
 
         /**
-         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the ICGC response
+         * Creates pagination buttons for search results in the given 'holder' using the 'pagination' object from the GDC response
          * @param {object} holder DOM location to place pagination buttons
          * @param {number} totalPages the total number of pages for the given query results
          * @param {string} type the type of results to create pagination button for
@@ -1367,7 +1367,6 @@ function (
                 trackConf.autoscale = 'local';
                 trackConf.bicolor_pivot = 0;
             } else if (storeClass === 'Genes') {
-                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Gene",
@@ -1381,7 +1380,6 @@ function (
                 );
 
             } else if (storeClass === 'SimpleSomaticMutations') {
-                trackConf.fmtDetailValue_projects = function(value) { return "<div id='projects-gdc-" + value +  "'>Loading...</div" };
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Simple Somatic Mutation",
