@@ -234,7 +234,7 @@ function (
             var geneLoading = thisB.createLoadingIcon(thisB.geneFacetTab.containerNode);
 
             // Update the accordions with results from the GDC
-            fetch(thisB.baseGraphQLUrl, {
+            fetch(thisB.baseGraphQLUrl + '/facets', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: JSON.stringify(bodyVal)

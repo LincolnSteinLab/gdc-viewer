@@ -73,7 +73,7 @@ function (
                 variables: {}
             }
 
-            fetch(thisB.baseGraphQLUrl, {
+            fetch(thisB.baseGraphQLUrl + '/primarySites', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: JSON.stringify(bodyVal)
