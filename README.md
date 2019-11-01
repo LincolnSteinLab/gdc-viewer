@@ -13,22 +13,16 @@ For installing gdc-viewer plugin:
 2. Add 'gdc-viewer' to the array of plugins in the `jbrowse_conf.json`.
 
 ## 3. Install Reference Sequence Data
-Now setup the reference sequence used. GDC requires the GRCh38 Human reference files, which can be found at http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/. You'll want to download the files of the form `Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz`.
+Now setup the reference sequence used. GDC requires the GRCh38 Human reference files.
 
-Then you can use the `bin/prepare-refeqs.pl` command to generate the RefSeq information.
+Download the GRCh38 `.fa` and `.fa.fai` files online (ex. http://bioinfo.hpc.cam.ac.uk/downloads/datasets/fasta/grch38/). Then put the following in `./data/tracks.conf` (note files may be named something else).
 
-Below is an example of these two steps for Chr1.
-
-Ex. Chromosome 1
-1. Download Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz from the above site.
 ```
-wget http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
+refSeqs=GRCh38.genome.fa.fai
+  
+[tracks.refseqs]
+urlTemplate=GRCh38.genome.fa
 ```
-2. Setup refeq with the following command
-```
-bin/prepare-refseqs.pl --fasta Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
-```
-Note that you can specify multiple fast in one command by doing `--fasta fasta1.fa.gz --fasta fasta2.fa.gz ...`
 
 ## 4. Adding new tracks
 We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`.
@@ -162,3 +156,13 @@ The following export types are supported by both GDC Genes and SSMs. To export, 
 * Sequin Table
 * CSV
 * Track Config
+
+# Automated testing
+Cypress.io is used for testing this plugin. The following steps show how to run the tests locally.
+1. Install JBrowse and but don't install chromosome files.
+2. Download Chr 1 fasta from `http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz`. There should be the fasta index file in `cypress/data/Homo_sapiens.GRCh38.dna.chromosome.1.fa.fai`. Put these files into `jbrowse/data/`.
+3. Install Cypress.io with `npm install`.
+4. Place `cypress/data/tracks.conf` into your `jbrowse/data/` directory. Make sure no other tracks are present.
+5. Run `npx cypress open` or `npx cypress run`
+
+**Note** while some tests have mocked endpoints, not all endpoints are mocked. This could lead to breakage of tests in the future.

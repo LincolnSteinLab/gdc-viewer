@@ -3,6 +3,7 @@ FROM node:latest
 LABEL maintainer="andrew.duncan@oicr.on.ca"
 
 ENV JBROWSE_VERSION 1.16.6
+ENV PLUGIN_VERSION=0.1.1
 
 # Install dependencies
 RUN apt-get -qq update --fix-missing
@@ -19,7 +20,7 @@ WORKDIR /jbrowse/
 # Download GDC Viewer
 RUN git clone https://github.com/agduncan94/gdc-viewer /gdc-viewer/ && \
     cd /gdc-viewer/ && \
-    git checkout 0.1.1 && \
+    git checkout ${PLUGIN_VERSION} && \
     cp -r gdc-viewer /jbrowse/plugins/gdc-viewer && \
     cat ./data/jbrowse.conf > /jbrowse/jbrowse.conf
 

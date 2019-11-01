@@ -78,7 +78,7 @@ function(
             var bodyVal = JSON.stringify(thisB.createQuery(ref, start, end));
 
             // Fetch CNVs and create features
-            fetch(thisB.graphQLUrl, {
+            fetch(thisB.graphQLUrl + '/CNVsTable', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: bodyVal
