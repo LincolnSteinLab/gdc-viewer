@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/agduncan94/gdc-viewer.svg?branch=develop)](https://travis-ci.org/agduncan94/gdc-viewer)
 # GDC JBrowse Plugin
 A plugin for [JBrowse](https://jbrowse.org/) for viewing [GDC](https://gdc.cancer.gov/) data. For any bugs, issues, or feature recommendations please create an issue through GitHub.
 
