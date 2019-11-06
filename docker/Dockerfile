@@ -2,8 +2,8 @@ FROM node:latest
 
 LABEL maintainer="andrew.duncan@oicr.on.ca"
 
-ENV JBROWSE_VERSION=1.16.6
-ENV PLUGIN_VERSION=develop
+ENV JBROWSE_VERSION 1.16.6
+ENV PLUGIN_VERSION develop
 
 # Install dependencies
 RUN apt-get -qq update --fix-missing
@@ -13,7 +13,7 @@ RUN apt-get --no-install-recommends -y install git build-essential zlib1g-dev li
 RUN mkdir -p /jbrowse/ && \
     git clone --recursive https://github.com/gmod/jbrowse /jbrowse/ && \
     cd /jbrowse/ && \
-    git checkout ${JBROWSE_VERSION}
+    git checkout ${JBROWSE_VERSION}-release
 
 WORKDIR /jbrowse/
 
