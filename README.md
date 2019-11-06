@@ -26,16 +26,7 @@ urlTemplate=GRCh38.genome.fa
 ```
 
 ## 4. Adding new tracks
-We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`.
-
-### A. Explore cases, genes and mutations
-This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
-
-### B. Explore Projects
-This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
-
-### C. Explore Primary Sites
-This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
+We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`. See [Dynamic Track Generation](#dynamic-track-generation) for more details.
 
 ## 5. Run JBrowse
 You'll have to run the following commands:
@@ -83,6 +74,23 @@ The following shows a filter for cases by ethnicity:
 ## Genes
 A simple view of all of the genes seen across all cases.
 
+You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
+
+```
+{ 
+   "op":"!=",
+   "content":{ 
+      "field":"cases.biotype",
+      "value":"protein_coding"
+   }
+}
+```
+
+To put it in the track config you may want to minimize it as such:
+```
+filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
+```
+
 Example Track:
 ```
 [tracks.GDC_Genes]
@@ -91,19 +99,32 @@ type=JBrowse/View/Track/GeneTrack
 key=GDC Genes
 metadata.datatype=Gene
 unsafePopup=true
-```
-
-You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
-
-```
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
+
+![GDC Genes](images/gdc-genes-protein-coding.png)
 
 You can set the max number of genes to return with the `size` field. It defaults to 100.
 You can view case specific genes by setting the `case` field.
 
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
+```
+{ 
+   "op":"=",
+   "content":{ 
+      "field":"ssms.reference_allele",
+      "value":"G"
+   }
+}
+```
+
+To put it in the track config you may want to minimize it as such:
+```
+filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
+```
 
 Example Track:
 ```
@@ -113,19 +134,34 @@ type=gdc-viewer/View/Track/SSMVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
-```
-
-You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
-
-```
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
+
+![GDC SSMs](images/gdc-mutations-base-g.png)
 
 You can set the max number of SSMs to return with the `size` field. It defaults to 100.
 You can view case specific SSMs by setting the `case` field.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.
+```
+{ 
+   "op":"=",
+   "content":{ 
+      "field":"cnv_change",
+      "value":[ 
+         "Gain"
+      ]
+   }
+}
+```
+
+To put it in the track config you may want to minimize it as such:
+```
+filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
+```
 
 Example Track:
 ```
@@ -139,16 +175,25 @@ bicolor_pivot=0
 unsafePopup=true
 ```
 
-You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.
-
-```
-filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
-```
+![GDC CNVs](images/gdc-cnv-gain.png)
 
 You can set the max number of CNVs to return with the `size` field. It defaults to 500.
 You can view case specific CNVs by setting the `case` field.
 
 Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
+
+# Dynamic Track Generation
+## Explore cases, genes and mutations
+This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
+![GDC Portal](images/gdc-portal-explore.png)
+
+## Explore Projects
+This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
+![GDC projects](images/gdc-project-browser.png)
+
+## Explore Primary Sites
+This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
+![GDC primary sites](images/gdc-primary-sites.png)
 
 # Export Types
 The following export types are supported by both GDC Genes and SSMs. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
