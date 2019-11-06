@@ -131,7 +131,7 @@ Example Track:
 ```
 [tracks.GDC_CNV]
 storeClass=gdc-viewer/Store/SeqFeature/CNVs
-type=gdc-viewer/View/Track/Wiggle/XYPlot
+type=JBrowse/View/Track/Wiggle/XYPlot
 key=GDC CNV
 metadata.datatype=CNV
 autoscale=local
