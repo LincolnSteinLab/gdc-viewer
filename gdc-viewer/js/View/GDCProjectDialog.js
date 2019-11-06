@@ -61,7 +61,7 @@ function (
          */
         getProjectInformation: function() {
             var thisB = this;
-            var url = thisB.baseGraphQLUrl + '/projects';
+            var url = thisB.baseGraphQLUrl + '/projects-dialog';
 
             // Clear current results
             dom.empty(thisB.resultsContainer);
