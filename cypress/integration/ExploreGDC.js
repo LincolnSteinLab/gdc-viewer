@@ -92,6 +92,7 @@ describe('Explore GDC', function() {
      * @param {*} mutationArray array of strings to check for on mutation tab
      */
     var checkAllResultsTab = function(donorArray, geneArray, mutationArray) {
+        cy.wait(3000) // wait a few seconds for results to load
         // Validate donor results
         checkResultsTab(donorArray)
 
@@ -102,18 +103,6 @@ describe('Explore GDC', function() {
         // Validate mutation results
         selectResultsTab(2)
         checkResultsTab(mutationArray)
-    }
-
-    /**
-     * Clears all applied filters
-     */
-    var clearFilters = function() {
-        // Remove filters
-        cy.get('.dijitIconDelete').click()
-
-        // Check that filters are clear
-        selectResultsTab(0)
-        checkResultsTab(['Showing 1 to 20 of 37,063'])
     }
 
     it('Should be able to explore and apply facets', function() {
