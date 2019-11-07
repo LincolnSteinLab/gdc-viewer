@@ -23,7 +23,7 @@
     "url": "https://github.com/agduncan94/gdc-viewer/issues"
   },
   "jbrowsePlugin": {
-    "name": "ICGCViewer"
+    "name": "GDCViewer"
   },
   "homepage": "https://github.com/agduncan94/gdc-viewer#readme",
   "devDependencies": {
