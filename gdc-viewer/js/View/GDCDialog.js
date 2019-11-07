@@ -234,7 +234,7 @@ function (
             var geneLoading = thisB.createLoadingIcon(thisB.geneFacetTab.containerNode);
 
             // Update the accordions with results from the GDC
-            fetch(thisB.baseGraphQLUrl, {
+            fetch(thisB.baseGraphQLUrl + '/facetResults', {
                 method: 'post',
                 headers: { 'X-Requested-With': null },
                 body: JSON.stringify(bodyVal)
@@ -398,7 +398,7 @@ function (
          */
         updateSSMSearchResults: function() {
             var thisB = this;
-            var url = thisB.baseGraphQLUrl + '/SsmsTable';
+            var url = thisB.baseGraphQLUrl + '/SsmSearchResults';
 
             // Clear existing pretty filters
             dom.empty(thisB.prettyFacetHolder);
@@ -497,7 +497,7 @@ function (
          */
         updateGeneSearchResults: function() {
             var thisB = this;
-            var url = thisB.baseGraphQLUrl + '/GenesTable';
+            var url = thisB.baseGraphQLUrl + '/GeneSearchResults';
 
             // Clear existing pretty filters
             dom.empty(thisB.prettyFacetHolder);
@@ -636,7 +636,7 @@ function (
          */
         updateCaseSearchResults: function() {
             var thisB = this;
-            var url = thisB.baseGraphQLUrl + '/ExploreCasesTable';
+            var url = thisB.baseGraphQLUrl + '/CaseSearchResults';
 
             // Clear existing pretty filters
             dom.empty(thisB.prettyFacetHolder);
