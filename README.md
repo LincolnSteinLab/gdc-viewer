@@ -102,7 +102,7 @@ unsafePopup=true
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
-![GDC Genes](images/gdc-genes-protein-coding.png)
+![GDC Genes](images/GDC-genes-protein-coding.png)
 
 You can set the max number of genes to return with the `size` field. It defaults to 100.
 You can view case specific genes by setting the `case` field.
@@ -137,7 +137,7 @@ unsafePopup=true
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
-![GDC SSMs](images/gdc-mutations-base-g.png)
+![GDC SSMs](images/GDC-mutations-base-g.png)
 
 You can set the max number of SSMs to return with the `size` field. It defaults to 100.
 You can view case specific SSMs by setting the `case` field.
@@ -175,7 +175,7 @@ bicolor_pivot=0
 unsafePopup=true
 ```
 
-![GDC CNVs](images/gdc-cnv-gain.png)
+![GDC CNVs](images/GDC-cnv-gain.png)
 
 You can set the max number of CNVs to return with the `size` field. It defaults to 500.
 You can view case specific CNVs by setting the `case` field.
@@ -185,15 +185,15 @@ Note: You can also use a density plot for the copy number data. Simply change th
 # Dynamic Track Generation
 ## Explore cases, genes and mutations
 This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
-![GDC Portal](images/gdc-portal-explore.png)
+![GDC Portal](images/GDC-portal-explore.png)
 
 ## Explore Projects
 This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
-![GDC projects](images/gdc-project-browser.png)
+![GDC projects](images/GDC-project-browser.png)
 
 ## Explore Primary Sites
 This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
-![GDC primary sites](images/gdc-primary-sites.png)
+![GDC primary sites](images/GDC-primary-sites.png)
 
 # Export Types
 The following export types are supported by both GDC Genes and SSMs. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
