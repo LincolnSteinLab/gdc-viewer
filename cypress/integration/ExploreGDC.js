@@ -92,6 +92,7 @@ describe('Explore GDC', function() {
      * @param {*} mutationArray array of strings to check for on mutation tab
      */
     var checkAllResultsTab = function(donorArray, geneArray, mutationArray) {
+        cy.wait(['@getMutationTrack', '@getGeneTrack'])
         cy.wait(3000) // wait a few seconds for results to load
         // Validate donor results
         checkResultsTab(donorArray)
