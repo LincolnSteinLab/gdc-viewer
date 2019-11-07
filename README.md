@@ -75,6 +75,8 @@ The following shows a filter for cases by ethnicity:
 ## Genes
 A simple view of all of the genes seen across all cases.
 
+You can view case specific genes by setting the `case` field.
+
 You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
 
 ```
@@ -105,11 +107,13 @@ filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 
 ![GDC Genes](images/GDC-genes-protein-coding.png)
 
-You can set the max number of genes to return with the `size` field. It defaults to 100.
-You can view case specific genes by setting the `case` field.
+### Extra notes
+You can set the max number of genes to return with the `size` field. It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
+
+You can view case specific SSMs by setting the `case` field.
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
 ```
@@ -140,11 +144,13 @@ filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 
 ![GDC SSMs](images/GDC-mutations-base-g.png)
 
-You can set the max number of SSMs to return with the `size` field. It defaults to 100.
-You can view case specific SSMs by setting the `case` field.
+### Extra notes
+You can set the max number of SSMs to return with the `size` field. It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
+
+You can view case specific CNVs by setting the `case` field.
 
 You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.
 ```
@@ -178,10 +184,10 @@ unsafePopup=true
 
 ![GDC CNVs](images/GDC-cnv-gain.png)
 
-You can set the max number of CNVs to return with the `size` field. It defaults to 500.
-You can view case specific CNVs by setting the `case` field.
+### Extra notes
+You can set the max number of CNVs to return with the `size` field. It defaults to 500. The smaller the number, the faster the results will appear.
 
-Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
+You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
 
 # Dynamic Track Generation
 ## Explore cases, genes and mutations
@@ -206,7 +212,7 @@ The following export types are supported by both GDC Genes and SSMs. To export, 
 
 # Automated testing
 Cypress.io is used for testing this plugin. The following steps show how to run the tests locally.
-1. Install JBrowse and but don't install chromosome files.
+1. Install JBrowse but don't install chromosome files.
 2. Download Chr 1 fasta from `http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz`. There should be the fasta index file in `cypress/data/Homo_sapiens.GRCh38.dna.chromosome.1.fa.fai`. Put these files into `jbrowse/data/`.
 3. Install Cypress.io with `npm install`.
 4. Place `cypress/data/tracks.conf` into your `jbrowse/data/` directory. Make sure no other tracks are present.
