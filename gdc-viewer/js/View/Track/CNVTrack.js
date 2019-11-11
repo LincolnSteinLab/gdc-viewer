@@ -1,18 +1,18 @@
 define(
     [
         "dojo/_base/declare",
-        "JBrowse/View/Track/HTMLFeatures",
+        "JBrowse/View/Track/Wiggle/XYPlot",
         'JBrowse/View/Track/_ExportMixin',
         'dojo/dom-construct',
         'dijit/form/Button'
     ],
    function(
        declare,
-       HTMLFeatures,
+       XYPlot,
        ExportMixin,
        domConstruct,
        Button) {
-   return declare([ HTMLFeatures, ExportMixin ], {
+   return declare([ XYPlot, ExportMixin ], {
 
         _exportFormats: function() {
             return [

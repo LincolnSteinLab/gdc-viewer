@@ -58,6 +58,7 @@ Note that this will only show preloaded tracks as well as tracks you have added 
 # Available Store SeqFeature
 ## A note on filters
 All SeqFeatures support filters as they are defined in the [GDC API Documentation](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query).
+
 Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, SSM filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
 
 The following shows a filter for cases by ethnicity:
@@ -72,6 +73,9 @@ The following shows a filter for cases by ethnicity:
   }
 }
 ```
+
+You can view/edit the filters associated with a track by clicking the down arrow for the track menu and selecting `View Applied Filters`. Be careful, there are currently no checks to see if the filters are valid before applying them.
+
 ## Genes
 A simple view of all of the genes seen across all cases.
 
@@ -174,7 +178,7 @@ Example Track:
 ```
 [tracks.GDC_CNV]
 storeClass=gdc-viewer/Store/SeqFeature/CNVs
-type=JBrowse/View/Track/Wiggle/XYPlot
+type=gdc-viewer/View/Track/CNVTrack
 key=GDC CNV
 metadata.datatype=CNV
 autoscale=local
@@ -187,7 +191,7 @@ unsafePopup=true
 ### Extra notes
 You can set the max number of CNVs to return with the `size` field. It defaults to 500. The smaller the number, the faster the results will appear.
 
-You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
+You can also use a density plot for the copy number data. Simply change the type from `gdc-viewer/View/Track/CNVTrack` to `JBrowse/View/Track/Wiggle/Density.`
 
 # Dynamic Track Generation
 ## Explore cases, genes and mutations

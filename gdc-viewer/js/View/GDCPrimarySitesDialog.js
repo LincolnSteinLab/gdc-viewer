@@ -171,7 +171,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.key, 'JBrowse/View/Track/Wiggle/XYPlot');
+                                thisB.addTrack('CNVs', hit.key, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for primary site " + hit.key);
                             }
                         })(hit)

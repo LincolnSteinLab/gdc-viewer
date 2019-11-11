@@ -594,7 +594,7 @@ function (
                     label: "Filtered CNVs from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, combinedFilters, 'JBrowse/View/Track/Wiggle/XYPlot');
+                        thisB.addTrack('CNVs', undefined, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
                         alert("Adding track with all CNVs from the GDC, with current filters applied");
                     }
                 });
@@ -606,7 +606,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: cnvMenu,
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, undefined, 'JBrowse/View/Track/Wiggle/XYPlot');
+                        thisB.addTrack('CNVs', undefined, undefined, 'gdc-viewer/View/Track/CNVTrack');
                         alert("Adding track with all CNVs from the GDC");
                     }
                 });
@@ -822,7 +822,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'JBrowse/View/Track/Wiggle/XYPlot');
+                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -836,7 +836,7 @@ function (
                         dropDown: cnvMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'JBrowse/View/Track/Wiggle/XYPlot');
+                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit)
