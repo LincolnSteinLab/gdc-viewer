@@ -3,13 +3,15 @@ define(
         "dojo/_base/declare",
         "JBrowse/View/Track/HTMLFeatures",
         'JBrowse/View/Track/_ExportMixin',
-        'dojo/dom-construct'
+        'dojo/dom-construct',
+        'dijit/form/Button'
     ],
    function(
        declare,
        HTMLFeatures,
        ExportMixin,
-       domConstruct) {
+       domConstruct,
+       Button) {
    return declare([ HTMLFeatures, ExportMixin ], {
 
         _exportFormats: function() {
@@ -50,7 +52,7 @@ define(
         },
 
         _trackMenuOptions: function () {
-            var track = this;
+            var that = this;
             var options = this.inherited(arguments);
             options.push({
                 label: 'Share Track as URL',
@@ -58,7 +60,53 @@ define(
                 title: 'Share Track as URL',
                 content: dojo.hitch(this,'_shareableLinkContent')
             });
+            options.push({
+                label: 'View Applied Filters',
+                action: "contentDialog",
+                title: 'View Applied Filters',
+                content: dojo.hitch(this,'_appliedFilters')
+            });
             return options;
+        },
+
+        _appliedFilters: function() {
+            var track = this;
+            var details = domConstruct.create('div', { className: 'detail', style: 'display: flex; flex-direction: column; align-items: center; justify-content: center;' });
+
+            // Create help text
+            var helpString = '<p>The following filters have been applied to the track.</p>';
+            var helpElement = domConstruct.toDom(helpString);
+            domConstruct.place(helpElement, details);
+
+            // Get filtered text
+            var filteredText = JSON.stringify(track.store.filters, null, 2)
+
+            var textArea = domConstruct.create(
+                'textarea',{
+                    rows: 20,
+                    value: filteredText,
+                    style: "width: 80%",
+                    readOnly: false,
+                    id: "filterTextArea"
+                }, details );
+
+            var updateTrackButton = new Button({
+                label: 'Update track',
+                onClick: function() {
+                    let trackString = document.getElementById("filterTextArea").value;
+                    var storeConf = {
+                        browser: track.browser,
+                        refSeq: track.browser.refSeq,
+                        type: track.store.config.type,
+                        case: track.store.config.case,
+                        filters: trackString
+                    };
+                    var storeName = track.browser.addStoreConfig(null, storeConf);
+                    track.config.store = storeName;
+                    track.browser.publish( '/jbrowse/v1/v/tracks/replace', [track.config] );
+                }
+            }).placeAt(details);
+            return details;
         },
 
         _shareableLinkContent: function() {
