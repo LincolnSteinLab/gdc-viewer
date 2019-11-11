@@ -1,0 +1,36 @@
+language: node_js
+
+node_js:
+  - 10
+
+addons:
+  apt:
+    packages:
+      - libgconf-2-4
+
+cache:
+  npm: true
+  directories:
+    - ~/.cache
+
+services:
+  - docker
+
+before_install:
+  - mkdir docker/data
+  - cp cypress/data/tracks.conf docker/data/tracks.conf
+  - cp cypress/data/Homo_sapiens.GRCh38.dna.chromosome.1.fa.fai docker/data/Homo_sapiens.GRCh38.dna.chromosome.1.fa.fai
+  - cp data/jbrowse.conf docker/data/jbrowse.conf
+  - cd docker/data
+  - curl -o Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
+  - gzip -d Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
+  - cd ../
+  - docker-compose build
+  - docker-compose up -d
+  - cd ../
+
+install:
+  - npm ci
+
+script:
+  - $(npm bin)/cypress run --record

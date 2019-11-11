@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/agduncan94/gdc-viewer.svg?branch=develop)](https://travis-ci.org/agduncan94/gdc-viewer)
 # GDC JBrowse Plugin
 A plugin for [JBrowse](https://jbrowse.org/) for viewing [GDC](https://gdc.cancer.gov/) data. For any bugs, issues, or feature recommendations please create an issue through GitHub.
 
@@ -13,34 +14,19 @@ For installing gdc-viewer plugin:
 2. Add 'gdc-viewer' to the array of plugins in the `jbrowse_conf.json`.
 
 ## 3. Install Reference Sequence Data
-Now setup the reference sequence used. GDC requires the GRCh38 Human reference files, which can be found at http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/. You'll want to download the files of the form `Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz`.
+Now setup the reference sequence used. GDC requires the GRCh38 Human reference files.
 
-Then you can use the `bin/prepare-refeqs.pl` command to generate the RefSeq information.
+Download the GRCh38 `.fa` and `.fa.fai` files online (ex. http://bioinfo.hpc.cam.ac.uk/downloads/datasets/fasta/grch38/). Then put the following in `./data/tracks.conf` (note files may be named something else).
 
-Below is an example of these two steps for Chr1.
-
-Ex. Chromosome 1
-1. Download Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz from the above site.
 ```
-wget http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
+refSeqs=GRCh38.genome.fa.fai
+  
+[tracks.refseqs]
+urlTemplate=GRCh38.genome.fa
 ```
-2. Setup refeq with the following command
-```
-bin/prepare-refseqs.pl --fasta Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
-```
-Note that you can specify multiple fast in one command by doing `--fasta fasta1.fa.gz --fasta fasta2.fa.gz ...`
 
 ## 4. Adding new tracks
-We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`.
-
-### A. Explore cases, genes and mutations
-This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
-
-### B. Explore Projects
-This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
-
-### C. Explore Primary Sites
-This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
+We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse. These are present in the menu under `GDC`. See [Dynamic Track Generation](#dynamic-track-generation) for more details.
 
 ## 5. Run JBrowse
 You'll have to run the following commands:
@@ -75,6 +61,7 @@ All SeqFeatures support filters as they are defined in the [GDC API Documentatio
 Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, SSM filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
 
 The following shows a filter for cases by ethnicity:
+```
 {
   "op":"in",
   "content":{
@@ -84,9 +71,28 @@ The following shows a filter for cases by ethnicity:
     ]
   }
 }
-
+```
 ## Genes
 A simple view of all of the genes seen across all cases.
+
+You can view case specific genes by setting the `case` field.
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
+
+```
+{ 
+   "op":"!=",
+   "content":{ 
+      "field":"cases.biotype",
+      "value":"protein_coding"
+   }
+}
+```
+
+To put it in the track config you may want to minimize it as such:
+```
+filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
+```
 
 Example Track:
 ```
@@ -96,19 +102,34 @@ type=JBrowse/View/Track/GeneTrack
 key=GDC Genes
 metadata.datatype=Gene
 unsafePopup=true
-```
-
-You can apply filters to the track too, in the same format as GDC. The below example only shows Genes whose biotype is not 'protein_coding'.
-
-```
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
-You can set the max number of genes to return with the `size` field. It defaults to 100.
-You can view case specific genes by setting the `case` field.
+![GDC Genes](images/GDC-genes-protein-coding.png)
+
+### Extra notes
+You can set the max number of genes to return with the `size` field. It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
+
+You can view case specific SSMs by setting the `case` field.
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
+```
+{ 
+   "op":"=",
+   "content":{ 
+      "field":"ssms.reference_allele",
+      "value":"G"
+   }
+}
+```
+
+To put it in the track config you may want to minimize it as such:
+```
+filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
+```
 
 Example Track:
 ```
@@ -118,25 +139,42 @@ type=gdc-viewer/View/Track/SSMVariants
 key=GDC SSM
 metadata.datatype=SSM
 unsafePopup=true
-```
-
-You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
-
-```
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
-You can set the max number of SSMs to return with the `size` field. It defaults to 100.
-You can view case specific SSMs by setting the `case` field.
+![GDC SSMs](images/GDC-mutations-base-g.png)
+
+### Extra notes
+You can set the max number of SSMs to return with the `size` field. It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
+
+You can view case specific CNVs by setting the `case` field.
+
+You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.
+```
+{ 
+   "op":"=",
+   "content":{ 
+      "field":"cnv_change",
+      "value":[ 
+         "Gain"
+      ]
+   }
+}
+```
+
+To put it in the track config you may want to minimize it as such:
+```
+filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
+```
 
 Example Track:
 ```
 [tracks.GDC_CNV]
 storeClass=gdc-viewer/Store/SeqFeature/CNVs
-type=gdc-viewer/View/Track/Wiggle/XYPlot
+type=JBrowse/View/Track/Wiggle/XYPlot
 key=GDC CNV
 metadata.datatype=CNV
 autoscale=local
@@ -144,16 +182,25 @@ bicolor_pivot=0
 unsafePopup=true
 ```
 
-You can apply filters to the track too, in the same format as GDC. The below example only shows CNVs that are 'Gains'.
+![GDC CNVs](images/GDC-cnv-gain.png)
 
-```
-filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
-```
+### Extra notes
+You can set the max number of CNVs to return with the `size` field. It defaults to 500. The smaller the number, the faster the results will appear.
 
-You can set the max number of CNVs to return with the `size` field. It defaults to 500.
-You can view case specific CNVs by setting the `case` field.
+You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
 
-Note: You can also use a density plot for the copy number data. Simply change the type from `JBrowse/View/Track/Wiggle/XYPlot` to `JBrowse/View/Track/Wiggle/Density.`
+# Dynamic Track Generation
+## Explore cases, genes and mutations
+This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
+![GDC Portal](images/GDC-portal-explore.png)
+
+## Explore Projects
+This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
+![GDC projects](images/GDC-project-browser.png)
+
+## Explore Primary Sites
+This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
+![GDC primary sites](images/GDC-primary-sites.png)
 
 # Export Types
 The following export types are supported by both GDC Genes and SSMs. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
@@ -162,3 +209,13 @@ The following export types are supported by both GDC Genes and SSMs. To export, 
 * Sequin Table
 * CSV
 * Track Config
+
+# Automated testing
+Cypress.io is used for testing this plugin. The following steps show how to run the tests locally.
+1. Install JBrowse but don't install chromosome files.
+2. Download Chr 1 fasta from `http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz`. There should be the fasta index file in `cypress/data/Homo_sapiens.GRCh38.dna.chromosome.1.fa.fai`. Put these files into `jbrowse/data/`.
+3. Install Cypress.io with `npm install`.
+4. Place `cypress/data/tracks.conf` into your `jbrowse/data/` directory. Make sure no other tracks are present.
+5. Run `npx cypress open` or `npx cypress run`
+
+**Note** while some tests have mocked endpoints, not all endpoints are mocked. This could lead to breakage of tests in the future.
