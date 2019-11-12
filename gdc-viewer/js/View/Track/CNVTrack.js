@@ -4,22 +4,35 @@ define(
         "JBrowse/View/Track/Wiggle/XYPlot",
         'JBrowse/View/Track/_ExportMixin',
         'dojo/dom-construct',
-        'dijit/form/Button'
+        'dijit/form/Button',
+        'JBrowse/Util'
     ],
    function(
        declare,
        XYPlot,
        ExportMixin,
        domConstruct,
-       Button) {
+       Button,
+       Util) {
    return declare([ XYPlot, ExportMixin ], {
+
+        _defaultConfig: function() {
+            return Util.deepUpdate(
+                dojo.clone( this.inherited(arguments) ),
+                {
+                    maxExportSpan: null,
+                    autoscale: 'local',
+                    bicolor_pivot: 0
+                }
+            );
+        },
 
         _exportFormats: function() {
             return [
-                {name: 'gdc-viewer/View/Export/GFF3', label: 'GFF3', fileExt: 'gff3'},
-                {name: 'gdc-viewer/View/Export/BED', label: 'BED', fileExt: 'bed'},
+                {name: 'GFF3', label: 'GFF3', fileExt: 'gff3'},
+                {name: 'bedGraph', label: 'bedGraph', fileExt: 'bedgraph'},
                 {name: 'gdc-viewer/View/Export/CSV', label: 'CSV', fileExt: 'csv'},
-                {name: 'gdc-viewer/View/Export/SequinTable', label: 'Sequin Table', fileExt: 'sqn'},
+                {name: 'Wiggle', label: 'Wiggle', fileExt: 'wig'},
                 {name: 'gdc-viewer/View/Export/TrackConfig', label: 'Track Config', fileExt: 'conf'},
                 {name: 'gdc-viewer/View/Export/TrackConfigJson', label: 'Track Config JSON', fileExt: 'json'}
             ];
@@ -27,6 +40,7 @@ define(
 
         _trackMenuOptions: function () {
             var options = this.inherited(arguments);
+            options.push({ type: 'dijit/MenuSeparator' } );
             options.push({
                 label: 'Share Track as URL',
                 action: "contentDialog",

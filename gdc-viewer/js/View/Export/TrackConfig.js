@@ -35,11 +35,6 @@ return declare( ExportBase,
             trackArray.push('size=' + this.store.size)
         }
 
-        if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
-            trackArray.push("autoscale=local");
-            trackArray.push("bicolor_pivot=0");
-        }
-
         if (this.store.filters) {
             trackArray.push('filters=' + JSON.stringify(this.store.filters))
         }
