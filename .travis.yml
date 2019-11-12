@@ -26,7 +26,8 @@ before_install:
   - gzip -d Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
   - cd ../
   - docker-compose build
-  - docker-compose up -d
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose up -d -e PLUGIN_VERSION=$TRAVIS_PULL_REQUEST_BRANCH; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker-compose up -d -e PLUGIN_VERSION=$TRAVIS_BRANCH; fi'
   - cd ../
 
 install:

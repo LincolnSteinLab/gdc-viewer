@@ -3,7 +3,7 @@ FROM node:latest
 LABEL maintainer="andrew.duncan@oicr.on.ca"
 
 ENV JBROWSE_VERSION 1.16.6
-ENV PLUGIN_VERSION develop
+#ENV PLUGIN_VERSION develop
 
 # Install dependencies
 RUN apt-get -qq update --fix-missing
