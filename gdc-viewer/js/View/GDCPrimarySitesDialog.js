@@ -241,7 +241,6 @@ function (
                     datatype: storeClass,
                     primarySite: primarySite
                 },
-                unsafePopup: true,
                 menuTemplate : [ 
                     {   
                      label : "View details",

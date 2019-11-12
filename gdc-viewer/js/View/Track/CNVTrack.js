@@ -108,7 +108,6 @@ define(
             addTrackConf.type = track.config.type;
             addTrackConf.key = track.config.key;
             addTrackConf.metadata = track.config.metadata;
-            addTrackConf.unsafePopup = true;
             addTrackConf.filters = track.store.config.filters;
             addTrackConf.case = track.store.config.case;
             addTrackConf.size = track.config.size;

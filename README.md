@@ -105,7 +105,6 @@ storeClass=gdc-viewer/Store/SeqFeature/Genes
 type=JBrowse/View/Track/GeneTrack
 key=GDC Genes
 metadata.datatype=Gene
-unsafePopup=true
 filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ```
 
@@ -142,7 +141,6 @@ storeClass=gdc-viewer/Store/SeqFeature/SimpleSomaticMutations
 type=gdc-viewer/View/Track/SSMVariants
 key=GDC SSM
 metadata.datatype=SSM
-unsafePopup=true
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
@@ -181,7 +179,7 @@ storeClass=gdc-viewer/Store/SeqFeature/CNVs
 type=gdc-viewer/View/Track/CNVTrack
 key=GDC CNV
 metadata.datatype=CNV
-unsafePopup=true
+
 ```
 
 ![GDC CNVs](images/GDC-cnv-gain.png)

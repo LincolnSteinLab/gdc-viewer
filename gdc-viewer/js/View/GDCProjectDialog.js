@@ -263,7 +263,6 @@ function (
                     datatype: storeClass,
                     project: projectId
                 },
-                unsafePopup: true,
                 menuTemplate : [ 
                     {   
                      label : "View details",

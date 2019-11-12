@@ -26,7 +26,6 @@ return declare( ExportBase,
             'metadata': {
                 'datatype': storeArray[storeArray.length - 1]
             },
-            'unsafePopup': true,
             'case': this.store.case,
             'size': this.store.size
         }

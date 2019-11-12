@@ -4,48 +4,26 @@ define(
         "JBrowse/View/Track/HTMLFeatures",
         'JBrowse/View/Track/_ExportMixin',
         'dojo/dom-construct',
-        'dijit/form/Button'
+        'dijit/form/Button',
+        'JBrowse/Util'
     ],
    function(
        declare,
        HTMLFeatures,
        ExportMixin,
        domConstruct,
-       Button) {
+       Button,
+       Util) {
    return declare([ HTMLFeatures, ExportMixin ], {
 
-    _canExportRegion: function( l ) {
-        //console.log('can generic export?');
-        console.log(l)
-        if( ! l ) return false;
-
-        console.log(this.config.maxExportSpan)
-
-        // if we have a maxExportSpan configured for this track, use it.
-        if( typeof this.config.maxExportSpan == 'number' || typeof this.config.maxExportSpan == 'string' ) {
-            console.log(l.end - l.start + 1 + ' <= ' + this.config.maxExportSpan + '?')
-            return l.end - l.start + 1 <= this.config.maxExportSpan;
-        }
-        else {
-            // if we know the store's feature density, then use that with
-            // a limit of maxExportFeatures or 5,000 features
-            var thisB = this;
-            var storeStats = {};
-            // will return immediately if the stats are available
-            this.store.getGlobalStats( function( s ) {
-                storeStats = s;
-            }, function(error){ }); // error callback does nothing for now
-            console.log(storeStats)
-            if( storeStats.featureDensity ) {
-                console.log(storeStats.featureDensity*(l.end - l.start))
-                console.log(thisB.config.maxExportFeatures)
-                return storeStats.featureDensity*(l.end - l.start) <= ( thisB.config.maxExportFeatures || 50000 );
-            }
-        }
-
-        // otherwise, i guess we can export
-        return true;
-    },
+        _defaultConfig: function() {
+            return Util.deepUpdate(
+                dojo.clone( this.inherited(arguments) ),
+                {
+                    unsafePopup: true
+                }
+            );
+        },
 
         _exportFormats: function() {
             return [
@@ -127,7 +105,6 @@ define(
             addTrackConf.type = track.config.type;
             addTrackConf.key = track.config.key;
             addTrackConf.metadata = track.config.metadata;
-            addTrackConf.unsafePopup = true;
             addTrackConf.filters = track.store.config.filters;
             addTrackConf.case = track.store.config.case;
             addTrackConf.size = track.config.size;

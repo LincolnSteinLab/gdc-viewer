@@ -1355,7 +1355,6 @@ function (
                     datatype: storeClass,
                     case: caseId
                 },
-                unsafePopup: true,
                 menuTemplate : [ 
                     {   
                      label : "View details",
