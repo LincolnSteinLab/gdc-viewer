@@ -181,8 +181,6 @@ storeClass=gdc-viewer/Store/SeqFeature/CNVs
 type=gdc-viewer/View/Track/CNVTrack
 key=GDC CNV
 metadata.datatype=CNV
-autoscale=local
-bicolor_pivot=0
 unsafePopup=true
 ```
 

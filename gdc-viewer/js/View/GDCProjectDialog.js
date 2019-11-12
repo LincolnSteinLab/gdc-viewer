@@ -271,10 +271,7 @@ function (
                ] 
             };
 
-            if (storeClass === 'CNVs') {
-                trackConf.autoscale = 'local';
-                trackConf.bicolor_pivot = 0;
-            } else if (storeClass === 'Genes') {
+            if (storeClass === 'Genes') {
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Gene",
