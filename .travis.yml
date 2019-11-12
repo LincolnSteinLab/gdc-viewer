@@ -24,14 +24,17 @@ before_install:
   - cd docker/data
   - curl -o Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
   - gzip -d Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
-  - cd ../
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_PULL_REQUEST_BRANCH}; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_BRANCH}; fi'
-  - docker-compose up -d
-  - cd ../
+  - cd ../../
 
 install:
   - npm ci
+  - cd docker
+  - echo $TRAVIS_PULL_REQUEST
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_PULL_REQUEST_BRANCH}; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_BRANCH}; fi'
+  - docker-compose build --build-arg plugin_version=$TRAVIS_BRANCH
+  - docker-compose up -d
+  - cd ../
 
 script:
   - $(npm bin)/cypress run --record
