@@ -25,7 +25,6 @@ before_install:
   - curl -o Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz http://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
   - gzip -d Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
   - cd ../
-  - docker-compose build
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose up -d -e PLUGIN_VERSION=$TRAVIS_PULL_REQUEST_BRANCH; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker-compose up -d -e PLUGIN_VERSION=$TRAVIS_BRANCH; fi'
   - cd ../
