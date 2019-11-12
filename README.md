@@ -189,8 +189,6 @@ unsafePopup=true
 ### Extra notes
 You can set the max number of CNVs to return with the `size` field. It defaults to 500. The smaller the number, the faster the results will appear.
 
-You can also use a density plot for the copy number data. Simply change the type from `gdc-viewer/View/Track/CNVTrack` to `JBrowse/View/Track/Wiggle/Density.`
-
 # Dynamic Track Generation
 ## Explore cases, genes and mutations
 This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
