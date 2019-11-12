@@ -29,9 +29,8 @@ before_install:
 install:
   - npm ci
   - cd docker
-  - echo $TRAVIS_PULL_REQUEST
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_PULL_REQUEST_BRANCH}; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_BRANCH}; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_BRANCH}; fi'
   - docker-compose build --build-arg plugin_version=$TRAVIS_BRANCH
   - docker-compose up -d
   - cd ../
