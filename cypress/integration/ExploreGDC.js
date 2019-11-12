@@ -113,7 +113,7 @@ describe('Explore GDC', function() {
         })
 
         checkAllResultsTab(
-            ['Showing 1 to 20 of 1,292', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
+            ['Showing 1 to 20 of 1,492', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
             ['Showing 1 to 20 of 21,168', 'TP53', 'TTN'],
             ['Showing 1 to 20 of 120,824', 'chr2:g.208248388C>T', 'chr17:g.7673803G>A']
         )
