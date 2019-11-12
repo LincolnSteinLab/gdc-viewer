@@ -35,4 +35,5 @@ install:
   - cd ../
 
 script:
-  - $(npm bin)/cypress run --record
+  # - $(npm bin)/cypress run --record
+  - $(npm bin)/cypress run
