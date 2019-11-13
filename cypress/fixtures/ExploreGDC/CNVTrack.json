@@ -1,0 +1,24 @@
+{
+    "data": {
+      "explore": {
+        "cnvs": {
+          "hits": {
+            "edges": [
+              {
+                "node": {
+                  "chromosome": "1",
+                  "cnv_change": "Gain",
+                  "cnv_id": "666e431a-80c5-5484-8a6c-1df696936c51",
+                  "end_position": 217871696.0,
+                  "id": "Q05WOjY2NmU0MzFhLTgwYzUtNTQ4NC04YTZjLTFkZjY5NjkzNmM1MQ==",
+                  "ncbi_build": "GRCh38",
+                  "start_position": 217631324.0
+                }
+              }
+            ],
+            "total": 1
+          }
+        }
+      }
+    }
+  }
