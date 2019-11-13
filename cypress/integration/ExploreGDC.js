@@ -22,6 +22,13 @@ describe('Explore GDC', function() {
                 response: 'fixture:ExploreGDC/SSMTrack.json'
             }).as('getMutationTrack')
 
+        cy
+            .route({
+                method: 'POST',
+                url: 'v0/graphql/CNVsTable',
+                response: 'fixture:ExploreGDC/CNVTrack.json'
+            }).as('getCNVTrack')
+
         cy.wait(1000) // Wait for load
         openExploreDialog()
     })
@@ -135,14 +142,16 @@ describe('Explore GDC', function() {
         cy.get('.dijitTabContainer').eq(1).within(() => {
             cy.contains('All Genes for Donor').eq(0).click()
             cy.contains('All SSMs for Donor').eq(0).click()
+            cy.contains('All CNVs for Donor').eq(0).click()
         })
 
         closePopup()
 
-        cy.wait(['@getMutationTrack.all', '@getGeneTrack.all'])
+        cy.wait(['@getMutationTrack.all', '@getGeneTrack.all', '@getCNVTrack.all'])
 
         // Check that tracks are added
         cy.contains('GDC_Genes_TCGA-A5-A1OF')
         cy.contains('GDC_SimpleSomaticMutations_TCGA-A5-A1OF')
+        cy.contains('GDC_CNVs_TCGA-A5-A1OF')
     })
 })
