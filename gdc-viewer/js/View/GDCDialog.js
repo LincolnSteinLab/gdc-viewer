@@ -455,7 +455,7 @@ function (
                     label: "Filtered SSMs form GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('SimpleSomaticMutations', undefined, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
+                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
                         alert("Adding track with all SSMs from the GDC, with current filters applied");
                     }
                 });
@@ -467,7 +467,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: ssmMenu,
                     onClick: function() {
-                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, 'gdc-viewer/View/Track/SSMTrack');
+                        thisB.addTrack('SimpleSomaticMutations', undefined, undefined, undefined, 'gdc-viewer/View/Track/SSMTrack');
                         alert("Add track with all SSMs from the GDC");
                     }
                 });
@@ -566,7 +566,7 @@ function (
                     label: "Filtered Genes from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('Genes', undefined, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
+                        thisB.addTrack('Genes', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                         alert("Adding track with all genes from the GDC, with current filters applied");
                     }
                 });
@@ -579,7 +579,7 @@ function (
                     dropDown: geneMenu,
                     style: "padding-right: 8px;",
                     onClick: function() {
-                        thisB.addTrack('Genes', undefined, undefined, 'gdc-viewer/View/Track/GeneTrack');
+                        thisB.addTrack('Genes', undefined, undefined, undefined, 'gdc-viewer/View/Track/GeneTrack');
                         alert("Adding track with all genes from the GDC");
                     }
                 });
@@ -594,7 +594,7 @@ function (
                     label: "Filtered CNVs from GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
+                        thisB.addTrack('CNVs', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
                         alert("Adding track with all CNVs from the GDC, with current filters applied");
                     }
                 });
@@ -606,7 +606,7 @@ function (
                     iconClass: "dijitIconNewTask",
                     dropDown: cnvMenu,
                     onClick: function() {
-                        thisB.addTrack('CNVs', undefined, undefined, 'gdc-viewer/View/Track/CNVTrack');
+                        thisB.addTrack('CNVs', undefined, undefined, undefined, 'gdc-viewer/View/Track/CNVTrack');
                         alert("Adding track with all CNVs from the GDC");
                     }
                 });
@@ -748,7 +748,8 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('Genes', hit.case_id, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
+                                console.log(hit)
+                                thisB.addTrack('Genes', hit.case_id, hit.submitter_id, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -762,7 +763,7 @@ function (
                         dropDown: geneMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('Genes', hit.case_id, undefined, 'gdc-viewer/View/Track/GeneTrack');
+                                thisB.addTrack('Genes', hit.case_id, hit.submitter_id, undefined, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
                         })(hit)
@@ -785,7 +786,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, hit.submitter_id, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -799,7 +800,7 @@ function (
                         dropDown: ssmMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, undefined, 'gdc-viewer/View/Track/SSMTrack');
+                                thisB.addTrack('SimpleSomaticMutations',  hit.case_id, hit.submitter_id, undefined, 'gdc-viewer/View/Track/SSMTrack');
                                 alert("Adding Simple Somatic Mutation track for case " +  hit.case_id);
                             }
                         })(hit)
@@ -822,7 +823,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
+                                thisB.addTrack('CNVs',  hit.case_id, hit.submitter_id, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit, combinedFilters)
@@ -836,7 +837,7 @@ function (
                         dropDown: cnvMenu,
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs',  hit.case_id, undefined, 'gdc-viewer/View/Track/CNVTrack');
+                                thisB.addTrack('CNVs',  hit.case_id, hit.submitter_id, undefined, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for case " +  hit.case_id);
                             }
                         })(hit)
@@ -1320,10 +1321,11 @@ function (
          * Generic function for adding a track of some type and store class
          * @param {string} storeClass the JBrowse store class
          * @param {number} caseId unique case ID
+         * @param {number} submitterId shorter case ID
          * @param {object} combinedFacetObject facet object with all three types combined
          * @param {string} trackType the JBrowse track type
          */
-        addTrack: function (storeClass, caseId, combinedFacetObject, trackType) {
+        addTrack: function (storeClass, caseId, submitterId, combinedFacetObject, trackType) {
             if (combinedFacetObject !== undefined) {
                 combinedFacetObject = combinedFacetObject === '' ? undefined : JSON.stringify(combinedFacetObject);
             }
@@ -1339,12 +1341,14 @@ function (
             var randomId = Math.random().toString(36).substring(7);
 
             var key = 'GDC_' + storeClass;
-            var label = key + '_' + randomId;
+            var label = key;
 
-            if (caseId != null && caseId != undefined) {
-                key += '_' + caseId
-                label += '_' + caseId
+            if (submitterId != null && submitterId != undefined) {
+                key += '_' + submitterId
+                label += '_' + submitterId
             }
+
+            label += '_' + randomId; // unique code appended to label to avoid duplicates
 
             var trackConf = {
                 type: trackType,

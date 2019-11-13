@@ -142,7 +142,7 @@ describe('Explore GDC', function() {
         cy.wait(['@getMutationTrack.all', '@getGeneTrack.all'])
 
         // Check that tracks are added
-        cy.contains('GDC_Genes_286c112d-7b73-40a1-b23c-99911388fdef')
-        cy.contains('GDC_SimpleSomaticMutations_286c112d-7b73-40a1-b23c-99911388fdef')
+        cy.contains('GDC_Genes_TCGA-A5-A1OF')
+        cy.contains('GDC_SimpleSomaticMutations_TCGA-A5-A1OF')
     })
 })

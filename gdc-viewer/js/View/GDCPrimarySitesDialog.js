@@ -227,10 +227,10 @@ function (
             var randomId = Math.random().toString(36).substring(7);
 
             var key = 'GDC_' + storeClass;
-            var label = key + '_' + randomId;
+            var label = key;
 
             key += '_' + primarySite
-            label += '_' + primarySite
+            label += '_' + primarySite + '_' + randomId
 
             var trackConf = {
                 type: trackType,
