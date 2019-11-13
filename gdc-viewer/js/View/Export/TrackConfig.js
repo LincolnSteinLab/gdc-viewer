@@ -23,8 +23,7 @@ return declare( ExportBase,
             'storeClass=' + this.store.config.type,
             'type=' + this.track.config.type,
             'key=' + this.track.key,
-            'metadata.datatype=' + storeArray[storeArray.length - 1],
-            'unsafePopup=true'
+            'metadata.datatype=' + storeArray[storeArray.length - 1]
         ]
 
         if (this.store.case) {
@@ -33,11 +32,6 @@ return declare( ExportBase,
 
         if (this.store.size) {
             trackArray.push('size=' + this.store.size)
-        }
-
-        if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
-            trackArray.push("autoscale=local");
-            trackArray.push("bicolor_pivot=0");
         }
 
         if (this.store.filters) {

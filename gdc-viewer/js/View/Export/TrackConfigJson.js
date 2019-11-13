@@ -26,14 +26,8 @@ return declare( ExportBase,
             'metadata': {
                 'datatype': storeArray[storeArray.length - 1]
             },
-            'unsafePopup': true,
             'case': this.store.case,
             'size': this.store.size
-        }
-
-        if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
-            trackObject['autoscale'] = 'local';
-            trackObject['bicolor_pivot'] = 0;
         }
 
         if (this.store.filters) {

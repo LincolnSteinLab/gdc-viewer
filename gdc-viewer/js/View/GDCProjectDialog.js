@@ -193,7 +193,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.project_id, 'JBrowse/View/Track/Wiggle/XYPlot');
+                                thisB.addTrack('CNVs', hit.project_id, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for project " + hit.project_id);
                             }
                         })(hit)
@@ -263,7 +263,6 @@ function (
                     datatype: storeClass,
                     project: projectId
                 },
-                unsafePopup: true,
                 menuTemplate : [ 
                     {   
                      label : "View details",
@@ -271,10 +270,7 @@ function (
                ] 
             };
 
-            if (storeClass === 'CNVs') {
-                trackConf.autoscale = 'local';
-                trackConf.bicolor_pivot = 0;
-            } else if (storeClass === 'Genes') {
+            if (storeClass === 'Genes') {
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Gene",
