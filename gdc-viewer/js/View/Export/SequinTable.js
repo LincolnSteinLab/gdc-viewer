@@ -1,3 +1,6 @@
+/**
+ * Support for SequinTable export
+ */
 define([ 'dojo/_base/declare',
          'dojo/_base/array',
          'JBrowse/View/Export/SequinTable'
@@ -7,6 +10,10 @@ define([ 'dojo/_base/declare',
 return declare( SequinTable,
 
 {
+    /**
+    * Called on each feature to create a corresponding line in the sequin table file
+    * @param {*} feature 
+    */
     formatFeature: function( feature ) {
         var thisB = this;
         if( ! this.headerPrinted )

@@ -1,3 +1,6 @@
+/**
+ * Class for gene tracks
+ */
 define(
     [
         "dojo/_base/declare",

@@ -1,8 +1,6 @@
 /**
- * Support for Sequin Feature table export.  See
- * http://www.ncbi.nlm.nih.gov/Sequin/table.html.
+ * Support for CSV export
  */
-
 define([ 'dojo/_base/declare',
          'JBrowse/View/Export'
        ],
@@ -15,6 +13,7 @@ return declare( ExportBase,
        this._printHeader(args);
    },
 
+   // The base header for genes and ssms
    defaultHeader: [
         'type',
         'start',
@@ -23,6 +22,7 @@ return declare( ExportBase,
         'id'
    ],
 
+   // The extended header for genes
    geneHeader: [
         'gene name',
         'biotype',
@@ -30,12 +30,14 @@ return declare( ExportBase,
         'synonyms'
    ],
 
+   // The extended header for ssms
    ssmHeader: [
         'reference allele',
         'dna change',
         'subtype'
     ],
 
+    // The full header for cnvs
     cnvHeader: [
         'start',
         'end',
@@ -44,7 +46,11 @@ return declare( ExportBase,
 
     fullHeader: [],
 
+    /**
+     * Print out the header of the CSV file
+     */
    _printHeader: function() {
+        this.fullHeader = []
         if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/Genes') {
             this.fullHeader = this.geneHeader
         } else if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/SimpleSomaticMutations') {
@@ -57,14 +63,19 @@ return declare( ExportBase,
         if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs') {
             headerString = (this.defaultHeader.concat(this.fullHeader)).join(',') + '\n'
         } else {
-            headerString = this.fullHeader.join(',') + '\n'
+            headerString = this.cnvHeader.join(',') + '\n'
         }
         this.print(headerString)
    },
 
+   /**
+    * Called on each feature to create a corresponding line in the CSV file
+    * @param {*} feature 
+    */
    formatFeature: function( feature ) {
         var featureArray = []
 
+        // SSM and Gene features have the extra about section
         if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs') {
             this.defaultHeader.forEach(field => featureArray.push(feature.get(field)))
             var about = feature.get('about')

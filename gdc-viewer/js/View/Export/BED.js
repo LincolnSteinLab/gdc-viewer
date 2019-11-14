@@ -1,3 +1,6 @@
+/**
+ * Support for BED export
+ */
 define([ 'dojo/_base/declare',
          'dojo/_base/array',
          'JBrowse/View/Export/BED'
@@ -8,6 +11,7 @@ return declare( BED,
 
 {
 
+    // Field names to ignore
     bed_field_names: [
         'seq_id',
         'start',
