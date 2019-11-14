@@ -1,8 +1,6 @@
 /**
- * Support for Sequin Feature table export.  See
- * http://www.ncbi.nlm.nih.gov/Sequin/table.html.
+ * Support for track config JSON export
  */
-
 define([ 'dojo/_base/declare',
          'JBrowse/View/Export'
        ],
@@ -11,10 +9,17 @@ define([ 'dojo/_base/declare',
 return declare( ExportBase,
 
 {
+    /**
+     * Constructor
+     * @param {*} args 
+     */
    constructor: function( args ) {
        this._printHeader(args);
    },
 
+   /**
+    * Prints out the whole track config JSON file
+    */
    _printHeader: function() {
        var storeArray = (this.store.config.type).split('/')
 
@@ -39,8 +44,11 @@ return declare( ExportBase,
         this.print(trackString)
    },
 
+   /**
+    * No features to print out since this is a track level file
+    * @param {*} feature 
+    */
    formatFeature: function( feature ) {
-       // This file type only requires track information and not feature information
         return ''
     }
 });

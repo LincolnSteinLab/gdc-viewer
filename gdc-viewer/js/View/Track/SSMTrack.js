@@ -1,3 +1,6 @@
+/**
+ * Class for SSM (simple somatic mutation) tracks
+ */
 define(
     [
         "dojo/_base/declare",

@@ -1,3 +1,6 @@
+/**
+ * Base class for GDC tracks with clickable features
+ */
 define(
     [
         "dojo/_base/declare",
@@ -53,6 +56,10 @@ define(
             return options;
         },
 
+        /**
+         * Create dialog showing applied filters for the given track.
+         * User can apply new filters here too.
+         */
         _appliedFilters: function() {
             var track = this;
             var details = domConstruct.create('div', { className: 'detail', style: 'display: flex; flex-direction: column; align-items: center; justify-content: center;' });
@@ -93,6 +100,9 @@ define(
             return details;
         },
 
+        /**
+         * Create a dialog with a shareable link to the current track.
+         */
         _shareableLinkContent: function() {
             var track = this;
             var details = domConstruct.create('div', { className: 'detail', style: 'display: flex; flex-direction: column; align-items: center; justify-content: center;' });

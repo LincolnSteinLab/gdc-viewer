@@ -1,5 +1,8 @@
 import gff from '@gmod/gff'
 
+/**
+ * Support for GFF3 export
+ */
 define([ 'dojo/_base/declare',
          'JBrowse/View/Export/GFF3'
        ],
