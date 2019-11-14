@@ -111,7 +111,7 @@ filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ![GDC Genes](images/GDC-genes-protein-coding.png)
 
 ### Extra notes
-You can set the max number of genes to return with the `size` field. It defaults to 100. The smaller the number, the faster the results will appear.
+You can set the max number of genes to return with the `size` field (per panel). It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## SSMs
 A simple view of all of the simple somatic mutations seen across all cases.
@@ -147,7 +147,7 @@ filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ![GDC SSMs](images/GDC-mutations-base-g.png)
 
 ### Extra notes
-You can set the max number of SSMs to return with the `size` field. It defaults to 100. The smaller the number, the faster the results will appear.
+You can set the max number of SSMs to return with the `size` field (per panel). It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
@@ -185,7 +185,7 @@ metadata.datatype=CNV
 ![GDC CNVs](images/GDC-cnv-gain.png)
 
 ### Extra notes
-You can set the max number of CNVs to return with the `size` field. It defaults to 500. The smaller the number, the faster the results will appear.
+You can set the max number of CNVs to return with the `size` field (per panel). It defaults to 500. The smaller the number, the faster the results will appear.
 
 # Dynamic Track Generation
 ## Explore cases, genes and mutations
