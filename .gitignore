@@ -2,3 +2,5 @@
 node_modules/
 docker/data/
 cypress/data/
+cypress/screenshots/
+cypress/videos/
