@@ -748,7 +748,6 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
-                                console.log(hit)
                                 thisB.addTrack('Genes', hit.case_id, hit.submitter_id, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
                                 alert("Adding Gene track for case " + hit.case_id);
                             }
