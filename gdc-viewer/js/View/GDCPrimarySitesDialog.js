@@ -171,7 +171,7 @@ function (
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
-                                thisB.addTrack('CNVs', hit.key, 'JBrowse/View/Track/Wiggle/XYPlot');
+                                thisB.addTrack('CNVs', hit.key, 'gdc-viewer/View/Track/CNVTrack');
                                 alert("Adding CNV track for primary site " + hit.key);
                             }
                         })(hit)
@@ -227,10 +227,10 @@ function (
             var randomId = Math.random().toString(36).substring(7);
 
             var key = 'GDC_' + storeClass;
-            var label = key + '_' + randomId;
+            var label = key;
 
             key += '_' + primarySite
-            label += '_' + primarySite
+            label += '_' + primarySite + '_' + randomId
 
             var trackConf = {
                 type: trackType,
@@ -241,7 +241,6 @@ function (
                     datatype: storeClass,
                     primarySite: primarySite
                 },
-                unsafePopup: true,
                 menuTemplate : [ 
                     {   
                      label : "View details",
@@ -249,10 +248,7 @@ function (
                ] 
             };
 
-            if (storeClass === 'CNVs') {
-                trackConf.autoscale = 'local';
-                trackConf.bicolor_pivot = 0;
-            } else if (storeClass === 'Genes') {
+            if (storeClass === 'Genes') {
                 trackConf.menuTemplate.push(
                     {   
                         label : "Highlight this Gene",

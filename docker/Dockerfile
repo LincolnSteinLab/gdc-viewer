@@ -2,7 +2,10 @@ FROM node:latest
 
 LABEL maintainer="andrew.duncan@oicr.on.ca"
 
+ARG plugin_version=develop
+
 ENV JBROWSE_VERSION 1.16.6
+ENV PLUGIN_VERSION=$plugin_version
 
 # Install dependencies
 RUN apt-get -qq update --fix-missing
@@ -19,17 +22,12 @@ WORKDIR /jbrowse/
 # Download GDC Viewer
 RUN git clone https://github.com/agduncan94/gdc-viewer /gdc-viewer/ && \
     cd /gdc-viewer/ && \
-    git checkout 0.1.1 && \
+    git checkout ${PLUGIN_VERSION} && \
     cp -r gdc-viewer /jbrowse/plugins/gdc-viewer && \
     cat ./data/jbrowse.conf > /jbrowse/jbrowse.conf
 
 # Setup JBrowse
-RUN ./setup.sh && \
-    ./bin/cpanm --force JSON Hash::Merge PerlIO::gzip Devel::Size \
-    Heap::Simple Heap::Simple::XS List::MoreUtils Exception::Class Test::Warn Bio::Perl \
-    Bio::DB::SeqFeature::Store File::Next Bio::DB::Das::Chado && \
-    rm -rf /root/.cpan/
-
+RUN ./setup.sh
 
 # Expose port 3000
 EXPOSE 3000

@@ -56,7 +56,7 @@ get: function(name) {
                 "count": 100
             }
         }
-        fetch('https://api.gdc.cancer.gov/v0/graphql/projects', {
+        fetch('https://api.gdc.cancer.gov/v0/graphql/gene-projects', {
             method: 'post',
             headers: { 'X-Requested-With': null },
             body: JSON.stringify(bodyValProjects)

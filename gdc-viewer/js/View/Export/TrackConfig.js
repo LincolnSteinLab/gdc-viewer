@@ -1,6 +1,5 @@
 /**
- * Support for Sequin Feature table export.  See
- * http://www.ncbi.nlm.nih.gov/Sequin/table.html.
+ * Support for track config table export
  */
 
 define([ 'dojo/_base/declare',
@@ -11,10 +10,17 @@ define([ 'dojo/_base/declare',
 return declare( ExportBase,
 
 {
+    /**
+     * Constructor
+     * @param {*} args 
+     */
    constructor: function( args ) {
        this._printHeader(args);
    },
 
+   /**
+    * Prints out the whole track config file
+    */
    _printHeader: function() {
        var storeArray = (this.store.config.type).split('/')
 
@@ -23,8 +29,7 @@ return declare( ExportBase,
             'storeClass=' + this.store.config.type,
             'type=' + this.track.config.type,
             'key=' + this.track.key,
-            'metadata.datatype=' + storeArray[storeArray.length - 1],
-            'unsafePopup=true'
+            'metadata.datatype=' + storeArray[storeArray.length - 1]
         ]
 
         if (this.store.case) {
@@ -33,11 +38,6 @@ return declare( ExportBase,
 
         if (this.store.size) {
             trackArray.push('size=' + this.store.size)
-        }
-
-        if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs') {
-            trackArray.push("autoscale=local");
-            trackArray.push("bicolor_pivot=0");
         }
 
         if (this.store.filters) {
@@ -49,8 +49,11 @@ return declare( ExportBase,
         this.print(trackString)
    },
 
+   /**
+    * No features to print out since this is a track level file
+    * @param {*} feature 
+    */
    formatFeature: function( feature ) {
-       // This file type only requires track information and not feature information
         return ''
     }
 });
