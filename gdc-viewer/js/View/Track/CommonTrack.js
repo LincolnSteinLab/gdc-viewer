@@ -7,14 +7,16 @@ define(
         'dojo/dom-construct',
         'dijit/form/Button',
         'dijit/form/NumberSpinner',
-        'dijit/form/ValidationTextBox'
+        'dijit/form/ValidationTextBox',
+        './ValidationTextArea'
     ],
    function(
        declare,
        domConstruct,
        Button,
        NumberSpinner,
-       ValidationTextBox) {
+       ValidationTextBox,
+       ValidationTextArea) {
    return declare(null, {
 
     _trackMenuOptions: function () {
@@ -59,14 +61,23 @@ define(
         // Get filtered text
         var filteredText = JSON.stringify(track.store.filters, null, 2)
 
-        var textArea = domConstruct.create(
-            'textarea',{
-                rows: 20,
-                value: filteredText,
-                style: "width: 80%",
-                readOnly: false,
-                id: "filterTextArea"
-            }, details );
+        var textArea = new ValidationTextArea({
+            rows: 20,
+            value: filteredText,
+            style: "width: 80%",
+            readOnly: false,
+            id: "filterTextArea",
+            invalidMessage: "Invalid JSON filter - must be a valid JSON",
+            isValid: function() {
+                var value = this.attr('value')
+                try {
+                  JSON.parse(value)
+                } catch (e) {
+                    return false;
+                }
+                return true;
+              }
+        }).placeAt(details);
 
         var caseString = '<div style="width: 80%"><h3>Case UUID</h3></div>';
         var caseElement = domConstruct.toDom(caseString);
@@ -97,9 +108,9 @@ define(
             label: 'Apply New Filters',
             iconClass: 'dijitIconSave',
             onClick: function() {
-                let trackString = document.getElementById("filterTextArea").value;
-                let caseString = document.getElementById("caseTextBox").value;
-                let sizeString = document.getElementById("sizeTextBox").value;
+                const trackString = document.getElementById("filterTextArea").value;
+                const caseString = document.getElementById("caseTextBox").value;
+                const sizeString = document.getElementById("sizeTextBox").value;
                 var storeConf = {
                     browser: track.browser,
                     refSeq: track.browser.refSeq,
@@ -113,6 +124,19 @@ define(
                 track.browser.publish( '/jbrowse/v1/v/tracks/replace', [track.config] );
             }
         }).placeAt(details);
+
+        caseIdTextBox.on('change', function(e) {
+            updateTrackButton.set('disabled', !caseIdTextBox.validate() || !sizeTextBox.validate() || !textArea.validate())
+        });
+
+        sizeTextBox.on('change', function(e) {
+            updateTrackButton.set('disabled', !caseIdTextBox.validate() || !sizeTextBox.validate() || !textArea.validate())
+        });
+
+        textArea.on('change', function(e) {
+            updateTrackButton.set('disabled', !caseIdTextBox.validate() || !sizeTextBox.validate() || !textArea.validate())
+        });
+
         return details;
     },
 
