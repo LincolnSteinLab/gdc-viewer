@@ -43,7 +43,7 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var cnvQuery = `query cnvResults($filters: FiltersArgument) { explore { cnvs { hits(filters: $filters) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
+            var cnvQuery = `query cnvResults($filters: FiltersArgument $size: Int $offset: Int) { explore { cnvs { hits(first: $size, offset: $offset, filters: $filters) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {

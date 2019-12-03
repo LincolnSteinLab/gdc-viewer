@@ -386,9 +386,9 @@ function (
          * @return {number}
          */
         compareTermElements: function(a, b) {
-            if (a.key < b.key)
+            if (a.key.toLowerCase() < b.key.toLowerCase())
                 return -1;
-            if (a.key > b.key)
+            if (a.key.toLowerCase() > b.key.toLowerCase())
                 return 1;
             return 0;
         },

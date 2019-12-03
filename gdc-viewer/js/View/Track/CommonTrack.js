@@ -100,7 +100,7 @@ define(
             value: track.store.size,
             style: "width: 80%",
             id: "sizeTextBox",
-            constraints: { min: 1, max: 1000, places: 0 },
+            constraints: { min: 1, max: 2000, places: 0 },
             smallDelta: 10
         }).placeAt(details);
 
