@@ -75,12 +75,14 @@ function(
                     'strand': thisB.prettyText(gene.gene_strand),
                     'type': 'Gene',
                     'gene description': thisB.prettyText(gene.description),
+                    'chromosome': gene.gene_chromosome,
                     'about': {
                         'biotype': thisB.prettyText(gene.biotype),
                         'gene name': thisB.prettyText(gene.name),
                         'id': thisB.prettyText(gene.gene_id),
                         'symbol': thisB.prettyText(gene.symbol),
-                        'synonyms': thisB.prettyText(gene.synonyms)
+                        'synonyms': thisB.prettyText(gene.synonyms),
+                        'strand': thisB.prettyText(gene.gene_strand)
                     },
                     'references': {
                         'ncbi gene': thisB.createLinkWithId(NCBI_LINK, gene.external_db_ids.entrez_gene),
