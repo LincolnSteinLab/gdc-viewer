@@ -4,7 +4,7 @@ A plugin for [JBrowse](https://jbrowse.org/) for viewing [GDC](https://gdc.cance
 
 # Installation and Setup
 ## 1. Install JBrowse
-Quick setup of JBrowse - https://github.com/GMOD/jbrowse/#install-jbrowse-from-github-for-developers
+Follow JBrowse readme for [quick setup.](https://github.com/GMOD/jbrowse/#install-jbrowse-from-github-for-developers)
 
 ## 2. Install Plugin
 See [JBrowse - Installing Plugins](https://jbrowse.org/docs/plugins.html) for a general approach to installing plugins.
