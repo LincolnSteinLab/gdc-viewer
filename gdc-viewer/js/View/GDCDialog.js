@@ -386,10 +386,10 @@ function (
          * @return {number}
          */
         compareTermElements: function(a, b) {
-            if (a.key.toLowerCase() < b.key.toLowerCase())
-                return -1;
-            if (a.key.toLowerCase() > b.key.toLowerCase())
+            if (a.count < b.count)
                 return 1;
+            if (a.count > b.count)
+                return -1;
             return 0;
         },
 
