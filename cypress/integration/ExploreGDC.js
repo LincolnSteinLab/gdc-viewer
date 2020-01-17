@@ -116,7 +116,7 @@ describe('Explore GDC', function() {
         // Select ethnicity -> hispanic or latino
         cy.get('.dijitDialog').within(() => {
             cy.contains('Explore data available on the GDC Data Portal')
-            selectFacetTab(0, 0, 0)
+            selectFacetTab(0, 0, 2)
         })
 
         checkAllResultsTab(
