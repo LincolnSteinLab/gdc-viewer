@@ -60,7 +60,7 @@ function(
 
         /**
          * Get the features to be displayed
-         * @param {object} query 
+         * @param {object} query Query object
          * @param {function} featureCallback 
          * @param {function} finishCallback 
          * @param {function} errorCallback 
@@ -102,7 +102,7 @@ function(
 
         /**
          * Creates a CNV feature with the given gene object
-         * @param {object} cnv 
+         * @param {object} cnv CNV object returned by GDC API
          * @param {function} featureCallback 
          */
         createCNVFeature: function(cnv, featureCallback) {
