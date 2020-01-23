@@ -50,11 +50,11 @@ define(
         domConstruct.place(headerElement, details);
 
         // Create help text
-        var helpString = '<span style="width: 80%">The following filters have been applied to the track. You can update the filters here, though no validation is done on the input.</span>';
+        var helpString = '<span style="width: 80%">The following filters have been applied to the track. You can update the filters here, though only basic validation is done on the input.</span>';
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 
-        var filterString = '<div style="width: 80%"><h3>Filters</h3></div>';
+        var filterString = '<div style="width: 80%"><h3>Filters</h3><span>Filters narrow down the features displayed on the track. We use the same format as the GDC API.</span></div>';
         var filterElement = domConstruct.toDom(filterString);
         domConstruct.place(filterElement, details);
 
@@ -79,7 +79,7 @@ define(
               }
         }).placeAt(details);
 
-        var caseString = '<div style="width: 80%"><h3>Case UUID</h3></div>';
+        var caseString = '<div style="width: 80%"><h3>Case UUID</h3><span>This is a unique identifier for the case, expressed as a UUID</span></div>';
         var caseElement = domConstruct.toDom(caseString);
         domConstruct.place(caseElement, details);
 
@@ -92,7 +92,7 @@ define(
             trim: true
         }).placeAt(details);
 
-        var sizeHeader = '<div style="width: 80%"><h3>Size</h3></div>';
+        var sizeHeader = '<div style="width: 80%"><h3>Size</h3><span>This is the maximum number of results to return per panel.</span></div>';
         var sizeElement = domConstruct.toDom(sizeHeader);
         domConstruct.place(sizeElement, details);
 
