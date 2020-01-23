@@ -45,12 +45,12 @@ define(
         var track = this;
         var details = domConstruct.create('div', { className: 'detail', style: 'display: flex; flex-direction: column; align-items: center; justify-content: center;' });
         
-        var headerString = '<h1 style="width: 80%">Track Filters</h1>';
+        var headerString = '<h1 style="width: 80%; margin-bottom: 5px;">View and Update Filters Applied To The Current Track</h1>';
         var headerElement = domConstruct.toDom(headerString);
         domConstruct.place(headerElement, details);
 
         // Create help text
-        var helpString = '<span style="width: 80%">The following filters have been applied to the track. You can update the filters here, though only basic validation is done on the input.</span>';
+        var helpString = '<span style="width: 80%; font-size: 14px;">The following filters have been applied to the track. You can update the filters here, though only basic validation is done on the input.</span>';
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 
@@ -79,7 +79,7 @@ define(
               }
         }).placeAt(details);
 
-        var caseString = '<div style="width: 80%"><h3>Case UUID</h3><span>This is a unique identifier for the case, expressed as a UUID</span></div>';
+        var caseString = '<div style="width: 80%"><h3>Case UUID</h3><span>This is a unique identifier for the case, expressed as a UUID.</span></div>';
         var caseElement = domConstruct.toDom(caseString);
         domConstruct.place(caseElement, details);
 
@@ -105,7 +105,7 @@ define(
         }).placeAt(details);
 
         var updateTrackButton = new Button({
-            label: 'Apply New Filters',
+            label: 'Apply Filters',
             iconClass: 'dijitIconSave',
             onClick: function() {
                 const trackString = document.getElementById("filterTextArea").value;
@@ -171,7 +171,7 @@ define(
         var shareableLink = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + params.toString();
 
         // Create help text
-        var helpString = '<span style="width: 80%">Use the following link to share the selected track at the current location.</span>';
+        var helpString = '<span style="width: 80%; font-size: 14px;">Use the following link to share the selected track at the current location.</span>';
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 

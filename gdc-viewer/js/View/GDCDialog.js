@@ -449,7 +449,7 @@ function (
                 }
                 dom.empty(thisB.mutationResultsTab.containerNode);
 
-                var ssmExplanation = dom.create('div', { innerHTML: "Add mutation tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px; background-color: lightgrey;" }, thisB.mutationResultsTab.containerNode);
+                var ssmExplanation = dom.create('div', { innerHTML: "Add mutation tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.mutationResultsTab.containerNode);
 
                 // Buttons for SSMs
                 var ssmMenu = new Menu({ style: "display: none;"});
@@ -562,7 +562,7 @@ function (
                     combinedFilters = JSON.parse(combinedFilters);
                 }
 
-                var geneExplanation = dom.create('div', { innerHTML: "Add gene and CNV tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px; background-color: lightgrey;" }, thisB.geneResultsTab.containerNode);
+                var geneExplanation = dom.create('div', { innerHTML: "Add gene and CNV tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.geneResultsTab.containerNode);
 
                 // Buttons for Genes
                 var geneMenu = new Menu({ style: "display: none;"});
@@ -689,7 +689,7 @@ function (
                 }
                 var endResultCount = thisB.casePage * thisB.pageSize <= totalCases ? thisB.casePage * thisB.pageSize : totalCases;
 
-                var casesExplanation = dom.create('div', { innerHTML: "Add mutation, gene, and CNV tracks for a given case. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px; background-color: lightgrey;" }, thisB.caseResultsTab.containerNode);
+                var casesExplanation = dom.create('div', { innerHTML: "Add mutation, gene, and CNV tracks for a given case. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.caseResultsTab.containerNode);
                 var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount.toLocaleString() + " to " + endResultCount.toLocaleString() + " of " + totalCases.toLocaleString() }, thisB.caseResultsTab.containerNode);
                 thisB.createDonorsTable(response, thisB.caseResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
