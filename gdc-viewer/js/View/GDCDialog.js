@@ -893,8 +893,8 @@ function (
                 <tr>
                     <th>Symbol</th>
                     <th>Name</th>
-                    <th># SSM Affected Cases in Cohort</th>
-                    <th># SSM Affected Cases Across the GDC</th>
+                    <th># Mutation Affected Cases in Cohort</th>
+                    <th># Mutation Affected Cases Across the GDC</th>
                     <th># CNV Gain</th>
                     <th># CNV Loss</th>
                     <th>Is Cancer Gene Census</th>

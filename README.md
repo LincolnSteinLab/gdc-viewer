@@ -113,12 +113,12 @@ filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
 ### Extra notes
 You can set the max number of genes to return with the `size` field (per panel). It defaults to 100. The smaller the number, the faster the results will appear.
 
-## SSMs
+## Mutations (SSMs)
 A simple view of all of the simple somatic mutations seen across all cases.
 
-You can view case specific SSMs by setting the `case` field.
+You can view case specific mutations by setting the `case` field.
 
-You can apply filters to the track too, in the same format as GDC. The below example only shows SSMs whose reference allele is 'G'.
+You can apply filters to the track too, in the same format as GDC. The below example only shows mutations whose reference allele is 'G'.
 ```
 { 
    "op":"=",
@@ -147,7 +147,7 @@ filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ![GDC SSMs](images/GDC-mutations-base-g.png)
 
 ### Extra notes
-You can set the max number of SSMs to return with the `size` field (per panel). It defaults to 100. The smaller the number, the faster the results will appear.
+You can set the max number of mutations to return with the `size` field (per panel). It defaults to 100. The smaller the number, the faster the results will appear.
 
 ## CNVs
 A simple view of all of the CNVs seen across all cases.
