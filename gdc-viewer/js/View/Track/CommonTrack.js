@@ -54,7 +54,7 @@ define(
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 
-        var filterString = '<div style="width: 80%"><h3>Filters</h3><span>Filters narrow down the features displayed on the track. We use the same format as the GDC API.</span></div>';
+        var filterString = '<div style="width: 80%"><h3>Filters</h3><span>Filters narrow down the features displayed on the track. We use the same format as the <a href="https://docs.gdc.cancer.gov/API/Users_Guide/GraphQL_Examples/" target="_nblank">GDC GraphQL API</a>.</span></div>';
         var filterElement = domConstruct.toDom(filterString);
         domConstruct.place(filterElement, details);
 
@@ -178,7 +178,7 @@ define(
         // Create text area with shareable link
         var textArea = domConstruct.create(
             'textarea',{
-                rows: 10,
+                rows: 1,
                 value: shareableLink,
                 style: "width: 80%",
                 readOnly: true

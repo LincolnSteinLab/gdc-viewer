@@ -166,7 +166,7 @@ function (
                     var geneMenu = new Menu({ style: "display: none;"});
 
                     var menuItemSSM = new MenuItem({
-                        label: "SSMs for Project",
+                        label: "Mutations for Project",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
@@ -214,7 +214,7 @@ function (
                     // Add  tooltips
                     thisB.addTooltipToButton(menuItemGene, "Add track with all genes for the given project");
                     thisB.addTooltipToButton(menuItemCNV, "Add track with all CNVs for the given project");
-                    thisB.addTooltipToButton(menuItemSSM, "Add track with all SSMs for the given project");
+                    thisB.addTooltipToButton(menuItemSSM, "Add track with all Mutations for the given project");
 
                     // Place buttons in table
                     dom.place(projectButtonNode, projectRowContentNode);

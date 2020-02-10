@@ -144,12 +144,12 @@ function (
                     var geneMenu = new Menu({ style: "display: none;"});
 
                     var menuItemSSM = new MenuItem({
-                        label: "SSMs for Primary Site",
+                        label: "Mutations for Primary Site",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
                                 thisB.addTrack('SimpleSomaticMutations', hit.key, 'gdc-viewer/View/Track/SSMTrack');
-                                alert("Adding SSM track for primary site " + hit.key);
+                                alert("Adding Mutation track for primary site " + hit.key);
                             }
                         })(hit)
                     });
@@ -192,7 +192,7 @@ function (
                     // Add  tooltips
                     thisB.addTooltipToButton(menuItemGene, "Add track with all genes for the given primary site");
                     thisB.addTooltipToButton(menuItemCNV, "Add track with all CNVs for the given primary site");
-                    thisB.addTooltipToButton(menuItemSSM, "Add track with all SSMs for the given primary site");
+                    thisB.addTooltipToButton(menuItemSSM, "Add track with all Mutations for the given primary site");
 
                     // Place buttons in table
                     dom.place(projectButtonNode, projectRowContentNode);

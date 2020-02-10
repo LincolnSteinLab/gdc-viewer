@@ -454,29 +454,29 @@ function (
                 // Buttons for SSMs
                 var ssmMenu = new Menu({ style: "display: none;"});
                 var menuItemSSMFiltered = new MenuItem({
-                    label: "Filtered SSMs form GDC",
+                    label: "Filtered Mutations form GDC",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
-                        alert("Adding track with all SSMs from the GDC, with current filters applied");
+                        alert("Adding track with all Mutations from the GDC, with current filters applied");
                     }
                 });
                 ssmMenu.addChild(menuItemSSMFiltered);
                 ssmMenu.startup();
 
                 var buttonAllSSMs = new ComboButton({
-                    label: "All SSMs from GDC",
+                    label: "All Mutations from GDC",
                     iconClass: "dijitIconNewTask",
                     dropDown: ssmMenu,
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, undefined, 'gdc-viewer/View/Track/SSMTrack');
-                        alert("Add track with all SSMs from the GDC");
+                        alert("Add track with all Mutations from the GDC");
                     }
                 });
                 buttonAllSSMs.placeAt(thisB.mutationResultsTab.containerNode);
                 buttonAllSSMs.startup();
-                thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all SSMs from the GDC, with current filters applied");
-                thisB.addTooltipToButton(buttonAllSSMs, "Add track with all SSMs from the GDC");
+                thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all Mutations from the GDC, with current filters applied");
+                thisB.addTooltipToButton(buttonAllSSMs, "Add track with all Mutations from the GDC");
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
                 var startResultCount = ((thisB.mutationPage - 1) * thisB.pageSize);
@@ -715,7 +715,7 @@ function (
                     <th>Primary Site</th>
                     <th>Gender</th>
                     <th>Genes</th>
-                    <th>SSMs</th>
+                    <th>Mutations</th>
                     <th>CNVs</th>
                 </tr>
             `;
@@ -786,7 +786,7 @@ function (
                     // SSM Buttons
                     var ssmMenu = new Menu({ style: "display: none;"});
                     var menuItemSsmFiltered = new MenuItem({
-                        label: "Filtered SSMs for Donor",
+                        label: "Filtered Mutations for Donor",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
@@ -799,7 +799,7 @@ function (
                     ssmMenu.startup();
 
                     var buttonAllSsms = new ComboButton({
-                        label: "All SSMs for Donor",
+                        label: "All Mutations for Donor",
                         iconClass: "dijitIconNewTask",
                         dropDown: ssmMenu,
                         onClick: (function(hit) {
@@ -811,8 +811,8 @@ function (
                     });
                     buttonAllSsms.placeAt(ssmButtonNode);
                     buttonAllSsms.startup();
-                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all SSMs for the given donor, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all SSMS for the given donor");
+                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all Mutations for the given donor, with current filters applied");
+                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all Mutations for the given donor");
 
                     // Place buttons in table
                     dom.place(ssmButtonNode, caseRowContentNode);

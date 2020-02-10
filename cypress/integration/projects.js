@@ -53,7 +53,7 @@ describe('Project dialog', function() {
         // Add SSM, Gene, and CNV tracks for project FM-AD (assume first in list)
         // Note that even though we select FM-AD, we are mocking TCGA-BRCA
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('SSMs for Project').click()
+        cy.contains('Mutations for Project').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
         cy.contains('Genes for Project').click()

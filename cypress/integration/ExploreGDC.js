@@ -141,7 +141,7 @@ describe('Explore GDC', function() {
         // Add tracks and check that they were added
         cy.get('.dijitTabContainer').eq(1).within(() => {
             cy.contains('All Genes for Donor').eq(0).click()
-            cy.contains('All SSMs for Donor').eq(0).click()
+            cy.contains('All Mutations for Donor').eq(0).click()
             cy.contains('All CNVs for Donor').eq(0).click()
         })
 

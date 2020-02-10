@@ -51,7 +51,7 @@ describe('Primary sites dialog', function() {
 
         // Add SSM, Gene, and CNV tracks for primary site bronchus and lung (assume first in list)
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('SSMs for Primary Site').click()
+        cy.contains('Mutations for Primary Site').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
         cy.contains('Genes for Primary Site').click()
