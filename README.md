@@ -189,7 +189,7 @@ You can set the max number of CNVs to return with the `size` field (per panel). 
 
 # Dynamic Track Generation
 ## Explore cases, genes and mutations
-This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific Mutation, Gene, and CNV tracks, along with GDC-wide Mutation, Gene and CNV tracks.
+This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create case specific Mutation, Gene, and CNV tracks, along with GDC-wide Mutation, Gene and CNV tracks.
 ![GDC Portal](images/GDC-portal-explore.png)
 
 ## Explore Projects

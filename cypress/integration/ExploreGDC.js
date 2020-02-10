@@ -93,15 +93,15 @@ describe('Explore GDC', function() {
 
     /**
      * Checks that each results tab has the expected information
-     * Assumes donor tab is already selected
-     * @param {*} donorArray array of strings to check for on donor tab
+     * Assumes case tab is already selected
+     * @param {*} caseArray array of strings to check for on case tab
      * @param {*} geneArray array of strings to check for on gene tab
      * @param {*} mutationArray array of strings to check for on mutation tab
      */
-    var checkAllResultsTab = function(donorArray, geneArray, mutationArray) {
+    var checkAllResultsTab = function(caseArray, geneArray, mutationArray) {
         cy.wait(3000) // wait a few seconds for results to load
-        // Validate donor results
-        checkResultsTab(donorArray)
+        // Validate case results
+        checkResultsTab(caseArray)
 
         // Validate gene results
         selectResultsTab(1)
@@ -140,9 +140,9 @@ describe('Explore GDC', function() {
 
         // Add tracks and check that they were added
         cy.get('.dijitTabContainer').eq(1).within(() => {
-            cy.contains('All Genes for Donor').eq(0).click()
-            cy.contains('All Mutations for Donor').eq(0).click()
-            cy.contains('All CNVs for Donor').eq(0).click()
+            cy.contains('All Genes').eq(0).click()
+            cy.contains('All Mutations').eq(0).click()
+            cy.contains('All CNVs').eq(0).click()
         })
 
         closePopup()

@@ -166,7 +166,7 @@ function (
                     var geneMenu = new Menu({ style: "display: none;"});
 
                     var menuItemSSM = new MenuItem({
-                        label: "Mutations for Project",
+                        label: "Mutations",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
@@ -178,7 +178,7 @@ function (
                     geneMenu.addChild(menuItemSSM);
 
                     var menuItemGene = new MenuItem({
-                        label: "Genes for Project",
+                        label: "Genes",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
@@ -190,7 +190,7 @@ function (
                     geneMenu.addChild(menuItemGene);
 
                     var menuItemCNV = new MenuItem({
-                        label: "CNVs for Project",
+                        label: "CNVs",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {

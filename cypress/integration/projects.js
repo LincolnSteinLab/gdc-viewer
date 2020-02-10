@@ -41,7 +41,7 @@ describe('Project dialog', function() {
     it('Should be able to view projects', function() {
         // Open track menu
         cy.get('#dropdownbutton_gdc').type('{enter}')
-        cy.contains('Explore Projects').click()
+        cy.contains('Explore projects').click()
 
         cy.wait('@getProjects')
 
@@ -53,13 +53,13 @@ describe('Project dialog', function() {
         // Add SSM, Gene, and CNV tracks for project FM-AD (assume first in list)
         // Note that even though we select FM-AD, we are mocking TCGA-BRCA
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('Mutations for Project').click()
+        cy.contains('Mutations').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('Genes for Project').click()
+        cy.contains('Genes').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('CNVs for Project').click()
+        cy.contains('CNVs').click()
 
         cy.contains('GDC Project Browser').parent().within(() => {
             cy.get('.dijitDialogCloseIcon').click()

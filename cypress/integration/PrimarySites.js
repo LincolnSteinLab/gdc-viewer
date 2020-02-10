@@ -40,7 +40,7 @@ describe('Primary sites dialog', function() {
     it('Should be able to view primary sites', function() {
         // Open track menu
         cy.get('#dropdownbutton_gdc').type('{enter}')
-        cy.contains('Explore Primary Sites').click()
+        cy.contains('Explore primary sites').click()
 
         cy.wait('@getPrimarySites')
 
@@ -51,13 +51,13 @@ describe('Primary sites dialog', function() {
 
         // Add SSM, Gene, and CNV tracks for primary site bronchus and lung (assume first in list)
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('Mutations for Primary Site').click()
+        cy.contains('Mutations').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('Genes for Primary Site').click()
+        cy.contains('Genes').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('CNVs for Primary Site').click()
+        cy.contains('CNVs').click()
 
         cy.contains('GDC Primary Site Browser').parent().within(() => {
             cy.get('.dijitDialogCloseIcon').click()
