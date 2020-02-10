@@ -59,7 +59,7 @@ Note that this will only show preloaded tracks as well as tracks you have added 
 ## A note on filters
 All tracks support filters as they are defined in the [GDC API Documentation](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query).
 
-Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, SSM filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
+Note that filters should have the filter type prepended to the front. Ex. Case filters use `cases.`, Mutation filters use `ssms.`, and Gene filters use `genes.`. GraphQL is used to retrieve results, so if the filters work there, they work with these Store classes.
 
 The following shows a filter for cases by ethnicity:
 ```
@@ -189,19 +189,19 @@ You can set the max number of CNVs to return with the `size` field (per panel). 
 
 # Dynamic Track Generation
 ## Explore cases, genes and mutations
-This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific SSM, Gene, and CNV tracks, along with GDC-wide SSM, Gene and CNV tracks.
+This dialog is similar to the Exploration section of the GDC data portal. As you apply facets on the left-hand side, updated results will be shown on the right side. You can create donor specific Mutation, Gene, and CNV tracks, along with GDC-wide Mutation, Gene and CNV tracks.
 ![GDC Portal](images/GDC-portal-explore.png)
 
 ## Explore Projects
-This dialog shows the projects present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each project.
+This dialog shows the projects present on the GDC Data Portal. You can add Mutation, Gene, and CNV tracks for each project.
 ![GDC projects](images/GDC-project-browser.png)
 
 ## Explore Primary Sites
-This dialog shows the primary sites present on the GDC Data Portal. You can add SSM, Gene, and CNV tracks for each primary site.
+This dialog shows the primary sites present on the GDC Data Portal. You can add Mutation, Gene, and CNV tracks for each primary site.
 ![GDC primary sites](images/GDC-primary-sites.png)
 
 # Export Types
-The following export types are supported by both GDC Genes and SSMs. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
+The following export types are supported by both GDC Genes and Mutations. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
 * BED
 * GFF3
 * Sequin Table
@@ -222,7 +222,7 @@ Cypress.io is used for testing this plugin. The following steps show how to run 
 This section just goes over some areas of the code to help new developers navigate.
 
 ## js/Model
-These files override the function for printing to the feature dialog. It overrides the get function to display content that requires extra API calls (on top of the call to grab the whole track). For example, this is used to generate the projects table shown on SSMs and gene feature dialogs.
+These files override the function for printing to the feature dialog. It overrides the get function to display content that requires extra API calls (on top of the call to grab the whole track). For example, this is used to generate the projects table shown on Mutations and gene feature dialogs.
 
 ## js/Store/SeqFeature
 These files connect the GDC API to JBrowse by creating a set of features based on an API call.
@@ -231,7 +231,7 @@ These files connect the GDC API to JBrowse by creating a set of features based o
 The top level contains files that create the various dialog boxes that appear in the menu bar. These allow for the dynamic generation of tracks.
 
 ### Export
-These files define export types for SSM, gene, and CNV tracks.
+These files define export types for Mutation, gene, and CNV tracks.
 
 ### Track
 These files extend the track dropdown options to include things like shareable links and view filters. This is also where overrides for the format of the feature dialogs are.
