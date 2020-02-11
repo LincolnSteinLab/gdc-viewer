@@ -449,7 +449,7 @@ function (
                 }
                 dom.empty(thisB.mutationResultsTab.containerNode);
 
-                var ssmExplanation = dom.create('div', { innerHTML: "Add mutation tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.mutationResultsTab.containerNode);
+                var ssmExplanation = dom.create('div', { innerHTML: "Add mutation tracks for all mutations available on the GDC portal. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.mutationResultsTab.containerNode);
 
                 // Buttons for SSMs
                 var ssmMenu = new Menu({ style: "display: none;"});
@@ -562,7 +562,7 @@ function (
                     combinedFilters = JSON.parse(combinedFilters);
                 }
 
-                var geneExplanation = dom.create('div', { innerHTML: "Add gene and CNV tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.geneResultsTab.containerNode);
+                var geneExplanation = dom.create('div', { innerHTML: "Add gene and CNV tracks for all genes available on the GDC portal. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.geneResultsTab.containerNode);
 
                 // Buttons for Genes
                 var geneMenu = new Menu({ style: "display: none;"});
