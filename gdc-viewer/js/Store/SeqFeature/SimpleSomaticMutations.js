@@ -244,7 +244,7 @@ function(
             var thisB = this;
             var locationFilter = {"op":"and","content":[{"op":">=","content":{"field":"ssms.start_position","value":start}},{"op":"<=","content":{"field":"ssms.end_position","value":end}},{"op":"=","content":{"field":"ssms.chromosome","value":['chr'+chr]}}]};
             if (thisB.case) {
-                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.case}};
+                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.case.split(',')}};
                 locationFilter.content.push(caseFilter);
             }
             return(locationFilter);

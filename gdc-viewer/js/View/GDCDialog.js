@@ -449,34 +449,34 @@ function (
                 }
                 dom.empty(thisB.mutationResultsTab.containerNode);
 
-                var ssmExplanation = dom.create('div', { innerHTML: "Add mutation tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.mutationResultsTab.containerNode);
+                var ssmExplanation = dom.create('div', { innerHTML: "Add mutation tracks for all mutations available on the GDC portal. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.mutationResultsTab.containerNode);
 
                 // Buttons for SSMs
                 var ssmMenu = new Menu({ style: "display: none;"});
                 var menuItemSSMFiltered = new MenuItem({
-                    label: "Filtered SSMs form GDC",
+                    label: "Filtered Mutations",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/SSMTrack');
-                        alert("Adding track with all SSMs from the GDC, with current filters applied");
+                        alert("Adding track with all Mutations from the GDC, with current filters applied");
                     }
                 });
                 ssmMenu.addChild(menuItemSSMFiltered);
                 ssmMenu.startup();
 
                 var buttonAllSSMs = new ComboButton({
-                    label: "All SSMs from GDC",
+                    label: "All Mutations",
                     iconClass: "dijitIconNewTask",
                     dropDown: ssmMenu,
                     onClick: function() {
                         thisB.addTrack('SimpleSomaticMutations', undefined, undefined, undefined, 'gdc-viewer/View/Track/SSMTrack');
-                        alert("Add track with all SSMs from the GDC");
+                        alert("Add track with all Mutations from the GDC");
                     }
                 });
                 buttonAllSSMs.placeAt(thisB.mutationResultsTab.containerNode);
                 buttonAllSSMs.startup();
-                thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all SSMs from the GDC, with current filters applied");
-                thisB.addTooltipToButton(buttonAllSSMs, "Add track with all SSMs from the GDC");
+                thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all Mutations from the GDC, with current filters applied");
+                thisB.addTooltipToButton(buttonAllSSMs, "Add track with all Mutations from the GDC");
 
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
                 var startResultCount = ((thisB.mutationPage - 1) * thisB.pageSize);
@@ -562,12 +562,12 @@ function (
                     combinedFilters = JSON.parse(combinedFilters);
                 }
 
-                var geneExplanation = dom.create('div', { innerHTML: "Add gene and CNV tracks for all cases across the GDC. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.geneResultsTab.containerNode);
+                var geneExplanation = dom.create('div', { innerHTML: "Add gene and CNV tracks for all genes available on the GDC portal. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.geneResultsTab.containerNode);
 
                 // Buttons for Genes
                 var geneMenu = new Menu({ style: "display: none;"});
                 var menuItemGeneFiltered = new MenuItem({
-                    label: "Filtered Genes from GDC",
+                    label: "Filtered Genes",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
                         thisB.addTrack('Genes', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/GeneTrack');
@@ -578,7 +578,7 @@ function (
                 geneMenu.startup();
 
                 var buttonAllGenes = new ComboButton({
-                    label: "All Genes from GDC",
+                    label: "All Genes",
                     iconClass: "dijitIconNewTask",
                     dropDown: geneMenu,
                     style: "padding-right: 8px;",
@@ -595,7 +595,7 @@ function (
                 // Buttons for CNVs
                 var cnvMenu = new Menu({ style: "display: none;"});
                 var menuItemCnvFiltered = new MenuItem({
-                    label: "Filtered CNVs from GDC",
+                    label: "Filtered CNVs",
                     iconClass: "dijitIconNewTask",
                     onClick: function() {
                         thisB.addTrack('CNVs', undefined, undefined, combinedFilters, 'gdc-viewer/View/Track/CNVTrack');
@@ -606,7 +606,7 @@ function (
                 cnvMenu.startup();
 
                 var buttonAllCnvs = new ComboButton({
-                    label: "All CNVs from GDC",
+                    label: "All CNVs",
                     iconClass: "dijitIconNewTask",
                     dropDown: cnvMenu,
                     onClick: function() {
@@ -691,7 +691,7 @@ function (
 
                 var casesExplanation = dom.create('div', { innerHTML: "Add mutation, gene, and CNV tracks for a given case. Optionally apply the selected filters when adding tracks.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px;" }, thisB.caseResultsTab.containerNode);
                 var resultsInfo = dom.create('div', { innerHTML: "Showing " + startResultCount.toLocaleString() + " to " + endResultCount.toLocaleString() + " of " + totalCases.toLocaleString() }, thisB.caseResultsTab.containerNode);
-                thisB.createDonorsTable(response, thisB.caseResultsTab.containerNode);
+                thisB.createCasesTable(response, thisB.caseResultsTab.containerNode);
                 thisB.createPaginationButtons(thisB.caseResultsTab.containerNode, totalCases / thisB.pageSize, 'case', thisB.casePage);
             }).catch(function(err) {
                 console.log(err);
@@ -704,7 +704,7 @@ function (
          * @param {object} response the response from the GDC graphQL query
          * @param {object} location dom element to place the table
          */
-        createDonorsTable: function(response, location) {
+        createCasesTable: function(response, location) {
             var thisB = this;
             var table = `<table class="results-table"></table>`;
             var tableNode = dom.toDom(table);
@@ -715,7 +715,7 @@ function (
                     <th>Primary Site</th>
                     <th>Gender</th>
                     <th>Genes</th>
-                    <th>SSMs</th>
+                    <th>Mutations</th>
                     <th>CNVs</th>
                 </tr>
             `;
@@ -749,7 +749,7 @@ function (
                     // Gene Buttons
                     var geneMenu = new Menu({ style: "display: none;"});
                     var menuItemGeneFiltered = new MenuItem({
-                        label: "Filtered Genes for Donor",
+                        label: "Filtered Genes",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
@@ -762,7 +762,7 @@ function (
                     geneMenu.startup();
 
                     var buttonAllGenes = new ComboButton({
-                        label: "All Genes for Donor",
+                        label: "All Genes",
                         iconClass: "dijitIconNewTask",
                         dropDown: geneMenu,
                         onClick: (function(hit) {
@@ -774,8 +774,8 @@ function (
                     });
                     buttonAllGenes.placeAt(geneButtonNode);
                     buttonAllGenes.startup();
-                    thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes for the given donor, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes for the given donor");
+                    thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes for the given case, with current filters applied");
+                    thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes for the given case");
 
                     // Place buttons in table
                     dom.place(geneButtonNode, caseRowContentNode);
@@ -786,7 +786,7 @@ function (
                     // SSM Buttons
                     var ssmMenu = new Menu({ style: "display: none;"});
                     var menuItemSsmFiltered = new MenuItem({
-                        label: "Filtered SSMs for Donor",
+                        label: "Filtered Mutations",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
@@ -799,7 +799,7 @@ function (
                     ssmMenu.startup();
 
                     var buttonAllSsms = new ComboButton({
-                        label: "All SSMs for Donor",
+                        label: "All Mutations",
                         iconClass: "dijitIconNewTask",
                         dropDown: ssmMenu,
                         onClick: (function(hit) {
@@ -811,8 +811,8 @@ function (
                     });
                     buttonAllSsms.placeAt(ssmButtonNode);
                     buttonAllSsms.startup();
-                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all SSMs for the given donor, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all SSMS for the given donor");
+                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all Mutations for the given case, with current filters applied");
+                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all Mutations for the given case");
 
                     // Place buttons in table
                     dom.place(ssmButtonNode, caseRowContentNode);
@@ -823,7 +823,7 @@ function (
                     // CNV Buttons
                     var cnvMenu = new Menu({ style: "display: none;"});
                     var menuItemCnvFiltered = new MenuItem({
-                        label: "Filtered CNVs for Donor",
+                        label: "Filtered CNVs",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit, combinedFilters) {
                             return function() {
@@ -836,7 +836,7 @@ function (
                     cnvMenu.startup();
 
                     var buttonAllCnvs = new ComboButton({
-                        label: "All CNVs for Donor",
+                        label: "All CNVs",
                         iconClass: "dijitIconNewTask",
                         dropDown: cnvMenu,
                         onClick: (function(hit) {
@@ -848,8 +848,8 @@ function (
                     });
                     buttonAllCnvs.placeAt(cnvButtonNode);
                     buttonAllCnvs.startup();
-                    thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs for the given donor, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs for the given donor");
+                    thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs for the given case, with current filters applied");
+                    thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs for the given case");
 
                     // Place buttons in table
                     dom.place(cnvButtonNode, caseRowContentNode);
@@ -893,8 +893,8 @@ function (
                 <tr>
                     <th>Symbol</th>
                     <th>Name</th>
-                    <th># SSM Affected Cases in Cohort</th>
-                    <th># SSM Affected Cases Across the GDC</th>
+                    <th># Mutation Affected Cases in Cohort</th>
+                    <th># Mutation Affected Cases Across the GDC</th>
                     <th># CNV Gain</th>
                     <th># CNV Loss</th>
                     <th>Is Cancer Gene Census</th>

@@ -54,7 +54,7 @@ define(
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 
-        var filterString = '<div style="width: 80%"><h3>Filters</h3><span>Filters narrow down the features displayed on the track. We use the same format as the GDC API.</span></div>';
+        var filterString = '<div style="width: 80%"><h3>Filters</h3><span>Filters narrow down the features displayed on the track. We use the same format as the <a href="https://docs.gdc.cancer.gov/API/Users_Guide/GraphQL_Examples/" target="_nblank">GDC GraphQL API</a>.</span></div>';
         var filterElement = domConstruct.toDom(filterString);
         domConstruct.place(filterElement, details);
 
@@ -79,7 +79,7 @@ define(
               }
         }).placeAt(details);
 
-        var caseString = '<div style="width: 80%"><h3>Case UUID</h3><span>This is a unique identifier for the case, expressed as a UUID.</span></div>';
+        var caseString = '<div style="width: 80%"><h3>Case UUIDs</h3><span>Comma separated unique identifiers for the case, expressed as UUIDs.</span></div>';
         var caseElement = domConstruct.toDom(caseString);
         domConstruct.place(caseElement, details);
 
@@ -87,7 +87,7 @@ define(
             value: track.store.config.case,
             style: "width: 80%",
             id: "caseTextBox",
-            regExp: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+            regExp: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(,[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})*$",
             invalidMessage: "Invalid Case UUID - Must be version 4 UUID",
             trim: true
         }).placeAt(details);
@@ -178,7 +178,7 @@ define(
         // Create text area with shareable link
         var textArea = domConstruct.create(
             'textarea',{
-                rows: 10,
+                rows: 1,
                 value: shareableLink,
                 style: "width: 80%",
                 readOnly: true

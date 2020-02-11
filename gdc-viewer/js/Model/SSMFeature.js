@@ -69,7 +69,7 @@ createProjectTable: function(response) {
             <th class="popup-table-header">Project</th>
             <th class="popup-table-header">Disease Type</th>
             <th class="popup-table-header">Site</th>
-            <th class="popup-table-header"># SSM Affected Cases</th>
+            <th class="popup-table-header"># Mutation Affected Cases</th>
         </tr>
     `;
 
