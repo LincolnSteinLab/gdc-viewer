@@ -19,41 +19,29 @@ get: function(name) {
     var thisB = this;
     if (name == 'projects') {
         var geneId = this.data[name.toLowerCase()];
-        var bodyValProjects = {
-            query: `query projectData( $count: Int ) { projectsViewer: viewer { projects { hits(first: $count) { edges { node { primary_site disease_type project_id id } } } } } }`,
+
+        var bodyValProjectsTable = {
+            query: `query ProjectTable( $caseAggsFilters: FiltersArgument $ssmTested: FiltersArgument $cnvGain: FiltersArgument $cnvLoss: FiltersArgument $cnvTested: FiltersArgument $cnvTestedByGene: FiltersArgument $cnvAll: FiltersArgument $ssmFilters: FiltersArgument $projectCount: Int ) { viewer { explore { ssms { hits(first: 0, filters: $ssmFilters) { total } } cases { cnvAll: hits(filters: $cnvAll) { total } cnvTestedByGene: hits(filters: $cnvTestedByGene) { total } gain: aggregations(filters: $cnvGain) { project__project_id { buckets { doc_count key } } } loss: aggregations(filters: $cnvLoss) { project__project_id { buckets { doc_count key } } } cnvTotal: aggregations(filters: $cnvTested) { project__project_id { buckets { doc_count key } } } filtered: aggregations(filters: $caseAggsFilters) { project__project_id { buckets { doc_count key } } } total: aggregations(filters: $ssmTested) { project__project_id { buckets { doc_count key } } } } } } projects { hits(first: $projectCount) { edges { node { primary_site disease_type project_id id } } } } }`,
             variables: {
-                "count": 100
+                "caseAggsFilters": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } }, { "op": "NOT", "content": { "field": "cases.gene.ssm.observation.observation_id", "value": "MISSING" } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
+                "ssmTested": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } } ] },
+                "cnvGain": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "cnvs.cnv_change", "value": [ "Gain" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
+                "cnvLoss": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "cnvs.cnv_change", "value": [ "Loss" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
+                "cnvTested": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } } ] },
+                "cnvTestedByGene": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
+                "cnvAll": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "cnvs.cnv_change", "value": [ "Gain", "Loss" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
+                "ssmFilters": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
+                "projectCount": 100
             }
         }
-        fetch('https://api.gdc.cancer.gov/v0/graphql/gene-projects', {
+        fetch('https://api.gdc.cancer.gov/v0/graphql/projectsTable', {
             method: 'post',
             headers: { 'X-Requested-With': null },
-            body: JSON.stringify(bodyValProjects)
+            body: JSON.stringify(bodyValProjectsTable)
         }).then(function(response) {
             return(response.json());
         }).then(function(response) {
-            thisB.projects = response.data.projectsViewer.projects.hits.edges;
-            var bodyValProjectsTable = {
-                query: `query ProjectTable( $caseAggsFilters: FiltersArgument $ssmTested: FiltersArgument $cnvGain: FiltersArgument $cnvLoss: FiltersArgument $cnvTested: FiltersArgument $cnvTestedByGene: FiltersArgument $cnvAll: FiltersArgument $ssmFilters: FiltersArgument ) { viewer { explore { ssms { hits(first: 0, filters: $ssmFilters) { total } } cases { cnvAll: hits(filters: $cnvAll) { total } cnvTestedByGene: hits(filters: $cnvTestedByGene) { total } gain: aggregations(filters: $cnvGain) { project__project_id { buckets { doc_count key } } } loss: aggregations(filters: $cnvLoss) { project__project_id { buckets { doc_count key } } } cnvTotal: aggregations(filters: $cnvTested) { project__project_id { buckets { doc_count key } } } filtered: aggregations(filters: $caseAggsFilters) { project__project_id { buckets { doc_count key } } } total: aggregations(filters: $ssmTested) { project__project_id { buckets { doc_count key } } } } } } }`,
-                variables: {
-                    "caseAggsFilters": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } }, { "op": "NOT", "content": { "field": "cases.gene.ssm.observation.observation_id", "value": "MISSING" } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
-                    "ssmTested": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } } ] },
-                    "cnvGain": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "cnvs.cnv_change", "value": [ "Gain" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
-                    "cnvLoss": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "cnvs.cnv_change", "value": [ "Loss" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
-                    "cnvTested": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } } ] },
-                    "cnvTestedByGene": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
-                    "cnvAll": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "cnv" ] } }, { "op": "in", "content": { "field": "cnvs.cnv_change", "value": [ "Gain", "Loss" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] },
-                    "ssmFilters": { "op": "and", "content": [ { "op": "in", "content": { "field": "cases.available_variation_data", "value": [ "ssm" ] } }, { "op": "in", "content": { "field": "genes.gene_id", "value": [ geneId ] } } ] }
-                }
-            }
-            return fetch('https://api.gdc.cancer.gov/v0/graphql/projectsTable', {
-                method: 'post',
-                headers: { 'X-Requested-With': null },
-                body: JSON.stringify(bodyValProjectsTable)
-            })
-        }).then(function(response) {
-            return(response.json());
-        }).then(function(response) {
+            thisB.projects = response.data.projects.hits.edges;
             document.getElementsByClassName('value projects')[0].innerHTML = thisB.createProjectTable(response);
         }).catch(function(err) {
             document.getElementsByClassName('value projects')[0].innerHTML = 'Error creating projects table';
