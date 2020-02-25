@@ -178,7 +178,7 @@ define(
         // Create text area with shareable link
         var textArea = domConstruct.create(
             'textarea',{
-                rows: 1,
+                rows: 3,
                 value: shareableLink,
                 style: "width: 80%",
                 readOnly: true
@@ -192,5 +192,5 @@ define(
         return details;
     }
    }); 
-   }   
+   } 
 );
