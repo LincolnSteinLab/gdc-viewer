@@ -16,15 +16,8 @@ describe('Gene track', function() {
         cy
             .route({
                 method: 'POST',
-                url: 'v0/graphql/gene-projects',
-                response: 'fixture:ExportGenes/GeneProjects.json'
-            }).as('getGeneProjects')
-        
-        cy
-            .route({
-                method: 'POST',
                 url: 'v0/graphql/projectsTable',
-                response: 'fixture:ExportGenes/ProjectTable.json'
+                response: 'fixture:ExportGenes/GeneProjects.json'
             }).as('getProjectsTable')
 
         // Open track menu
@@ -58,7 +51,7 @@ describe('Gene track', function() {
         if (radioIndex === 2) {
             cy.wait('@getGeneTable').then(() => {
                 cy.wait(3000) // Give time to process results
-                cy.wait(['@getGeneProjects.all', '@getProjectsTable.all']).then(() => {
+                cy.wait(['@getProjectsTable.all']).then(() => {
                     cy.wait(3000) // Give time to process results
                     for (var text of textValues) {
                         cy.get('textarea').should('to.include.value', text)

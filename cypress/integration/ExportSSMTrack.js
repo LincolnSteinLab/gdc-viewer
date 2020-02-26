@@ -12,13 +12,6 @@ describe('SSM track', function() {
                 url: 'v0/graphql/SsmsTable',
                 response: 'fixture:ExportSSMs/SsmsTable.json'
               }).as('getSSMTable')
-
-        cy
-            .route({
-                method: 'POST',
-                url: 'v0/graphql/ssm-projects',
-                response: 'fixture:ExportSSMs/SSMProjects.json'
-            }).as('getSSMProjects')
         
         cy
             .route({
@@ -58,7 +51,7 @@ describe('SSM track', function() {
         if (radioIndex === 2) {
             cy.wait('@getSSMTable').then(() => {
                 cy.wait(3000) // Give time to process results
-                cy.wait(['@getSSMProjects.all', '@getProjectsTable.all']).then(() => {
+                cy.wait(['@getProjectsTable.all']).then(() => {
                     cy.wait(3000) // Give time to process results
                     for (var text of textValues) {
                         cy.get('textarea').should('to.include.value', text)

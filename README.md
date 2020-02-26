@@ -87,7 +87,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 { 
    "op":"!=",
    "content":{ 
-      "field":"cases.biotype",
+      "field":"genes.biotype",
       "value":"protein_coding"
    }
 }
@@ -95,7 +95,7 @@ You can apply filters to the track too, in the same format as GDC. The below exa
 
 To put it in the track config you may want to minimize it as such:
 ```
-filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
+filters={"op":"!=","content":{"field":"genes.biotype","value":"protein_coding"}}
 ```
 
 Example Track:
@@ -105,7 +105,7 @@ storeClass=gdc-viewer/Store/SeqFeature/Genes
 type=JBrowse/View/Track/GeneTrack
 key=GDC Genes
 metadata.datatype=Gene
-filters={"op":"!=","content":{"field":"cases.biotype","value":"protein_coding"}}
+filters={"op":"!=","content":{"field":"genes.biotype","value":"protein_coding"}}
 ```
 
 ![GDC Genes](images/GDC-genes-protein-coding.png)
