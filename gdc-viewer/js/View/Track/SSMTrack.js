@@ -12,7 +12,13 @@ define(
        domConstruct,
        BaseTrack) {
    return declare(BaseTrack, {
-
+        /**
+         * Override the additional details shown in the dialogs
+         * @param {*} track
+         * @param {*} f
+         * @param {*} featDiv
+         * @param {*} container
+         */
         _renderAdditionalTagsDetail: function( track, f, featDiv, container ) {
             var atElement = domConstruct.create(
                 'div',

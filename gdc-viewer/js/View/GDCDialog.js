@@ -478,6 +478,7 @@ function (
                 thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all Mutations from the GDC, with current filters applied");
                 thisB.addTooltipToButton(buttonAllSSMs, "Add track with all Mutations from the GDC");
 
+                // Determine information for pagination and results
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
                 var startResultCount = ((thisB.mutationPage - 1) * thisB.pageSize);
                 if (totalSSMs > 0) {
@@ -619,6 +620,7 @@ function (
                 thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs from the GDC, with current filters applied");
                 thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs from the GDC");
 
+                // Determine information for pagination and results
                 var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
                 var startResultCount = ((thisB.genePage - 1) * thisB.pageSize);
                 if (totalGenes > 0) {
@@ -682,6 +684,7 @@ function (
             }).then(function(response) {
                 dom.empty(thisB.caseResultsTab.containerNode);
 
+                // Determine information for pagination and results
                 var totalCases = response.data.exploreCasesTableViewer.explore.cases.hits.total;
                 var startResultCount = ((thisB.casePage - 1) * thisB.pageSize);
                 if (totalCases > 0) {

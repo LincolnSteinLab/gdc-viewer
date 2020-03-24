@@ -1,3 +1,6 @@
+/**
+ * Extends SimpleTextArea to support the validation features of the ValidationTextBox
+ */
 define(
     [
         "dojo/_base/declare",

@@ -28,6 +28,9 @@ define(
             );
         },
 
+        /**
+         * Override the available export types
+         */
         _exportFormats: function() {
             return [
                 {name: 'GFF3', label: 'GFF3', fileExt: 'gff3'},
