@@ -12,13 +12,6 @@ describe('SSM track', function() {
                 url: 'v0/graphql/SsmsTable',
                 response: 'fixture:ExportSSMs/SsmsTable.json'
               }).as('getSSMTable')
-
-        cy
-            .route({
-                method: 'POST',
-                url: 'v0/graphql/ssm-projects',
-                response: 'fixture:ExportSSMs/SSMProjects.json'
-            }).as('getSSMProjects')
         
         cy
             .route({
@@ -58,7 +51,7 @@ describe('SSM track', function() {
         if (radioIndex === 2) {
             cy.wait('@getSSMTable').then(() => {
                 cy.wait(3000) // Give time to process results
-                cy.wait(['@getSSMProjects.all', '@getProjectsTable.all']).then(() => {
+                cy.wait(['@getProjectsTable.all']).then(() => {
                     cy.wait(3000) // Give time to process results
                     for (var text of textValues) {
                         cy.get('textarea').should('to.include.value', text)
@@ -81,7 +74,7 @@ describe('SSM track', function() {
     it('Should be able to export SSMs in various export formats', function() {
         testExport(2, 'GFF3', ['##gff-version 3', '##sequence-region', 'Simple Somatic Mutation'])
         testExport(3, 'BED', ['track name="GDC_SSM" useScore=0', '1	56496417	56496417	ec690998-d555-5ed3-ab18-55e8685b2bfd'])
-        testExport(4, 'CSV', ['type,start,end,strand,id,reference allele,dna change,subtype', 'Simple Somatic Mutation,56496417,56496417,,,T,chr1:g.56496417delT,Small deletion'])
+        testExport(4, 'CSV', ['id,type,start,end,chromosome,reference allele,dna change,subtype', 'ec690998-d555-5ed3-ab18-55e8685b2bfd,Simple Somatic Mutation,56496417,56496417,,T,chr1:g.56496417delT,Small deletion'])
         testExport(5, 'Sequin Table', ['>Feature 1', '56496418	56496417	Simple Somatic Mutation'])
         cy.fixture('ExportSSMs/track-conf-export.conf').then((json) => {
             testExport(6, 'Track Config', [json])

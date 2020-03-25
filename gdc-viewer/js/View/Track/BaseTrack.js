@@ -26,6 +26,9 @@ define(
             );
         },
 
+        /**
+         * Override the available export types
+         */
         _exportFormats: function() {
             return [
                 {name: 'gdc-viewer/View/Export/GFF3', label: 'GFF3', fileExt: 'gff3'},

@@ -19,6 +19,9 @@ define(
        ValidationTextArea) {
    return declare(null, {
 
+    /**
+     * Adds additional track menu options
+     */
     _trackMenuOptions: function () {
         var options = this.inherited(arguments);
         options.push({ type: 'dijit/MenuSeparator' } );
@@ -45,20 +48,21 @@ define(
         var track = this;
         var details = domConstruct.create('div', { className: 'detail', style: 'display: flex; flex-direction: column; align-items: center; justify-content: center;' });
         
-        var headerString = '<h1 style="width: 80%">Track Filters</h1>';
+        // Create header text
+        var headerString = '<h1 style="width: 80%; margin-bottom: 5px;">View and Update Filters Applied To The Current Track</h1>';
         var headerElement = domConstruct.toDom(headerString);
         domConstruct.place(headerElement, details);
 
-        // Create help text
-        var helpString = '<span style="width: 80%">The following filters have been applied to the track. You can update the filters here, though no validation is done on the input.</span>';
+        // Create filter help text
+        var helpString = '<span style="width: 80%; font-size: 14px;">The following filters have been applied to the track. You can update the filters here, though only basic validation is done on the input.</span>';
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 
-        var filterString = '<div style="width: 80%"><h3>Filters</h3></div>';
+        var filterString = '<div style="width: 80%"><h3>Filters</h3><span>Filters narrow down the features displayed on the track. We use the same format as the <a href="https://docs.gdc.cancer.gov/API/Users_Guide/GraphQL_Examples/" target="_nblank">GDC GraphQL API</a>.</span></div>';
         var filterElement = domConstruct.toDom(filterString);
         domConstruct.place(filterElement, details);
 
-        // Get filtered text
+        // Display filtered text
         var filteredText = JSON.stringify(track.store.filters, null, 2)
 
         var textArea = new ValidationTextArea({
@@ -79,7 +83,8 @@ define(
               }
         }).placeAt(details);
 
-        var caseString = '<div style="width: 80%"><h3>Case UUID</h3></div>';
+        // Display cases
+        var caseString = '<div style="width: 80%"><h3>Case UUIDs</h3><span>Comma separated unique identifiers for the case, expressed as UUIDs.</span></div>';
         var caseElement = domConstruct.toDom(caseString);
         domConstruct.place(caseElement, details);
 
@@ -87,12 +92,13 @@ define(
             value: track.store.config.case,
             style: "width: 80%",
             id: "caseTextBox",
-            regExp: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+            regExp: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(,[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})*$",
             invalidMessage: "Invalid Case UUID - Must be version 4 UUID",
             trim: true
         }).placeAt(details);
 
-        var sizeHeader = '<div style="width: 80%"><h3>Size</h3></div>';
+        // Display size
+        var sizeHeader = '<div style="width: 80%"><h3>Size</h3><span>This is the maximum number of results to return per panel.</span></div>';
         var sizeElement = domConstruct.toDom(sizeHeader);
         domConstruct.place(sizeElement, details);
 
@@ -100,12 +106,13 @@ define(
             value: track.store.size,
             style: "width: 80%",
             id: "sizeTextBox",
-            constraints: { min: 1, max: 1000, places: 0 },
+            constraints: { min: 1, max: 2000, places: 0 },
             smallDelta: 10
         }).placeAt(details);
 
+        // Add button to update the track with changed content
         var updateTrackButton = new Button({
-            label: 'Apply New Filters',
+            label: 'Apply Filters',
             iconClass: 'dijitIconSave',
             onClick: function() {
                 const trackString = document.getElementById("filterTextArea").value;
@@ -125,6 +132,7 @@ define(
             }
         }).placeAt(details);
 
+        // Change listeners for text boxes
         caseIdTextBox.on('change', function(e) {
             updateTrackButton.set('disabled', !caseIdTextBox.validate() || !sizeTextBox.validate() || !textArea.validate())
         });
@@ -171,14 +179,14 @@ define(
         var shareableLink = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + params.toString();
 
         // Create help text
-        var helpString = '<span style="width: 80%">Use the following link to share the selected track at the current location.</span>';
+        var helpString = '<span style="width: 80%; font-size: 14px;">Use the following link to share the selected track at the current location.</span>';
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
 
         // Create text area with shareable link
         var textArea = domConstruct.create(
             'textarea',{
-                rows: 10,
+                rows: 3,
                 value: shareableLink,
                 style: "width: 80%",
                 readOnly: true
@@ -192,5 +200,5 @@ define(
         return details;
     }
    }); 
-   }   
+   } 
 );

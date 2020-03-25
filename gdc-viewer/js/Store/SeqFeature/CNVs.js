@@ -43,7 +43,7 @@ function(
          */
         createQuery: function(ref, start, end) {
             var thisB = this;
-            var cnvQuery = `query cnvResults($filters: FiltersArgument) { explore { cnvs { hits(filters: $filters) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
+            var cnvQuery = `query cnvResults($filters: FiltersArgument $size: Int $offset: Int) { explore { cnvs { hits(first: $size, offset: $offset, filters: $filters) { total edges { node { id cnv_id start_position end_position chromosome ncbi_build cnv_change } } } } } } `;
             var combinedFilters = thisB.getFilterQuery(ref, start, end);
 
             var bodyVal = {
@@ -60,7 +60,7 @@ function(
 
         /**
          * Get the features to be displayed
-         * @param {object} query 
+         * @param {object} query Query object
          * @param {function} featureCallback 
          * @param {function} finishCallback 
          * @param {function} errorCallback 
@@ -102,7 +102,7 @@ function(
 
         /**
          * Creates a CNV feature with the given gene object
-         * @param {object} cnv 
+         * @param {object} cnv CNV object returned by GDC API
          * @param {function} featureCallback 
          */
         createCNVFeature: function(cnv, featureCallback) {
@@ -128,7 +128,7 @@ function(
             var thisB = this;
             var locationFilter = {"op":"and","content":[{"op":">=","content":{"field":"cnvs.start_position","value":start}},{"op":"<=","content":{"field":"cnvs.end_position","value":end}},{"op":"=","content":{"field":"cnvs.chromosome","value":[chr]}}]};
             if (thisB.case) {
-                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.case}};
+                var caseFilter = {"op":"in","content":{"field": "cases.case_id","value": thisB.case.split(',')}};
                 locationFilter.content.push(caseFilter);
             }
             return(locationFilter);

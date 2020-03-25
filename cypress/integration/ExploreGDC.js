@@ -93,15 +93,15 @@ describe('Explore GDC', function() {
 
     /**
      * Checks that each results tab has the expected information
-     * Assumes donor tab is already selected
-     * @param {*} donorArray array of strings to check for on donor tab
+     * Assumes case tab is already selected
+     * @param {*} caseArray array of strings to check for on case tab
      * @param {*} geneArray array of strings to check for on gene tab
      * @param {*} mutationArray array of strings to check for on mutation tab
      */
-    var checkAllResultsTab = function(donorArray, geneArray, mutationArray) {
+    var checkAllResultsTab = function(caseArray, geneArray, mutationArray) {
         cy.wait(3000) // wait a few seconds for results to load
-        // Validate donor results
-        checkResultsTab(donorArray)
+        // Validate case results
+        checkResultsTab(caseArray)
 
         // Validate gene results
         selectResultsTab(1)
@@ -116,11 +116,11 @@ describe('Explore GDC', function() {
         // Select ethnicity -> hispanic or latino
         cy.get('.dijitDialog').within(() => {
             cy.contains('Explore data available on the GDC Data Portal')
-            selectFacetTab(0, 0, 0)
+            selectFacetTab(0, 0, 2)
         })
 
         checkAllResultsTab(
-            ['Showing 1 to 20 of 1,492', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
+            ['Showing 1 to 20 of 3,107', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
             ['Showing 1 to 20 of 21,168', 'TP53', 'TTN'],
             ['Showing 1 to 20 of 120,824', 'chr2:g.208248388C>T', 'chr17:g.7673803G>A']
         )
@@ -140,9 +140,9 @@ describe('Explore GDC', function() {
 
         // Add tracks and check that they were added
         cy.get('.dijitTabContainer').eq(1).within(() => {
-            cy.contains('All Genes for Donor').eq(0).click()
-            cy.contains('All SSMs for Donor').eq(0).click()
-            cy.contains('All CNVs for Donor').eq(0).click()
+            cy.contains('All Genes').eq(0).click()
+            cy.contains('All Mutations').eq(0).click()
+            cy.contains('All CNVs').eq(0).click()
         })
 
         closePopup()

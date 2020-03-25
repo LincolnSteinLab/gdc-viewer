@@ -18,12 +18,12 @@ return declare( ExportBase,
         'type',
         'start',
         'end',
-        'strand',
-        'id'
+        'chromosome'
    ],
 
    // The extended header for genes
    geneHeader: [
+        'strand',
         'gene name',
         'biotype',
         'symbol',
@@ -51,21 +51,24 @@ return declare( ExportBase,
      */
    _printHeader: function() {
         this.fullHeader = []
-        if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/Genes') {
-            this.fullHeader = this.geneHeader
-        } else if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/SimpleSomaticMutations') {
-            this.fullHeader = this.ssmHeader
-        } else if (this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/CNVs') {
-            this.fullHeader = this.cnvHeader
+        if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/Genes' || this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/Genes') {
+            this.fullHeader = [...this.geneHeader];
+        } else if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/SimpleSomaticMutations' || this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/SimpleSomaticMutations') {
+            this.fullHeader = [...this.ssmHeader];
+        } else if (this.store.config.type === 'gdc-viewer/Store/SeqFeature/CNVs' || this.store.config.storeClass === 'gdc-viewer/Store/SeqFeature/CNVs') {
+            this.fullHeader = [...this.cnvHeader];
         }
 
         var headerString
-        if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs') {
-            headerString = (this.defaultHeader.concat(this.fullHeader)).join(',') + '\n'
+        if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs' && this.store.config.type !== 'gdc-viewer/Store/SeqFeature/CNVs') {
+            headerString = (this.defaultHeader.concat(this.fullHeader)).join(',')
         } else {
-            headerString = this.cnvHeader.join(',') + '\n'
+            headerString = this.cnvHeader.join(',')
         }
-        this.print(headerString)
+        if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs' && this.store.config.type !== 'gdc-viewer/Store/SeqFeature/CNVs') {
+            this.print('id,')
+        }
+        this.print(headerString + '\n')
    },
 
    /**
@@ -75,10 +78,12 @@ return declare( ExportBase,
    formatFeature: function( feature ) {
         var featureArray = []
 
+        var about = feature.get('about')
+
         // SSM and Gene features have the extra about section
-        if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs') {
+        if (this.store.config.storeClass !== 'gdc-viewer/Store/SeqFeature/CNVs' && this.store.config.type !== 'gdc-viewer/Store/SeqFeature/CNVs') {
+            featureArray.push(about['id'])
             this.defaultHeader.forEach(field => featureArray.push(feature.get(field)))
-            var about = feature.get('about')
             this.fullHeader.forEach(field => {
                 if (field === 'synonyms') {
                     if (about[field]) {

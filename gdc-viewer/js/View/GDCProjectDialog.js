@@ -54,6 +54,7 @@ function (
             var thisB = this;
             var headerSection = dom.create('div', { style: "margin-bottom: 5px;" }, thisB.dialogContainer);
             var aboutMessage = dom.create('h1', { innerHTML: "View projects available on the GDC Data Portal" }, headerSection);
+            var pageExplanation = dom.create('div', { innerHTML: "Add mutation, gene and CNV tracks for all cases across the GDC, filtered by project.", style: "font-size: 14px; margin-bottom: 5px; padding: 5px; margin-top:5px;" }, headerSection);
         },
 
         /**
@@ -165,7 +166,7 @@ function (
                     var geneMenu = new Menu({ style: "display: none;"});
 
                     var menuItemSSM = new MenuItem({
-                        label: "SSMs for Project",
+                        label: "All Mutations",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
@@ -177,7 +178,7 @@ function (
                     geneMenu.addChild(menuItemSSM);
 
                     var menuItemGene = new MenuItem({
-                        label: "Genes for Project",
+                        label: "All Genes",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
@@ -189,7 +190,7 @@ function (
                     geneMenu.addChild(menuItemGene);
 
                     var menuItemCNV = new MenuItem({
-                        label: "CNVs for Project",
+                        label: "All CNVs",
                         iconClass: "dijitIconNewTask",
                         onClick: (function(hit) {
                             return function() {
@@ -213,7 +214,7 @@ function (
                     // Add  tooltips
                     thisB.addTooltipToButton(menuItemGene, "Add track with all genes for the given project");
                     thisB.addTooltipToButton(menuItemCNV, "Add track with all CNVs for the given project");
-                    thisB.addTooltipToButton(menuItemSSM, "Add track with all SSMs for the given project");
+                    thisB.addTooltipToButton(menuItemSSM, "Add track with all Mutations for the given project");
 
                     // Place buttons in table
                     dom.place(projectButtonNode, projectRowContentNode);

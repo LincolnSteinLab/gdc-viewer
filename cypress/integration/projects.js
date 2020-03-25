@@ -41,7 +41,7 @@ describe('Project dialog', function() {
     it('Should be able to view projects', function() {
         // Open track menu
         cy.get('#dropdownbutton_gdc').type('{enter}')
-        cy.contains('Explore Projects').click()
+        cy.contains('Explore projects').click()
 
         cy.wait('@getProjects')
 
@@ -53,13 +53,13 @@ describe('Project dialog', function() {
         // Add SSM, Gene, and CNV tracks for project FM-AD (assume first in list)
         // Note that even though we select FM-AD, we are mocking TCGA-BRCA
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('SSMs for Project').click()
+        cy.contains('All Mutations').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('Genes for Project').click()
+        cy.contains('All Genes').click()
 
         cy.get('#dijit_form_ComboButton_0_arrow').should('be.visible').type('{enter}')
-        cy.contains('CNVs for Project').click()
+        cy.contains('All CNVs').click()
 
         cy.contains('GDC Project Browser').parent().within(() => {
             cy.get('.dijitDialogCloseIcon').click()
@@ -72,12 +72,6 @@ describe('Project dialog', function() {
         cy.contains('GDC_CNVs_FM-AD')
 
         // Stub some responses for viewing a mutation
-        cy
-            .route({
-                method: 'POST',
-                url: 'v0/graphql/ssm-projects',
-                response: 'fixture:projects/mutation-projects.json'
-              }).as('getProjectsForMutation')
 
         cy
             .route({
@@ -93,7 +87,6 @@ describe('Project dialog', function() {
 
         // Ensure mutation has right data
         cy.get('.popup-dialog').within(() => {
-            cy.wait('@getProjectsForMutation')
             cy.contains('Simple Somatic Mutation')
             cy.contains('chr1:g.52055208delT')
             cy.contains('7ffb5e22-05d6-5664-a0b0-908184bacbb9')
@@ -117,12 +110,6 @@ describe('Project dialog', function() {
         })
 
         // Stub some responses for viewing a gene
-        cy
-            .route({
-                method: 'POST',
-                url: 'v0/graphql/gene-projects',
-                response: 'fixture:projects/gene-projects.json'
-              }).as('getProjectsForGene')
 
         cy
             .route({
@@ -138,7 +125,6 @@ describe('Project dialog', function() {
 
         // Ensure gene has right data
         cy.get('.popup-dialog').within(() => {
-            cy.wait('@getProjectsForGene')
             cy.contains('Gene')
             cy.contains('The protein encoded by this gene is expressed in the brain, predominantly in the parietal and frontal cortex as well as in dorsal root ganglia.')
             cy.contains('protein_coding')
