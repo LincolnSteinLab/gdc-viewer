@@ -163,13 +163,12 @@ You can optionally apply the current facets to the track itself when you add a t
 ## Explore Projects
 This dialog shows the projects present on the GDC Data Portal. You can add Mutation, Gene, and CNV tracks for each project.
 
-![GDC projects](images/GDC-project-browser.png)
-![GDC CNVs]({{ site.url }}/assets/images/GDC-project-browser.png)
+![GDC projects]({{ site.url }}/assets/images/GDC-project-browser.png)
 
 ## Explore Primary Sites
 This dialog shows the primary sites present on the GDC Data Portal. You can add Mutation, Gene, and CNV tracks for each primary site.
 
-![GDC CNVs]({{ site.url }}/assets/images/GDC-primary-sites.png)
+![GDC primary sites]({{ site.url }}/assets/images/GDC-primary-sites.png)
 
 # Export Types
 The following export types are supported by both GDC Genes and Mutations. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
