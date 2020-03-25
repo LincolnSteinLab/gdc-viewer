@@ -70,7 +70,7 @@ metadata.datatype=Gene
 filters={"op":"!=","content":{"field":"genes.biotype","value":"protein_coding"}}
 ```
 
-![GDC Genes](images/GDC-genes-protein-coding.png)
+![GDC Genes]({{ site.url }}/assets/images/GDC-genes-protein-coding.png)
 
 ### Extra notes
 {: .no_toc }
@@ -107,7 +107,7 @@ metadata.datatype=SSM
 filters={"op":"=","content":{"field":"ssms.reference_allele","value":"G"}}
 ```
 
-![GDC SSMs](images/GDC-mutations-base-g.png)
+![GDC SSMs]({{ site.url }}/assets/images/GDC-mutations-base-g.png)
 
 ### Extra notes
 {: .no_toc }
@@ -146,7 +146,7 @@ metadata.datatype=CNV
 
 ```
 
-![GDC CNVs](images/GDC-cnv-gain.png)
+![GDC CNVs]({{ site.url }}/assets/images/GDC-cnv-gain.png)
 
 ### Extra notes
 {: .no_toc }
@@ -158,17 +158,18 @@ This dialog is similar to the Exploration section of the GDC data portal. As you
 
 You can optionally apply the current facets to the track itself when you add a track. For example, say you have applied the facet VEP impact of high. On the `Mutations` tab there is the option to add all mutations from the GDC or add all filtered mutations from the GDC. The first option will create a track with all mutations present on the GDC portal (no filtering). The second option will create a track with only mutations that have a VEP impact of high. As you can see, this becomes very powerful when you combine multiple facets.
 
-![GDC Portal](images/GDC-portal-explore.png)
+![GDC Portal]({{ site.url }}/assets/images/GDC-portal-explore.png)
 
 ## Explore Projects
 This dialog shows the projects present on the GDC Data Portal. You can add Mutation, Gene, and CNV tracks for each project.
 
 ![GDC projects](images/GDC-project-browser.png)
+![GDC CNVs]({{ site.url }}/assets/images/GDC-project-browser.png)
 
 ## Explore Primary Sites
 This dialog shows the primary sites present on the GDC Data Portal. You can add Mutation, Gene, and CNV tracks for each primary site.
 
-![GDC primary sites](images/GDC-primary-sites.png)
+![GDC CNVs]({{ site.url }}/assets/images/GDC-primary-sites.png)
 
 # Export Types
 The following export types are supported by both GDC Genes and Mutations. To export, select `Save track data` in the track dropdown. Note that not all track information is carried over to the exported file.
