@@ -1,5 +1,5 @@
 /**
- * A base class for GDC dialogs
+ * A base class for GDC dialogs, including common functions and variables
  */
 define([
     'dojo/_base/declare',

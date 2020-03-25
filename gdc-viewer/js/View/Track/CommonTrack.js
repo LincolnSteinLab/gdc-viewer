@@ -19,6 +19,9 @@ define(
        ValidationTextArea) {
    return declare(null, {
 
+    /**
+     * Adds additional track menu options
+     */
     _trackMenuOptions: function () {
         var options = this.inherited(arguments);
         options.push({ type: 'dijit/MenuSeparator' } );
@@ -45,11 +48,12 @@ define(
         var track = this;
         var details = domConstruct.create('div', { className: 'detail', style: 'display: flex; flex-direction: column; align-items: center; justify-content: center;' });
         
+        // Create header text
         var headerString = '<h1 style="width: 80%; margin-bottom: 5px;">View and Update Filters Applied To The Current Track</h1>';
         var headerElement = domConstruct.toDom(headerString);
         domConstruct.place(headerElement, details);
 
-        // Create help text
+        // Create filter help text
         var helpString = '<span style="width: 80%; font-size: 14px;">The following filters have been applied to the track. You can update the filters here, though only basic validation is done on the input.</span>';
         var helpElement = domConstruct.toDom(helpString);
         domConstruct.place(helpElement, details);
@@ -58,7 +62,7 @@ define(
         var filterElement = domConstruct.toDom(filterString);
         domConstruct.place(filterElement, details);
 
-        // Get filtered text
+        // Display filtered text
         var filteredText = JSON.stringify(track.store.filters, null, 2)
 
         var textArea = new ValidationTextArea({
@@ -79,6 +83,7 @@ define(
               }
         }).placeAt(details);
 
+        // Display cases
         var caseString = '<div style="width: 80%"><h3>Case UUIDs</h3><span>Comma separated unique identifiers for the case, expressed as UUIDs.</span></div>';
         var caseElement = domConstruct.toDom(caseString);
         domConstruct.place(caseElement, details);
@@ -92,6 +97,7 @@ define(
             trim: true
         }).placeAt(details);
 
+        // Display size
         var sizeHeader = '<div style="width: 80%"><h3>Size</h3><span>This is the maximum number of results to return per panel.</span></div>';
         var sizeElement = domConstruct.toDom(sizeHeader);
         domConstruct.place(sizeElement, details);
@@ -104,6 +110,7 @@ define(
             smallDelta: 10
         }).placeAt(details);
 
+        // Add button to update the track with changed content
         var updateTrackButton = new Button({
             label: 'Apply Filters',
             iconClass: 'dijitIconSave',
@@ -125,6 +132,7 @@ define(
             }
         }).placeAt(details);
 
+        // Change listeners for text boxes
         caseIdTextBox.on('change', function(e) {
             updateTrackButton.set('disabled', !caseIdTextBox.validate() || !sizeTextBox.validate() || !textArea.validate())
         });
