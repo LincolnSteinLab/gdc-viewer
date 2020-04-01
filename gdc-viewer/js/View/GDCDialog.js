@@ -912,7 +912,6 @@ function (
                 for (var hitId in response.data.genesTableViewer.explore.genes.hits.edges) {
                     hasHits = true;
                     var hit = response.data.genesTableViewer.explore.genes.hits.edges[hitId].node;
-                    console.log(hit)
 
                     var caseRowContent = `
                             <td><a target="_blank" href="https://portal.gdc.cancer.gov/genes/${hit.gene_id}">${hit.symbol}</a></td>
