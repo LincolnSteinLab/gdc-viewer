@@ -110,7 +110,7 @@ function(
             cnvFeature = {
                 id: cnv.id,
                 data: {
-                    'start': cnv.start_position,
+                    'start': cnv.start_position - 1,
                     'end': cnv.end_position,
                     'score': thisB.convertCNVChangeToScore(cnv.cnv_change)
                 }
