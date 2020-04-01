@@ -916,8 +916,8 @@ function (
                     var caseRowContent = `
                             <td><a target="_blank" href="https://portal.gdc.cancer.gov/genes/${hit.gene_id}">${hit.symbol}</a></td>
                             <td>${hit.name}</td>
+                            <td>${(hit.numCases).toLocaleString()} / ${(response.data.genesTableViewer.explore.filteredCases.hits.total).toLocaleString()}</td>
                             <td>${(hit.ssm_case.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.cases.hits.total).toLocaleString()}</td>
-                            <td>${(hit.ssm_case.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.filteredCases.hits.total).toLocaleString()}</td>
                             <td>${(hit.case_cnv_gain.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.cnvCases.hits.total).toLocaleString()}</td>
                             <td>${(hit.case_cnv_loss.hits.total).toLocaleString()} / ${(response.data.genesTableViewer.explore.cnvCases.hits.total).toLocaleString()}</td>
                             <td>${hit.is_cancer_gene_census ? 'Yes' : 'No' }</td>
