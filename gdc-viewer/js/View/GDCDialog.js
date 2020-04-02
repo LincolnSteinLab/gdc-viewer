@@ -896,11 +896,11 @@ function (
                 <tr>
                     <th>Symbol</th>
                     <th>Name</th>
-                    <th># Mutation Affected Cases in Cohort</th>
-                    <th># Mutation Affected Cases Across the GDC</th>
-                    <th># CNV Gain</th>
-                    <th># CNV Loss</th>
-                    <th>Is Cancer Gene Census</th>
+                    <th># Cases Where Gene is Mutated in Cohort</th>
+                    <th># Cases Where Gene is Mutated Across the GDC</th>
+                    <th># Cases with CNV Gain</th>
+                    <th># Cases with CNV Loss</th>
+                    <th>In Cancer Gene Census</th>
                 </tr>
             `;
 
