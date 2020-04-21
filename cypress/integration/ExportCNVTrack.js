@@ -54,8 +54,8 @@ describe('CNV track', function() {
     // Assumption: loc=1%3A1..248956422
     it('Should be able to export CNV in various export formats', function() {
         testExport(2, 'GFF3', ['##gff-version 3', '##sequence-region'])
-        testExport(3, 'bedGraph', ['track type=bedGraph name="GDC_CNV"', '1	51354263	51519328	-1'])
-        testExport(4, 'CSV', ['start,end,score', '51354263,51519328,-1'])
+        testExport(3, 'bedGraph', ['track type=bedGraph name="GDC_CNV"', '1	51354261	51519328	-1'])
+        testExport(4, 'CSV', ['start,end,score', '51354261,51519328,-1'])
         testExport(5, 'Wiggle', ['track type=wiggle_0 name="GDC_CNV"', 'variableStep chrom=1 span=165065'])
         cy.fixture('ExportCNVs/track-conf-export.conf').then((json) => {
             testExport(6, 'Track Config', [json])
