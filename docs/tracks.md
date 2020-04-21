@@ -143,7 +143,7 @@ storeClass=gdc-viewer/Store/SeqFeature/CNVs
 type=gdc-viewer/View/Track/CNVTrack
 key=GDC CNV
 metadata.datatype=CNV
-
+filters={"op":"=","content":{"field":"cnv_change","value":["Gain"]}}
 ```
 
 ![GDC CNVs]({{ site.url }}/assets/images/GDC-cnv-gain.png)
