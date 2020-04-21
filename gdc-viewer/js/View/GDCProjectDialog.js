@@ -135,11 +135,10 @@ function (
             var tableNode = dom.toDom(table);
             var rowsHolder = `
                 <tr>
-                    <th>Project</th>
-                    <th>Disease Type</th>
-                    <th>Primary Site</th>
+                    <th>Project ID</th>
+                    <th>Project Name</th>
                     <th>Program</th>
-                    <th>Cases</th>
+                    <th># Cases</th>
                     <th>Actions</th>
                 </tr>
             `;
@@ -152,8 +151,7 @@ function (
 
                     var projectRowContent = `
                             <td><a target="_blank"  href="https://portal.gdc.cancer.gov/projects/${hit.project_id}">${hit.project_id}</a></td>
-                            <td>${hit.disease_type}</td>
-                            <td>${hit.primary_site}</td>
+                            <td>${hit.name}</td>
                             <td>${hit.program.name}</td>
                             <td>${(hit.summary.case_count).toLocaleString()}</td>
                     `
