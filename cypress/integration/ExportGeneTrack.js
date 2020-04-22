@@ -73,9 +73,9 @@ describe('Gene track', function() {
     // Assumption: loc=1%3A1..248956422
     it('Should be able to export Genes in various export formats', function() {
         testExport(2, 'GFF3', ['##gff-version 3', '##sequence-region', 'Gene'])
-        testExport(3, 'BED', ['track name="GDC_Genes" useScore=0', '1	152302175	152325203	ENSG00000143631		-'])
-        testExport(4, 'CSV', ['id,type,start,end,chromosome,strand,gene name,biotype,symbol,synonyms', 'ENSG00000143631,Gene,152302175,152325203,1,-1,filaggrin,protein_coding,FLG'])
-        testExport(5, 'Sequin Table', ['>Feature 1', '152325203	152302176	Gene'])
+        testExport(3, 'BED', ['track name="GDC_Genes" useScore=0', '1	152302174	152325203	ENSG00000143631		-'])
+        testExport(4, 'CSV', ['id,type,start,end,chromosome,strand,gene name,biotype,symbol,synonyms', 'ENSG00000143631,Gene,152302174,152325203,1,-1,filaggrin,protein_coding,FLG'])
+        testExport(5, 'Sequin Table', ['>Feature 1', '152325203	152302175	Gene'])
         cy.fixture('ExportGenes/track-conf-export.conf').then((json) => {
             testExport(6, 'Track Config', [json])
         })

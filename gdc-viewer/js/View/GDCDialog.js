@@ -292,7 +292,6 @@ function (
                     thisB.refreshContent();
                 }
             }).placeAt(errorMessageHolder);
-            thisB.addTooltipToButton(hardRefreshButton, "Manually refresh all content based on current filters");
         },
 
         /**
@@ -475,8 +474,6 @@ function (
                 });
                 buttonAllSSMs.placeAt(thisB.mutationResultsTab.containerNode);
                 buttonAllSSMs.startup();
-                thisB.addTooltipToButton(menuItemSSMFiltered, "Add track with all Mutations from the GDC, with current filters applied");
-                thisB.addTooltipToButton(buttonAllSSMs, "Add track with all Mutations from the GDC");
 
                 // Determine information for pagination and results
                 var totalSSMs = response.data.viewer.explore.ssms.hits.total;
@@ -590,8 +587,6 @@ function (
                 });
                 buttonAllGenes.placeAt(thisB.geneResultsTab.containerNode);
                 buttonAllGenes.startup();
-                thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes from the GDC, with current filters applied");
-                thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes from the GDC");
 
                 // Buttons for CNVs
                 var cnvMenu = new Menu({ style: "display: none;"});
@@ -617,8 +612,6 @@ function (
                 });
                 buttonAllCnvs.placeAt(thisB.geneResultsTab.containerNode);
                 buttonAllCnvs.startup();
-                thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs from the GDC, with current filters applied");
-                thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs from the GDC");
 
                 // Determine information for pagination and results
                 var totalGenes = response.data.genesTableViewer.explore.genes.hits.total;
@@ -777,8 +770,6 @@ function (
                     });
                     buttonAllGenes.placeAt(geneButtonNode);
                     buttonAllGenes.startup();
-                    thisB.addTooltipToButton(menuItemGeneFiltered, "Add track with all genes for the given case, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllGenes, "Add track with all genes for the given case");
 
                     // Place buttons in table
                     dom.place(geneButtonNode, caseRowContentNode);
@@ -814,8 +805,6 @@ function (
                     });
                     buttonAllSsms.placeAt(ssmButtonNode);
                     buttonAllSsms.startup();
-                    thisB.addTooltipToButton(menuItemSsmFiltered, "Add track with all Mutations for the given case, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllSsms, "Add track with all Mutations for the given case");
 
                     // Place buttons in table
                     dom.place(ssmButtonNode, caseRowContentNode);
@@ -851,8 +840,6 @@ function (
                     });
                     buttonAllCnvs.placeAt(cnvButtonNode);
                     buttonAllCnvs.startup();
-                    thisB.addTooltipToButton(menuItemCnvFiltered, "Add track with all CNVs for the given case, with current filters applied");
-                    thisB.addTooltipToButton(buttonAllCnvs, "Add track with all CNVs for the given case");
 
                     // Place buttons in table
                     dom.place(cnvButtonNode, caseRowContentNode);
@@ -896,11 +883,11 @@ function (
                 <tr>
                     <th>Symbol</th>
                     <th>Name</th>
-                    <th># Mutation Affected Cases in Cohort</th>
-                    <th># Mutation Affected Cases Across the GDC</th>
-                    <th># CNV Gain</th>
-                    <th># CNV Loss</th>
-                    <th>Is Cancer Gene Census</th>
+                    <th># Cases Where Gene is Mutated in Cohort</th>
+                    <th># Cases Where Gene is Mutated Across the GDC</th>
+                    <th># Cases with CNV Gain</th>
+                    <th># Cases with CNV Loss</th>
+                    <th>In Cancer Gene Census</th>
                 </tr>
             `;
 
@@ -1259,7 +1246,6 @@ function (
                         thisB.clearFacets()
                     }
                 }, "clearFacets").placeAt(location);
-                thisB.addTooltipToButton(clearFacetButton, "Clear all filters");
             }
 
             var currentFilter = 0;

@@ -70,7 +70,7 @@ function(
                 id: gene.gene_id,
                 data: {
                     'entity_name': gene.gene_id,
-                    'start': thisB.prettyText(gene.gene_start),
+                    'start': thisB.prettyText(gene.gene_start - 1),
                     'end': thisB.prettyText(gene.gene_end),
                     'strand': thisB.prettyText(gene.gene_strand),
                     'type': 'Gene',

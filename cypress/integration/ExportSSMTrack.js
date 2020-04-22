@@ -73,9 +73,9 @@ describe('SSM track', function() {
     // Assumption: loc=1%3A1..248956422
     it('Should be able to export SSMs in various export formats', function() {
         testExport(2, 'GFF3', ['##gff-version 3', '##sequence-region', 'Simple Somatic Mutation'])
-        testExport(3, 'BED', ['track name="GDC_SSM" useScore=0', '1	56496417	56496417	ec690998-d555-5ed3-ab18-55e8685b2bfd'])
-        testExport(4, 'CSV', ['id,type,start,end,chromosome,reference allele,dna change,subtype', 'ec690998-d555-5ed3-ab18-55e8685b2bfd,Simple Somatic Mutation,56496417,56496417,,T,chr1:g.56496417delT,Small deletion'])
-        testExport(5, 'Sequin Table', ['>Feature 1', '56496418	56496417	Simple Somatic Mutation'])
+        testExport(3, 'BED', ['track name="GDC_SSM" useScore=0', '1	56496416	56496417	ec690998-d555-5ed3-ab18-55e8685b2bfd'])
+        testExport(4, 'CSV', ['id,type,start,end,chromosome,reference allele,dna change,subtype', 'ec690998-d555-5ed3-ab18-55e8685b2bfd,Simple Somatic Mutation,56496416,56496417,,T,chr1:g.56496417delT,Small deletion'])
+        testExport(5, 'Sequin Table', ['>Feature 1', '56496417	56496417	Simple Somatic Mutation'])
         cy.fixture('ExportSSMs/track-conf-export.conf').then((json) => {
             testExport(6, 'Track Config', [json])
         })
