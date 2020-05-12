@@ -192,6 +192,17 @@ define(
                 readOnly: true
             }, details );
 
+        // Create a copy button for text
+        var copyButton = new Button({
+            label: 'Copy',
+            iconClass: 'dijitIconCopy',
+            onClick: function() {
+                textArea.focus();
+                textArea.select();
+                document.execCommand("copy");
+            }
+        }).placeAt(details);
+
         // Create a DOM element for the link
         var linkString = '<a target="_blank" href="' + shareableLink + '">Open in New Tab</a>';
         var linkElement = domConstruct.toDom(linkString);
