@@ -29,7 +29,7 @@ define(
             label: 'Share Track as URL',
             action: "contentDialog",
             title: 'Share Track as URL',
-            content: dojo.hitch(this,'_shareableLinkContent')
+            content: dojo.hitch(this,'_shareableLinkContent'),
         });
         options.push({
             label: 'View Applied Filters',
@@ -191,6 +191,16 @@ define(
                 style: "width: 80%",
                 readOnly: true
             }, details );
+
+        var copyButton = new Button({
+            label: 'Copy',
+            iconClass: 'dijitIconSave',
+            onClick: function() {
+                textArea.focus();
+                textArea.select();
+                document.execCommand("copy");
+            }
+        }).placeAt(details);
 
         // Create a DOM element for the link
         var linkString = '<a target="_blank" href="' + shareableLink + '">Open in New Tab</a>';
