@@ -194,7 +194,7 @@ define(
 
         var copyButton = new Button({
             label: 'Copy',
-            iconClass: 'dijitIconSave',
+            iconClass: 'dijitIconCopy',
             onClick: function() {
                 textArea.focus();
                 textArea.select();
