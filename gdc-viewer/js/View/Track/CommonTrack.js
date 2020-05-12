@@ -29,7 +29,7 @@ define(
             label: 'Share Track as URL',
             action: "contentDialog",
             title: 'Share Track as URL',
-            content: dojo.hitch(this,'_shareableLinkContent'),
+            content: dojo.hitch(this,'_shareableLinkContent')
         });
         options.push({
             label: 'View Applied Filters',
@@ -192,6 +192,7 @@ define(
                 readOnly: true
             }, details );
 
+        // Create a copy button for text
         var copyButton = new Button({
             label: 'Copy',
             iconClass: 'dijitIconCopy',
