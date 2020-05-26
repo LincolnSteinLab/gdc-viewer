@@ -209,7 +209,7 @@ function (
             var thisB = this;
             
             // Create combined facet object
-            var combinedFilters = thisB.combineAllFilters();
+            var combinedFilters = thisB.combineAllFilters(true);
             combinedFilters = combinedFilters ? JSON.parse(combinedFilters) : combinedFilters
 
             var facetQuery = `query Queries($filters:FiltersArgument!,$first:Int!,$offset:Int!) {viewer {...F4}} fragment F0 on ECaseAggregations {primary_site {buckets {doc_count,key}},project__program__name {buckets {doc_count,key}},project__project_id {buckets {doc_count,key}},disease_type {buckets {doc_count,key}},demographic__gender {buckets {doc_count,key}},diagnoses__age_at_diagnosis {stats {max,min,count}},demographic__race {buckets {doc_count,key}},demographic__ethnicity {buckets {doc_count,key}}} fragment F1 on GeneAggregations {biotype {buckets {doc_count,key}},case__cnv__cnv_change {buckets {doc_count,key,key_as_string}},is_cancer_gene_census {buckets {doc_count,key,key_as_string}}} fragment F2 on CNVAggregations {cnv_change {buckets {doc_count,key,key_as_string}}} fragment F3 on SsmAggregations {consequence__transcript__annotation__vep_impact {buckets {doc_count,key}},consequence__transcript__annotation__polyphen_impact {buckets {doc_count,key}},consequence__transcript__annotation__sift_impact {buckets {doc_count,key}},consequence__transcript__consequence_type {buckets {doc_count,key}},mutation_subtype {buckets {doc_count,key}},occurrence__case__observation__variant_calling__variant_caller {buckets {doc_count,key}}} fragment F4 on Root {explore {cases {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F0},_hits:hits(first:$first,offset:$offset,filters:$filters,score:"gene.gene_id") {total}},genes {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F1},_hits:hits(filters:$filters) {total}},cnvs {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F2},_hits:hits(filters:$filters) {total}},ssms {_aggregations:aggregations(filters:$filters,aggregations_filter_themselves:false) {...F3},_hits:hits(filters:$filters) {total}}}}`;
@@ -415,7 +415,7 @@ function (
             var ssmQuery = `query ssmResultsTableQuery( $ssmTypeFilter: FiltersArgument $ssmCaseFilters: FiltersArgument $ssmSize: Int $ssmConsequenceFilters: FiltersArgument $ssmOffset: Int $ssmFilters: FiltersArgument $score: String $sort: [Sort] ) { viewer { explore { cases { hits(first: 0, filters: $ssmTypeFilter) { total } } filteredCases: cases { hits(first: 0, filters: $ssmCaseFilters) { total } } ssms { hits(first: $ssmSize, offset: $ssmOffset, filters: $ssmFilters, score: $score, sort: $sort) { total edges { node { id score genomic_dna_change mutation_subtype ssm_id consequence { hits(first: 1, filters: $ssmConsequenceFilters) { edges { node { transcript { is_canonical annotation { vep_impact polyphen_impact polyphen_score sift_score sift_impact } consequence_type gene { gene_id symbol } aa_change } id } } } } filteredOccurences: occurrence { hits(first: 0, filters: $ssmCaseFilters) { total } } occurrence { hits(first: 0, filters: $ssmTypeFilter) { total } } } } } } } } }`;
             var caseFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["ssm"]}}]}
 
-            var combinedFilters = thisB.combineAllFilters();
+            var combinedFilters = thisB.combineAllFilters(true);
             if (combinedFilters) {
                 combinedFilters = JSON.parse(combinedFilters);
                 caseFilter.content.push(combinedFilters);
@@ -442,7 +442,7 @@ function (
             }).then(function(response) {
                 return(response.json());
             }).then(function(response) {
-                var combinedFilters = thisB.combineAllFilters();
+                var combinedFilters = thisB.combineAllFilters(true);
                 if (combinedFilters) {
                     combinedFilters = JSON.parse(combinedFilters);
                 }
@@ -519,7 +519,7 @@ function (
             var cnvGainFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
             var cnvLossFilter = {"op":"and","content":[{"op":"in","content":{"field":"available_variation_data","value":["cnv"]}}]}
 
-            var combinedFilters = thisB.combineAllFilters();
+            var combinedFilters = thisB.combineAllFilters(true);
             if (combinedFilters) {
                 combinedFilters = JSON.parse(combinedFilters);
                 geneFilter.content.push(combinedFilters);
@@ -555,7 +555,7 @@ function (
                 return(response.json());
             }).then(function(response) {
                 dom.empty(thisB.geneResultsTab.containerNode);
-                var combinedFilters = thisB.combineAllFilters();
+                var combinedFilters = thisB.combineAllFilters(true);
                 if (combinedFilters) {
                     combinedFilters = JSON.parse(combinedFilters);
                 }
@@ -652,7 +652,7 @@ function (
             var size = thisB.pageSize;
             var caseQuery = `query caseResultsTableQuery( $filters: FiltersArgument $casesSize: Int $casesOffset: Int $casesScore: String $sort: [Sort] ) { exploreCasesTableViewer: viewer { explore { cases { hits(first: $casesSize, offset: $casesOffset, filters: $filters, score: $casesScore, sort: $sort) { total edges { node { score id case_id primary_site disease_type submitter_id project { project_id program { name } id } diagnoses { hits(first: 1) { edges { node { primary_diagnosis age_at_diagnosis id } } } } demographic { gender ethnicity race } summary { data_categories { file_count data_category } experimental_strategies { experimental_strategy file_count } file_count } } } } } } } }`;
 
-            var combinedFilters = thisB.combineAllFilters();
+            var combinedFilters = thisB.combineAllFilters(true);
             if (combinedFilters) {
                 combinedFilters = JSON.parse(combinedFilters);
             }
@@ -736,7 +736,7 @@ function (
                     var geneButtonNode = dom.toDom(`<td></td>`);
 
                     // Create Filters for buttons
-                    var combinedFilters = thisB.combineAllFilters();
+                    var combinedFilters = thisB.combineAllFilters(true);
 
                     if (combinedFilters) {
                         combinedFilters = JSON.parse(combinedFilters);
@@ -1203,22 +1203,23 @@ function (
 
         /**
          * Combines all three types of filters into one encoded filter string
+         * @param {boolean} toConvert Whether or not to convert to GDC filter
          * @return {object} combined filter object
          */
-        combineAllFilters: function() {
+        combineAllFilters: function(toConvert) {
             var thisB = this;
 
             var caseFiltersCopy = {};
-            Object.keys(thisB.caseFilters).forEach(filter => caseFiltersCopy['cases.' + filter.replace(/__/g, '.')] = thisB.caseFilters[filter]);
+            Object.keys(thisB.caseFilters).forEach(filter => { if (thisB.caseFilters[filter].length !== 0) { caseFiltersCopy['cases.' + filter.replace(/__/g, '.')] = thisB.caseFilters[filter];}});
 
             var geneFiltersCopy = {};
-            Object.keys(thisB.geneFilters).forEach(filter => geneFiltersCopy['genes.' + filter.replace(/__/g, '.')] = thisB.geneFilters[filter]);
+            Object.keys(thisB.geneFilters).forEach(filter => { if (thisB.geneFilters[filter].length !== 0) { geneFiltersCopy['genes.' + filter.replace(/__/g, '.')] = thisB.geneFilters[filter];}});
 
             var mutationFiltersCopy = {};
-            Object.keys(thisB.mutationFilters).forEach(filter => mutationFiltersCopy['ssms.' + filter.replace(/__/g, '.')] = thisB.mutationFilters[filter]);
+            Object.keys(thisB.mutationFilters).forEach(filter => { if (thisB.mutationFilters[filter].length !== 0) { mutationFiltersCopy['ssms.' + filter.replace(/__/g, '.')] = thisB.mutationFilters[filter];}});
 
             var combinedFilters = Object.assign({}, caseFiltersCopy, mutationFiltersCopy, geneFiltersCopy);
-            return decodeURI(thisB.convertFilterObjectToGDCFilter(combinedFilters));
+            return toConvert ? decodeURI(thisB.convertFilterObjectToGDCFilter(combinedFilters)) : combinedFilters;
         },
 
         /**
@@ -1319,6 +1320,7 @@ function (
          * @param {string} trackType the JBrowse track type
          */
         addTrack: function (storeClass, caseId, submitterId, combinedFacetObject, trackType) {
+            var thisB = this;
             if (combinedFacetObject !== undefined) {
                 combinedFacetObject = combinedFacetObject === '' ? undefined : JSON.stringify(combinedFacetObject);
             }
@@ -1343,15 +1345,24 @@ function (
 
             label += '_' + randomId; // unique code appended to label to avoid duplicates
 
+            var metadataObject = {
+                datatype: storeClass,
+                case: caseId
+            }
+            if (combinedFacetObject !== undefined) {
+                var combinedFilters = thisB.combineAllFilters(false);
+                Object.keys(combinedFilters).map(function(key, index) {
+                    combinedFilters[key] = combinedFilters[key].join(', ');
+                });
+                metadataObject = Object.assign(metadataObject, combinedFilters)
+            }
+
             var trackConf = {
                 type: trackType,
                 store: storeName,
                 label: label,
                 key: key,
-                metadata: {
-                    datatype: storeClass,
-                    case: caseId
-                },
+                metadata: metadataObject,
                 menuTemplate : [ 
                     {   
                      label : "View details",
