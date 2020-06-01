@@ -33,7 +33,33 @@ install:
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker-compose build --build-arg plugin_version=${TRAVIS_BRANCH}; fi'
   - docker-compose up -d
   - cd ../
+  - cpanm --notest Text::Markdown DateTime JSON
+  - cd ../
+  - git clone https://github.com/GMOD/jbrowse.git
+  - cp -R $TRAVIS_BUILD_DIR jbrowse/plugins/
+  - cd $TRAVIS_BUILD_DIR
 
 script:
-  # - $(npm bin)/cypress run --record
   - $(npm bin)/cypress run
+  # Only build below if on a tag
+  - |
+    if [[ "x$TRAVIS_TAG" != "x" ]]; then
+      cd ../jbrowse/
+      RELEASE_VERSION=`node -e 'require("fs").readFile("src/JBrowse/package.json", (e,d)=>console.log(JSON.parse(d).version))'`
+      make -f build/Makefile release-min
+      rm -rf JBrowse-*/
+      unzip -q JBrowse-$RELEASE_VERSION.zip
+      cd $TRAVIS_BUILD_DIR
+    fi
+
+deploy:
+  provider: s3
+  skip_cleanup: true
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET
+  bucket: "gdc-jbrowse"
+  local-dir: ../jbrowse/JBrowse-$RELEASE_VERSION
+  upload-dir: code/gdc-viewer/$TRAVIS_BRANCH
+  on:
+    repo: agduncan94/gdc-viewer
+    tags: true
