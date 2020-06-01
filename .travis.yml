@@ -58,4 +58,4 @@ deploy:
   upload-dir: code/gdc-viewer/$TRAVIS_BRANCH
   on:
     repo: agduncan94/gdc-viewer
-    all_branches: true
+    tags: true
