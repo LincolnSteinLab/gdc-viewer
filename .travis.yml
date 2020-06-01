@@ -41,12 +41,16 @@ install:
 
 script:
   - $(npm bin)/cypress run
-  - cd ../jbrowse/
-  - RELEASE_VERSION=`node -e 'require("fs").readFile("src/JBrowse/package.json", (e,d)=>console.log(JSON.parse(d).version))'`
-  - make -f build/Makefile release-min
-  - rm -rf JBrowse-*/
-  - unzip -q JBrowse-$RELEASE_VERSION.zip
-  - cd $TRAVIS_BUILD_DIR
+  # Only build below if on a tag
+  - |
+    if [[ "x$TRAVIS_TAG" != "x" ]]; then
+      cd ../jbrowse/
+      RELEASE_VERSION=`node -e 'require("fs").readFile("src/JBrowse/package.json", (e,d)=>console.log(JSON.parse(d).version))'`
+      make -f build/Makefile release-min
+      rm -rf JBrowse-*/
+      unzip -q JBrowse-$RELEASE_VERSION.zip
+      cd $TRAVIS_BUILD_DIR
+    fi
 
 deploy:
   provider: s3
