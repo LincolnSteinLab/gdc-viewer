@@ -28,6 +28,6 @@
   },
   "homepage": "https://agduncan94.github.io/gdc-viewer/",
   "devDependencies": {
-    "cypress": "^3.5.0"
+    "cypress": "^4.7.0"
   }
 }
