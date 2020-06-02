@@ -36,7 +36,7 @@ install:
   - cpanm --notest Text::Markdown DateTime JSON
   - cd ../
   - git clone https://github.com/GMOD/jbrowse.git
-  - cp -R $TRAVIS_BUILD_DIR jbrowse/plugins/
+  - cp -R $TRAVIS_BUILD_DIR/gdc-viewer/ jbrowse/plugins/
   - cd $TRAVIS_BUILD_DIR
   - cp data/jbrowse.conf ../jbrowse/jbrowse.conf
 
