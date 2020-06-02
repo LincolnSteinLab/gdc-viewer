@@ -38,6 +38,7 @@ install:
   - git clone https://github.com/GMOD/jbrowse.git
   - cp -R $TRAVIS_BUILD_DIR jbrowse/plugins/
   - cd $TRAVIS_BUILD_DIR
+  - cp data/jbrowse.conf ../jbrowse/jbrowse.conf
 
 script:
   - $(npm bin)/cypress run
