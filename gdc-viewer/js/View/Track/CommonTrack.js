@@ -6,18 +6,12 @@ define(
         "dojo/_base/declare",
         'dojo/dom-construct',
         'dijit/form/Button',
-        'dijit/form/NumberSpinner',
-        'dijit/form/ValidationTextBox',
-        './ValidationTextArea',
         './AppliedFiltersEditor'
     ],
    function(
        declare,
        domConstruct,
        Button,
-       NumberSpinner,
-       ValidationTextBox,
-       ValidationTextArea,
        AppliedFiltersEditor) {
    return declare(null, {
 
