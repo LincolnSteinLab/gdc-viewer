@@ -131,7 +131,7 @@ return declare( null, {
             
         // Add button to update the track with changed content
         var updateTrackButton = new Button({
-            label: 'Apply Filters',
+            label: 'Apply',
             iconClass: 'dijitIconSave',
             onClick: dojo.hitch( this, function() {
                 const trackString = document.getElementById("filterTextArea").value;
