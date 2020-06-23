@@ -46,11 +46,19 @@ function (
             var thisB = this;
             var features = this.bareFeatures = [];
 
+            var featuresSorted = true;
+            var seenRefs = this.refSeqs = {};
             var parser = new Parser(
                 {
                     featureCallback: function (fs) {
                         array.forEach(fs, function (feature) {
-                            console.log(feature)
+                            var prevFeature = features[ features.length - 1 ];
+                            var regRefName = thisB.browser.regularizeReferenceName(feature.seq_id);
+                            if (regRefName in seenRefs && prevFeature && prevFeature.seq_id != feature.seq_id) {featuresSorted = false;}
+                            if (prevFeature && prevFeature.seq_id == feature.seq_id && feature.start < prevFeature.start) {featuresSorted = false;}
+
+                            if (!(regRefName in seenRefs)) {seenRefs[ regRefName ] = features.length;}
+
                             if (thisB.config.featureCallback) {
                                 features.push(thisB.config.featureCallback(feature, thisB));
                             } else {
@@ -59,6 +67,12 @@ function (
                         });
                     },
                     endCallback: function ()  {
+                        if (!featuresSorted) {
+                            features.sort(thisB._compareFeatureData);
+                            // need to rebuild the refseq index if changing the sort order
+                            thisB._rebuildRefSeqs(features);
+                        }
+
                         thisB._estimateGlobalStats()
                             .then(function (stats) {
                                 thisB.globalStats = stats;
@@ -80,11 +94,11 @@ function (
                         if (i !== 0) {
                             splitLine = line.split('\t')
                             // Second column contains location in the format refseq:chr:start-end:strand
-                            // This needs to be redistributed to form BED format
+                            // This needs to be redistributed to form BED format 
                             featureLocation = splitLine[1]
                             splitLocation = featureLocation.split(':')
                             splitPos = splitLocation[2].split('-')
-                            locationArray = [splitLocation[1], splitPos[0], splitPos[1]]
+                            locationArray = [splitLocation[1].replace('chr', ''), splitPos[0], splitPos[1]]
                             splitLine.splice(1, 1)
                             splitLine = locationArray.concat(splitLine)
                             splitLine.splice(5, 0, splitLocation[3])
