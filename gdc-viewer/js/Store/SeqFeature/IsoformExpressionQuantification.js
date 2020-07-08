@@ -15,6 +15,7 @@ function (
     BaseBEDLikeFeature
 ) {
     return declare(BaseBEDLikeFeature, {
+        // Converts a non-BED file line to BED, and appends the original line to the end
         convertLineToBED: function(line) {
             originalLine = line.split('\t');
             // Second column contains location in the format refseq:chr:start-end:strand

@@ -93,6 +93,7 @@ function(
                         if (i == 0) {
                             parser.setExtraFields(line)
                         } else {
+                            // Creates a line where the first columns are BED format and the remaining are extra metadata
                             parser.addLine(thisB.convertLineToBED(line));
                         }
                         i++;
