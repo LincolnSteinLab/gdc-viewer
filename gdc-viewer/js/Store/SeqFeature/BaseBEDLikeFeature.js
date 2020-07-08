@@ -1,12 +1,12 @@
 /**
- * Base class for some Store SeqFeature for GDC
+ * Base class for BEDlike files from the GDC
  */
 define([
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
     'JBrowse/Store/SeqFeature/BED',
-    'JBrowse/Store/SeqFeature/BED/Parser',
+    './BedLikeParser',
     'JBrowse/Store/SeqFeature',
     'JBrowse/Model/XHRBlob',
     'JBrowse/Model/BlobFilehandleWrapper'
@@ -90,7 +90,9 @@ function(
             this.data.fetchLines(
                 function (line) {
                     try {
-                        if (i > 0) {
+                        if (i == 0) {
+                            parser.setExtraFields(line)
+                        } else {
                             parser.addLine(thisB.convertLineToBED(line));
                         }
                         i++;
