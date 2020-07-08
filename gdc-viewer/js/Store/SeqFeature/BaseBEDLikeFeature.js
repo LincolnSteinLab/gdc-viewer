@@ -22,20 +22,15 @@ function(
     BlobFilehandleWrapper
 ) {
     return declare([ SeqFeatureStore, BED ], {
-        downloadUrl: 'https://api.gdc.cancer.gov/data/',
-        
         /**
          * Constructor
          * @param {*} args 
          */
         constructor: function (args) {
-            // Unique file ID
-            this.fileId = args.fileId;
-
             this.data = new BlobFilehandleWrapper(
                 new XHRBlob(
                     this.resolveUrl(
-                        this.downloadUrl + this.fileId
+                        args.urlTemplate
                     )
                 )
             );
