@@ -76,7 +76,7 @@ function (
 
             fetch(thisB.baseGraphQLUrl + '/primarySites', {
                 method: 'post',
-                headers: { 'X-Requested-With': null },
+                headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                 body: JSON.stringify(bodyVal)
             }).then(function(response) {
                 return(response.json());

@@ -80,7 +80,7 @@ function(
             // Fetch CNVs and create features
             fetch(thisB.graphQLUrl + '/CNVsTable', {
                 method: 'post',
-                headers: { 'X-Requested-With': null },
+                headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                 body: bodyVal
             }).then(function(response) {
                 return(response.json());
