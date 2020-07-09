@@ -236,7 +236,7 @@ function (
             // Update the accordions with results from the GDC
             fetch(thisB.baseGraphQLUrl + '/facetResults', {
                 method: 'post',
-                headers: { 'X-Requested-With': null },
+                headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                 body: JSON.stringify(bodyVal)
             }).then(function(response) {
                 return(response.json());
@@ -437,7 +437,7 @@ function (
 
             fetch(url, {
                 method: 'post',
-                headers: { 'X-Requested-With': null },
+                headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                 body: JSON.stringify(bodyVal)
             }).then(function(response) {
                 return(response.json());
@@ -549,7 +549,7 @@ function (
 
             fetch(url, {
                 method: 'post',
-                headers: { 'X-Requested-With': null },
+                headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                 body: JSON.stringify(bodyVal)
             }).then(function(response) {
                 return(response.json());
@@ -670,7 +670,7 @@ function (
 
             fetch(url, {
                 method: 'post',
-                headers: { 'X-Requested-With': null },
+                headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                 body: JSON.stringify(bodyVal)
             }).then(function(response) {
                 return(response.json());
