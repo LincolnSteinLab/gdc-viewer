@@ -122,7 +122,7 @@ function(
             // Fetch Genes and create features
             fetch(thisB.graphQLUrl + '/GenesTable', {
                     method: 'post',
-                    headers: { 'X-Requested-With': null },
+                    headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
                     body: bodyVal
             }).then(function(response) {
                 return(response.json());

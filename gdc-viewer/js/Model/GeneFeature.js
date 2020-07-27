@@ -33,7 +33,7 @@ get: function(name) {
         }
         fetch('https://api.gdc.cancer.gov/v0/graphql/projectsTable', {
             method: 'post',
-            headers: { 'X-Requested-With': null },
+            headers: { 'X-Requested-With': null, 'Content-Type': 'application/json' },
             body: JSON.stringify(bodyValProjectsTable)
         }).then(function(response) {
             return(response.json());
