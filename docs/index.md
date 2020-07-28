@@ -15,7 +15,7 @@ A plugin for [JBrowse](https://jbrowse.org/) for viewing [GDC](https://gdc.cance
 # Overview
 This plugin provides the ability to create mutation, gene, and CNV tracks on JBrowse based on complex query filters. These filters are the same as those used in the GDC API. For example, you could create a track of all mutations found in gliomas that have a high VEP score.
 
-[See the tracks page]({{ site.baseurl }}{% link tracks.md %}) for some examples of what this plugin is capable of. 
+[See the tracks page]({{ site.url }}{% link tracks.md %}) for some examples of what this plugin is capable of. 
 
 # Features
 * Create Mutation, Gene and CNV tracks with rich metadata
