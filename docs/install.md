@@ -29,7 +29,7 @@ git clone https://github.com/agduncan94/gdc-viewer.git
 cp -R gdc-viewer/gdc-viewer <jbrowse-location>/plugins/gdc-viewer
 ```
 
-Now add the 'gdc-viewer' plugin to the array of plugins in the `<jbrowse-location>/jbrowse_conf.json`.
+Now add the 'gdc-viewer' plugin to the array of plugins in the `<jbrowse-location>/jbrowse.conf`.
 ```ini
 [ plugins.gdc-viewer ]
 location = <jbrowse-location>/plugins/gdc-viewer
@@ -69,6 +69,7 @@ Run the following commands to build JBrowse and the GDC plugin.
 
 **Note that ./setup.sh prints some errors about volvox, but they can be ignored. It may also take a few minutes.**
 ```bash
+cd <jbrowse-location>
 ./setup.sh
 yarn
 ```
