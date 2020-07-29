@@ -5,75 +5,89 @@ nav_order: 2
 ---
 
 # Installation and Setup
-The installation assumes you are working on an Ubuntu machine.
+The installation assumes you are working on an Ubuntu or MacOS machine.
+
+## 0. Install dependencies
+* [Yarn](ttps://classic.yarnpkg.com/en/docs/install/)
+
+* [Node](https://nodejs.org/en/download/)
+
+Note: You may find it easier to use a node versioning tool to install Node. Two popular tools are [n](https://github.com/tj/n) and [nvm](https://github.com/nvm-sh/nvm).
 
 ## 1. Install JBrowse
-
-Clone the JBrowse repostitory and enter.
-```
+Clone the JBrowse repostitory. Don't switch into the directory just yet.
+```bash
 git clone https://github.com/GMOD/jbrowse
-cd jbrowse
 ```
 
-## 2. Install Plugin
-Clone the GDC plugin in a new terminal window and then copy the gdc-viewer subfolder into the JBrowse plugins directory.
-```
-git clone git@github.com:agduncan94/gdc-viewer.git
+We will use the placeholder `<jbrowse-location>` to refer to where JBrowse is install on your computer. An example would be `/Users/aduncan/Downloads/jbrowse`.
+
+## 2. Install GDC Plugin
+Clone the GDC plugin and then copy the gdc-viewer subfolder into the JBrowse plugins directory.
+```bash
+git clone https://github.com/agduncan94/gdc-viewer.git
 cp -R gdc-viewer/gdc-viewer <jbrowse-location>/plugins/gdc-viewer
 ```
 
-Now add the 'gdc-viewer' plugin to the array of plugins in the `jbrowse/jbrowse_conf.json`.
-```
+Now add the 'gdc-viewer' plugin to the array of plugins in the `<jbrowse-location>/jbrowse_conf.json`.
+```ini
 [ plugins.gdc-viewer ]
 location = <jbrowse-location>/plugins/gdc-viewer
 ```
 
-See [JBrowse - Installing Plugins](https://jbrowse.org/docs/plugins.html) for a general approach to installing plugins.
-
 ## 3. Install Reference Sequence Data
 Now setup the reference sequence used. GDC requires the GRCh38 Human reference files.
 
-First create the `data` directory in `jbrowse/data`
+Create the `data` directory in `<jbrowse-location>/data`.
 
-```
+```bash
+cd <jbrowse-location>
 mkdir data
+cd data
 ```
 
-Download the GRCh38 `.fa` and `.fa.fai` files online (ex. http://bioinfo.hpc.cam.ac.uk/downloads/datasets/fasta/grch38/). Then put the following in `./data/tracks.conf` (note files may be named something else).
+Download the GRCh38 `.fa` and `.fa.fai` files online. Two places you could find these files are:
+* https://s3.amazonaws.com/igv.org.genomes/genomes.json
+* http://bioinfo.hpc.cam.ac.uk/downloads/datasets/fasta/grch38/
 
-```
-refSeqs=reference_genome.fa.fai
+Then put the following in `<jbrowse-location>/data/tracks.conf` (note files may be named something else).
+
+```ini
+refSeqs=hg38.fa.fai
   
 [tracks.refseqs]
-urlTemplate=reference_genome.fa
+urlTemplate=hg38.fa
 ```
 
 ## 4. Adding new tracks (optional)
-We have some basic example tracks in `data/tracks.conf`. You can also add new tracks by using the GDC dialog accessible within JBrowse.
+We have some basic example tracks in the [data/tracks.conf](https://github.com/agduncan94/gdc-viewer/blob/develop/data/tracks.conf) file of the gdc-viewer repository.
+
+You can also add new tracks by using the GDC dialog accessible within JBrowse. [See the tracks page]({{ site.url }}{% link tracks.md %}).
 
 ## 5. Build JBrowse
 Run the following commands to build JBrowse and the GDC plugin.
 
-**Note that ./setup.sh prints some errors about volvox, but they can be ignored. It may also take a few minutes**
-```
+**Note that ./setup.sh prints some errors about volvox, but they can be ignored. It may also take a few minutes.**
+```bash
 ./setup.sh
 yarn
 ```
 
 ## 5. Run JBrowse
-You'll have to run the following commands:
+Then run the following commands:
 
-```
+```bash
 yarn watch
-yarn start (in a new terminal tab/window)
+# open a new terminal tab/window
+yarn start
 ```
 
-JBrowse should now be running with the GDC Plugin working!
+JBrowse should now be running with the GDC Plugin working! See the `yarn start` command to determine the port that the plugin is using.
 
 # JBrowse configuration
 ## Faceted Track Selector
-Add the following to your `jbrowse/jbrowse.conf` to use the faceted track selector.
-```
+Add the following to your `<jbrowse-location>/jbrowse.conf` to use the faceted track selector.
+```ini
 [trackSelector]
 type = Faceted
 displayColumns =
