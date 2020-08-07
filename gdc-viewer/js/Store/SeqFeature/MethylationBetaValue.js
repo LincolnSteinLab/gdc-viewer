@@ -27,7 +27,7 @@ function (
         },
 
         getName: function() {
-            return 'GeneLevelCopyNumber'
+            return 'MethylationBetaValue'
         }
     })
 })
