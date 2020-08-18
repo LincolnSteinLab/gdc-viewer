@@ -5,7 +5,8 @@ define([
            'dijit/MenuItem',
            './View/GDCDialog',
            './View/GDCProjectDialog',
-           './View/GDCPrimarySitesDialog'
+           './View/GDCPrimarySitesDialog',
+           './View/GDCStoreTokenDialog'
        ],
        function(
            declare,
@@ -14,7 +15,8 @@ define([
            MenuItem,
            GDCDialog,
            GDCProjectDialog,
-           GDCPrimarySitesDialog
+           GDCPrimarySitesDialog,
+           GDCStoreTokenDialog
        ) {
 return declare( JBrowsePlugin,
 {
@@ -37,6 +39,12 @@ return declare( JBrowsePlugin,
                     label: 'Explore primary sites',
                     iconClass: "dijitIconSearch",
                     onClick: lang.hitch(this, 'createGDCPrimarySites')
+                }));
+            this.browser.addGlobalMenuItem('gdc', new MenuItem(
+                {
+                    label: 'Login',
+                    iconClass: "dijitIconSearch",
+                    onClick: lang.hitch(this, 'createGDCLogin')
                 }));
             this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
         }, this);            
@@ -91,6 +99,23 @@ return declare( JBrowsePlugin,
             function () {
             }
         );
-    }
+    },
+
+    /**
+     * Create the dialog for logging in to the GDC
+     */
+    createGDCLogin: function () {
+        var searchDialog = new GDCStoreTokenDialog(
+            {
+                onHide: function() {
+                    this.destroy();
+                }
+            }
+        );
+        searchDialog.show(this.browser,
+            function () {
+            }
+        );
+    },
 });
 });
