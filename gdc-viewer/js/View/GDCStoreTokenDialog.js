@@ -1,5 +1,5 @@
 /**
- * A base class for GDC dialogs, including common functions and variables
+ * A Dialog for getting the token information of the user
  */
 define([
     'dojo/_base/declare',

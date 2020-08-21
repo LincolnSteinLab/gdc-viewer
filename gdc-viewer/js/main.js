@@ -6,7 +6,8 @@ define([
            './View/GDCDialog',
            './View/GDCProjectDialog',
            './View/GDCPrimarySitesDialog',
-           './View/GDCStoreTokenDialog'
+           './View/GDCStoreTokenDialog',
+           './View/GDCByFileIdDialog'
        ],
        function(
            declare,
@@ -16,7 +17,8 @@ define([
            GDCDialog,
            GDCProjectDialog,
            GDCPrimarySitesDialog,
-           GDCStoreTokenDialog
+           GDCStoreTokenDialog,
+           GDCByFileIdDialog
        ) {
 return declare( JBrowsePlugin,
 {
@@ -45,6 +47,12 @@ return declare( JBrowsePlugin,
                     label: 'Login',
                     iconClass: "dijitIconSearch",
                     onClick: lang.hitch(this, 'createGDCLogin')
+                }));
+            this.browser.addGlobalMenuItem('gdc', new MenuItem(
+                {
+                    label: 'By File Id',
+                    iconClass: "dijitIconSearch",
+                    onClick: lang.hitch(this, 'createGDCByFileId')
                 }));
             this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
         }, this);            
@@ -106,6 +114,23 @@ return declare( JBrowsePlugin,
      */
     createGDCLogin: function () {
         var searchDialog = new GDCStoreTokenDialog(
+            {
+                onHide: function() {
+                    this.destroy();
+                }
+            }
+        );
+        searchDialog.show(this.browser,
+            function () {
+            }
+        );
+    },
+
+    /**
+     * Create the dialog for adding files by ID
+     */
+    createGDCByFileId: function () {
+        var searchDialog = new GDCByFileIdDialog(
             {
                 onHide: function() {
                     this.destroy();
