@@ -28,6 +28,7 @@ function (
 
         // Parent DOM to hold results
         dialogContainer: undefined,
+        searchContainer: undefined,
         resultsContainer: undefined,
 
         /**
@@ -51,23 +52,9 @@ function (
             // Container holds all results in the dialog
             thisB.dialogContainer = dom.create('div', { className: 'dialog-container', style: { width: '700px', height: '500px' } });
 
-            // Create header section
+            // Create different sections
             thisB.createHeaderSection();
-            
-
-            var tokenTextBox = new TextBox({
-                name: "fileId",
-                value: "",
-                placeHolder: "Enter a file ID"
-            }).placeAt(thisB.dialogContainer);
-
-            var searchButton = new Button({
-                label: 'Search',
-                onClick: function() {
-                    thisB.fetchFileMetadata(tokenTextBox.get("value"))
-                }
-            }).placeAt(thisB.dialogContainer);
-
+            thisB.createSearchBar();
             thisB.resultsContainer = dom.create('div', { style: { width: '100%', height: '100%' } }, thisB.dialogContainer);
 
             thisB.resize();
@@ -80,8 +67,33 @@ function (
          */
         createHeaderSection: function() {
             var thisB = this;
-            var headerSection = dom.create('div', { style: "margin-bottom: 5px;" }, thisB.dialogContainer);
+            var headerSection = dom.create('div', { style: "margin-bottom: 15px;" }, thisB.dialogContainer);
             var aboutMessage = dom.create('h1', { innerHTML: "Add Track By File ID" }, headerSection);
+        },
+
+        /**
+         * Add a search bar section
+         */
+        createSearchBar: function() {
+            var thisB = this;
+            thisB.searchContainer = dom.create('div', { className: 'flexHolder', style: { 'justify-content': 'center', 'align-content': 'center' } }, thisB.dialogContainer);
+
+
+            var aboutMessage = dom.create('span', { style: { 'flex': '1 0 0', 'text-align': 'right', 'font-size': '15px' }, innerHTML: "File ID" }, thisB.searchContainer);
+            var tokenTextBox = new TextBox({
+                name: "fileId",
+                value: "",
+                placeHolder: "Enter a file ID",
+                style: { 'flex': '3 0 0'}
+            }).placeAt(thisB.searchContainer);
+
+            var searchButton = new Button({
+                label: 'Search',
+                style: { 'flex': '1 0 0'},
+                onClick: function() {
+                    thisB.fetchFileMetadata(tokenTextBox.get("value"))
+                }
+            }).placeAt(thisB.searchContainer);
         },
 
         /**
@@ -153,7 +165,7 @@ function (
 
             var fileName = dom.create('p', { innerHTML: "File Name: " + file.file_name }, thisB.resultsContainer);
             var fileId = dom.create('p', { innerHTML: "File Id: " + file.file_id }, thisB.resultsContainer);
-            var dataCategory = dom.create('p', { innerHTML: "Data Categorye: " + file.data_category }, thisB.resultsContainer);
+            var dataCategory = dom.create('p', { innerHTML: "Data Category: " + file.data_category }, thisB.resultsContainer);
             var dataFormat = dom.create('p', { innerHTML: "Data Format: " + file.data_format }, thisB.resultsContainer);
             var dataType = dom.create('p', { innerHTML: "Data Type: " + file.data_type }, thisB.resultsContainer);
             var access = dom.create('p', { innerHTML: "Access: " + file.access }, thisB.resultsContainer);

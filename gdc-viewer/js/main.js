@@ -2,7 +2,9 @@ define([
            'dojo/_base/declare',
            'dojo/_base/lang',
            'JBrowse/Plugin',
+           'dijit/Menu',
            'dijit/MenuItem',
+           'dijit/PopupMenuItem',
            './View/GDCDialog',
            './View/GDCProjectDialog',
            './View/GDCPrimarySitesDialog',
@@ -13,7 +15,9 @@ define([
            declare,
            lang,
            JBrowsePlugin,
+           Menu,
            MenuItem,
+           PopupMenuItem,
            GDCDialog,
            GDCProjectDialog,
            GDCPrimarySitesDialog,
@@ -24,36 +28,40 @@ return declare( JBrowsePlugin,
 {
     constructor: function () {
         this.browser.afterMilestone('initView', function () {
-            this.browser.addGlobalMenuItem('gdc', new MenuItem(
-                {
-                    label: 'Explore cases, genes and mutations',
-                    iconClass: "dijitIconSearch",
-                    onClick: lang.hitch(this, 'createGDCExplore')
-                }));
-            this.browser.addGlobalMenuItem('gdc', new MenuItem(
-                {
-                    label: 'Explore projects',
-                    iconClass: "dijitIconSearch",
-                    onClick: lang.hitch(this, 'createGDCProject')
-                }));
-            this.browser.addGlobalMenuItem('gdc', new MenuItem(
-                {
-                    label: 'Explore primary sites',
-                    iconClass: "dijitIconSearch",
-                    onClick: lang.hitch(this, 'createGDCPrimarySites')
-                }));
-            this.browser.addGlobalMenuItem('gdc', new MenuItem(
-                {
-                    label: 'Login',
-                    iconClass: "dijitIconSearch",
-                    onClick: lang.hitch(this, 'createGDCLogin')
-                }));
-            this.browser.addGlobalMenuItem('gdc', new MenuItem(
-                {
-                    label: 'By File Id',
-                    iconClass: "dijitIconSearch",
-                    onClick: lang.hitch(this, 'createGDCByFileId')
-                }));
+            var explorationSubmenu = new Menu();
+            explorationSubmenu.addChild(new MenuItem({
+                label: 'Explore cases, genes and mutations',
+                onClick: lang.hitch(this, 'createGDCExplore')
+            }));
+            explorationSubmenu.addChild(new MenuItem({
+                label: 'Explore projects',
+                onClick: lang.hitch(this, 'createGDCProject')
+            }));
+            explorationSubmenu.addChild(new MenuItem({
+                label: 'Explore primary sites',
+                onClick: lang.hitch(this, 'createGDCPrimarySites')
+            }));
+            this.browser.addGlobalMenuItem('gdc', new PopupMenuItem({
+                label: "Exploration",
+                iconClass: "dijitIconSearch",
+                popup: explorationSubmenu
+            }));
+
+            var fileSubmenu = new Menu();
+            fileSubmenu.addChild(new MenuItem({
+                label: 'Add tracks by file id',
+                onClick: lang.hitch(this, 'createGDCByFileId')
+            }));
+            fileSubmenu.addChild(new MenuItem({
+                label: 'Login',
+                onClick: lang.hitch(this, 'createGDCLogin')
+            }));
+            this.browser.addGlobalMenuItem('gdc', new PopupMenuItem({
+                label: "Repository files",
+                iconClass: "dijitIconFile",
+                popup: fileSubmenu
+            }));
+        
             this.browser.renderGlobalMenu('gdc', {text: 'GDC'}, this.browser.menuBar);
         }, this);            
     },
