@@ -48,18 +48,22 @@ function (
             // Create header section
             thisB.createHeaderSection();
 
+            thisB.searchContainer = dom.create('div', { className: 'flexHolder', style: { 'justify-content': 'center', 'align-content': 'center' } }, thisB.dialogContainer);
+
             var tokenTextBox = new TextBox({
                 name: "token",
                 value: "",
-                placeHolder: "enter your token"
-            }).placeAt(thisB.dialogContainer);
+                placeHolder: "Enter your token",
+                style: { 'flex': '3 0 0'}
+            }).placeAt(thisB.searchContainer);
 
             var loginButton = new Button({
                 label: 'Login',
+                style: { 'flex': '1 0 0'},
                 onClick: function() {
                     sessionStorage.setItem('token', tokenTextBox.get("value"));
                 }
-            }).placeAt(thisB.dialogContainer);
+            }).placeAt(thisB.searchContainer);
 
             // Update the form
             thisB.resize();

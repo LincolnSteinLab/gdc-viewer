@@ -78,10 +78,9 @@ function (
             var thisB = this;
             thisB.searchContainer = dom.create('div', { className: 'flexHolder', style: { 'justify-content': 'center', 'align-content': 'center' } }, thisB.dialogContainer);
 
-            // var aboutMessage = dom.create('span', { style: { 'flex': '1 0 0', 'text-align': 'right', 'font-size': '15px' }, innerHTML: "File ID" }, thisB.searchContainer);
             var tokenTextBox = new TextBox({
                 name: "fileId",
-                value: "634ea37e-d905-49b7-a4e4-535249e78a75",
+                value: "",
                 placeHolder: "Search by file ID or name",
                 style: { 'flex': '3 0 0'}
             }).placeAt(thisB.searchContainer);
