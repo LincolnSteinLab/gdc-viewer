@@ -55,7 +55,7 @@ function (
             // Create different sections
             thisB.createHeaderSection();
             thisB.createSearchBar();
-            thisB.resultsContainer = dom.create('div', { style: { width: '100%', height: '100%' } }, thisB.dialogContainer);
+            thisB.resultsContainer = dom.create('div', { className: 'flexHolder', }, thisB.dialogContainer);
 
             thisB.resize();
 
@@ -68,7 +68,7 @@ function (
         createHeaderSection: function() {
             var thisB = this;
             var headerSection = dom.create('div', { style: "margin-bottom: 15px;" }, thisB.dialogContainer);
-            var aboutMessage = dom.create('h1', { innerHTML: "Add Track By File ID" }, headerSection);
+            var aboutMessage = dom.create('h1', { innerHTML: "Add Track By File ID or Name" }, headerSection);
         },
 
         /**
@@ -78,12 +78,11 @@ function (
             var thisB = this;
             thisB.searchContainer = dom.create('div', { className: 'flexHolder', style: { 'justify-content': 'center', 'align-content': 'center' } }, thisB.dialogContainer);
 
-
-            var aboutMessage = dom.create('span', { style: { 'flex': '1 0 0', 'text-align': 'right', 'font-size': '15px' }, innerHTML: "File ID" }, thisB.searchContainer);
+            // var aboutMessage = dom.create('span', { style: { 'flex': '1 0 0', 'text-align': 'right', 'font-size': '15px' }, innerHTML: "File ID" }, thisB.searchContainer);
             var tokenTextBox = new TextBox({
                 name: "fileId",
-                value: "",
-                placeHolder: "Enter a file ID",
+                value: "634ea37e-d905-49b7-a4e4-535249e78a75",
+                placeHolder: "Search by file ID or name",
                 style: { 'flex': '3 0 0'}
             }).placeAt(thisB.searchContainer);
 
@@ -118,13 +117,27 @@ function (
                 query: fileMetadataQuery,
                 variables: {
                     "filters": {
-                      "op": "=",
-                      "content": {
-                        "field": "file_id",
-                        "value": [
-                          fileId
+                        "op": "or",
+                        "content": [
+                            {
+                                "op": "=",
+                                "content": {
+                                  "field": "file_id",
+                                  "value": [
+                                    fileId
+                                  ]
+                                }
+                              },
+                              {
+                                "op": "=",
+                                "content": {
+                                  "field": "file_name",
+                                  "value": [
+                                    fileId
+                                  ]
+                                }
+                              }
                         ]
-                      }
                     }
                   }
             }
@@ -163,20 +176,22 @@ function (
 
             var file = response.data.repository.files.hits.edges[0].node;
 
-            var fileName = dom.create('p', { innerHTML: "File Name: " + file.file_name }, thisB.resultsContainer);
-            var fileId = dom.create('p', { innerHTML: "File Id: " + file.file_id }, thisB.resultsContainer);
-            var dataCategory = dom.create('p', { innerHTML: "Data Category: " + file.data_category }, thisB.resultsContainer);
-            var dataFormat = dom.create('p', { innerHTML: "Data Format: " + file.data_format }, thisB.resultsContainer);
-            var dataType = dom.create('p', { innerHTML: "Data Type: " + file.data_type }, thisB.resultsContainer);
-            var access = dom.create('p', { innerHTML: "Access: " + file.access }, thisB.resultsContainer);
-            var fileSize = dom.create('p', { innerHTML: "File Size: " + file.file_size }, thisB.resultsContainer);
-            var state = dom.create('p', { innerHTML: "State: " + file.state }, thisB.resultsContainer);
+            var results = dom.create('div', { className: 'flexColumnHolder', style: { border: '1px solid #ccc', 'flex': '1 0 0', 'margin-top': '10px', 'padding': '5px' } }, thisB.resultsContainer);
+
+            var fileName = dom.create('div', { innerHTML: "File Name: " + file.file_name }, results);
+            var fileId = dom.create('div', { innerHTML: "File Id: " + file.file_id }, results);
+            var dataCategory = dom.create('div', { innerHTML: "Data Category: " + file.data_category }, results);
+            var dataFormat = dom.create('div', { innerHTML: "Data Format: " + file.data_format }, results);
+            var dataType = dom.create('div', { innerHTML: "Data Type: " + file.data_type }, results);
+            var access = dom.create('div', { innerHTML: "Access: " + file.access }, results);
+            var fileSize = dom.create('div', { innerHTML: "File Size: " + file.file_size }, results);
+            var state = dom.create('div', { innerHTML: "State: " + file.state }, results);
 
 
             var indexFile = file.index_files.hits.edges[0].node
 
-            var indexFileName = dom.create('p', { innerHTML: "Index File Name: " + indexFile.file_name }, thisB.resultsContainer);
-            var indexFileId = dom.create('p', { innerHTML: "Index File Id: " + indexFile.file_id }, thisB.resultsContainer);
+            var indexFileName = dom.create('div', { innerHTML: "Index File Name: " + indexFile.file_name }, results);
+            var indexFileId = dom.create('div', { innerHTML: "Index File Id: " + indexFile.file_id }, results);
 
             // TODO - add track button
             var addTrack = new Button({
@@ -184,7 +199,7 @@ function (
                 onClick: function() {
                     thisB.addTrack(file.file_id, indexFile.file_id)
                 }
-            }).placeAt(thisB.dialogContainer);
+            }).placeAt(results);
 
         },
 
@@ -229,7 +244,7 @@ function (
          * @return {object} loading icon
          */
         createLoadingIcon: function (location) {
-            var loadingIcon = dom.create('div', { className: 'loading-gdc' }, location);
+            var loadingIcon = dom.create('div', { className: 'loading-gdc', style : { 'flex': '1 0 0' } }, location);
             var spinner = dom.create('div', {}, loadingIcon);
             return loadingIcon;
         },

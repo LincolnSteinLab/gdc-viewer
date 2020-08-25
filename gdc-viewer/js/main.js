@@ -31,14 +31,17 @@ return declare( JBrowsePlugin,
             var explorationSubmenu = new Menu();
             explorationSubmenu.addChild(new MenuItem({
                 label: 'Explore cases, genes and mutations',
+                iconClass: "dijitIconSearch",
                 onClick: lang.hitch(this, 'createGDCExplore')
             }));
             explorationSubmenu.addChild(new MenuItem({
                 label: 'Explore projects',
+                iconClass: "dijitIconSearch",
                 onClick: lang.hitch(this, 'createGDCProject')
             }));
             explorationSubmenu.addChild(new MenuItem({
                 label: 'Explore primary sites',
+                iconClass: "dijitIconSearch",
                 onClick: lang.hitch(this, 'createGDCPrimarySites')
             }));
             this.browser.addGlobalMenuItem('gdc', new PopupMenuItem({
@@ -50,10 +53,12 @@ return declare( JBrowsePlugin,
             var fileSubmenu = new Menu();
             fileSubmenu.addChild(new MenuItem({
                 label: 'Add tracks by file id',
+                iconClass: "dijitIconNewTask",
                 onClick: lang.hitch(this, 'createGDCByFileId')
             }));
             fileSubmenu.addChild(new MenuItem({
                 label: 'Login',
+                iconClass: "dijitIconUsers",
                 onClick: lang.hitch(this, 'createGDCLogin')
             }));
             this.browser.addGlobalMenuItem('gdc', new PopupMenuItem({
