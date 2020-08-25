@@ -155,7 +155,12 @@ function (
             }).then(function(response) {
                 dom.empty(thisB.resultsContainer);
                 if (response.data) {
-                    thisB.createFileResult(response);
+                    if (response.data.repository.files.hits.total > 0) {
+                        thisB.createFileResult(response);
+                    } else {
+                        var results = dom.create('div', { className: 'flexColumnHolder', style: { border: '1px solid #ccc', 'flex': '1 0 0', 'margin-top': '10px', 'padding': '5px' } }, thisB.resultsContainer);
+                        var message = dom.create('div', { innerHTML: 'No files were found matching your search' }, results);
+                    }
                 } else {
                     // Error message
                 }
