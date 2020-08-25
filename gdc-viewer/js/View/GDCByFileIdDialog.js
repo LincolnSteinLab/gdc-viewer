@@ -178,7 +178,7 @@ function (
 
             var results = dom.create('div', { className: 'flexColumnHolder', style: { border: '1px solid #ccc', 'flex': '1 0 0', 'margin-top': '10px', 'padding': '5px' } }, thisB.resultsContainer);
 
-            var fileName = dom.create('div', { innerHTML: "File Name: " + file.file_name }, results);
+            var fileName = dom.create('div', { innerHTML: file.file_name, style: { 'font-size': '1.2em'} }, results);
             var fileId = dom.create('div', { innerHTML: "File Id: " + file.file_id }, results);
             var dataCategory = dom.create('div', { innerHTML: "Data Category: " + file.data_category }, results);
             var dataFormat = dom.create('div', { innerHTML: "Data Format: " + file.data_format }, results);
@@ -193,7 +193,6 @@ function (
             var indexFileName = dom.create('div', { innerHTML: "Index File Name: " + indexFile.file_name }, results);
             var indexFileId = dom.create('div', { innerHTML: "Index File Id: " + indexFile.file_id }, results);
 
-            // TODO - add track button
             var addTrack = new Button({
                 label: 'Add Track',
                 onClick: function() {
