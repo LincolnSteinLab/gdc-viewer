@@ -40,6 +40,7 @@ describe('Primary sites dialog', function() {
     it('Should be able to view primary sites', function() {
         // Open track menu
         cy.get('#dropdownbutton_gdc').type('{enter}')
+        cy.contains('Exploration').click()
         cy.contains('Explore primary sites').click()
 
         cy.wait('@getPrimarySites')
