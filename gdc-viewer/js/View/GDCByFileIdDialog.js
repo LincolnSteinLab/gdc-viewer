@@ -26,7 +26,7 @@ function (
         // baseGDCFileUrl: 'http://localhost:8010/proxy/data/',
         baseGDCFileUrl: 'https://api.gdc.cancer.gov/data/',
 
-        // Parent DOM to hold results
+        // Parent containers to hold form and results
         dialogContainer: undefined,
         searchContainer: undefined,
         resultsContainer: undefined,
@@ -102,7 +102,7 @@ function (
         show: function (browser, callback) {
             this.browser = browser;
             this.callback = callback || function () {};
-            this.set('title', 'Add Track By File ID');
+            this.set('title', 'Add Track By File ID or Name');
             this.set('content', this._dialogContent());
             this.inherited(arguments);
             focus.focus(this.closeButtonNode);
@@ -158,8 +158,7 @@ function (
                     if (response.data.repository.files.hits.total > 0) {
                         thisB.createFileResult(response);
                     } else {
-                        var results = dom.create('div', { className: 'flexColumnHolder', style: { border: '1px solid #ccc', 'flex': '1 0 0', 'margin-top': '10px', 'padding': '5px' } }, thisB.resultsContainer);
-                        var message = dom.create('div', { innerHTML: 'No files were found matching your search' }, results);
+                        thisB.createErrorResult(thisB.resultsContainer);
                     }
                 } else {
                     // Error message
@@ -191,11 +190,12 @@ function (
             var fileSize = dom.create('div', { innerHTML: "File Size: " + file.file_size }, results);
             var state = dom.create('div', { innerHTML: "State: " + file.state }, results);
 
-
             var indexFile = file.index_files.hits.edges[0].node
 
             var indexFileName = dom.create('div', { innerHTML: "Index File Name: " + indexFile.file_name }, results);
             var indexFileId = dom.create('div', { innerHTML: "Index File Id: " + indexFile.file_id }, results);
+           
+            var link = dom.create('a', { innerHTML: "View on the GDC", target: "_blank", href: "https://portal.gdc.cancer.gov/files/" + file.file_id }, results);
 
             var addTrack = new Button({
                 label: 'Add Track',
@@ -214,7 +214,7 @@ function (
             var storeConf = {
                 browser: this.browser,
                 refSeq: this.browser.refSeq,
-                type: 'JBrowse/Store/SeqFeature/BAM',
+                type: 'gdc-viewer/Store/SeqFeature/BAM',
                 urlTemplate: this.baseGDCFileUrl + fileId,
                 baiUrlTemplate: this.baseGDCFileUrl + indexFileId
             };
@@ -251,5 +251,14 @@ function (
             var spinner = dom.create('div', {}, loadingIcon);
             return loadingIcon;
         },
+
+        /**
+         * Creates an error message for search results and places at location
+         * @param {*} location 
+         */
+        createErrorResult: function (location) {
+            var results = dom.create('div', { className: 'flexColumnHolder', style: { border: '1px solid #ccc', 'flex': '1 0 0', 'margin-top': '10px', 'padding': '5px' } }, location);
+            var message = dom.create('div', { innerHTML: 'No files were found matching your search' }, results);
+        }
     });
 });

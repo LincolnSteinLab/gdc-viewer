@@ -678,6 +678,7 @@ function (
                 dom.empty(thisB.caseResultsTab.containerNode);
 
                 // Determine information for pagination and results
+                console.log(response)
                 var totalCases = response.data.exploreCasesTableViewer.explore.cases.hits.total;
                 var startResultCount = ((thisB.casePage - 1) * thisB.pageSize);
                 if (totalCases > 0) {
