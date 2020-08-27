@@ -190,10 +190,12 @@ function (
             var fileSize = dom.create('div', { innerHTML: "File Size: " + file.file_size }, results);
             var state = dom.create('div', { innerHTML: "State: " + file.state }, results);
 
-            var indexFile = file.index_files.hits.edges[0].node
+            if (file.index_files.hits.total > 0) {
+                var indexFile = file.index_files.hits.edges[0].node
 
-            var indexFileName = dom.create('div', { innerHTML: "Index File Name: " + indexFile.file_name }, results);
-            var indexFileId = dom.create('div', { innerHTML: "Index File Id: " + indexFile.file_id }, results);
+                var indexFileName = dom.create('div', { innerHTML: "Index File Name: " + indexFile.file_name }, results);
+                var indexFileId = dom.create('div', { innerHTML: "Index File Id: " + indexFile.file_id }, results);
+            }
            
             var link = dom.create('a', { innerHTML: "View on the GDC", target: "_blank", href: "https://portal.gdc.cancer.gov/files/" + file.file_id }, results);
 
