@@ -25,7 +25,7 @@ We will use the placeholder `<jbrowse-location>` to refer to where JBrowse is in
 ## 2. Install GDC Plugin
 Clone the GDC plugin and then copy the gdc-viewer subfolder into the JBrowse plugins directory.
 ```bash
-git clone https://github.com/agduncan94/gdc-viewer.git
+git clone https://github.com/LincolnSteinLab/gdc-viewer.git
 cp -R gdc-viewer/gdc-viewer <jbrowse-location>/plugins/gdc-viewer
 ```
 
@@ -75,7 +75,7 @@ urlTemplate=hg38.fa
 ```
 
 ## 4. Adding new tracks (optional)
-We have some basic example tracks in the [data/tracks.conf](https://github.com/agduncan94/gdc-viewer/blob/develop/data/tracks.conf) file of the gdc-viewer repository.
+We have some basic example tracks in the [data/tracks.conf](https://github.com/LincolnSteinLab/gdc-viewer/blob/develop/data/tracks.conf) file of the gdc-viewer repository.
 
 You can also add new tracks by using the GDC dialog accessible within JBrowse. [See the tracks page]({{ site.url }}{% link tracks.md %}).
 

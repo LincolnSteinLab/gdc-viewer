@@ -20,7 +20,7 @@ RUN mkdir -p /jbrowse/ && \
 WORKDIR /jbrowse/
 
 # Download GDC Viewer
-RUN git clone https://github.com/agduncan94/gdc-viewer /gdc-viewer/ && \
+RUN git clone https://github.com/LincolnSteinLab/gdc-viewer /gdc-viewer/ && \
     cd /gdc-viewer/ && \
     git checkout ${PLUGIN_VERSION} && \
     cp -r gdc-viewer /jbrowse/plugins/gdc-viewer && \
