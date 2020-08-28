@@ -62,5 +62,5 @@ deploy:
   local-dir: ../jbrowse/JBrowse-$RELEASE_VERSION
   upload-dir: code/gdc-viewer/$TRAVIS_BRANCH
   on:
-    repo: agduncan94/gdc-viewer
+    repo: LincolnSteinLab/gdc-viewer
     tags: true
