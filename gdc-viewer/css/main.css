@@ -50,6 +50,14 @@ table.results-table tr:nth-child(odd) {
     align-items: stretch;
 }
 
+.flexColumnHolder {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+}
+
 .flex-column {
     display: flex;
     flex-direction:column;

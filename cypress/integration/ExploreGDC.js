@@ -38,6 +38,7 @@ describe('Explore GDC', function() {
      */
     var openExploreDialog = function () {
         cy.get('#dropdownbutton_gdc').type('{enter}')
+        cy.contains('Exploration').click()
         cy.contains('Explore cases, genes and mutations').click()
     }
 
