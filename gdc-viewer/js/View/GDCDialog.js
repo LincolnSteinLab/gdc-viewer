@@ -339,7 +339,11 @@ function (
                                         } else if (this.value.type === 'ssm') {
                                             thisB.mutationFilters[this.value.facet].push(this.value.term);
                                         } else if (this.value.type === 'gene') {
-                                            thisB.geneFilters[this.value.facet].push(this.value.term);
+                                            if (this.value.facet === 'is_cancer_gene_census') {
+                                                thisB.geneFilters[this.value.facet].push(this.value.term === '1' ? true : false);
+                                            } else {
+                                                thisB.geneFilters[this.value.facet].push(this.value.term);
+                                            }
                                         }
                                     } else {
                                         if (this.value.type === 'case') {
@@ -353,9 +357,17 @@ function (
                                                 thisB.mutationFilters[this.value.facet].splice(indexOfValue, 1);
                                             }
                                         } else if (this.value.type === 'gene') {
-                                            var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
-                                            if (indexOfValue != -1) {
-                                                thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
+                                            if (this.value.facet === 'is_cancer_gene_census') {
+                                                var booleanValue = this.value.term === '1' ? true : false
+                                                var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(booleanValue);
+                                                if (indexOfValue != -1) {
+                                                    thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
+                                                }
+                                            } else {
+                                                var indexOfValue = thisB.geneFilters[this.value.facet].indexOf(this.value.term);
+                                                if (indexOfValue != -1) {
+                                                    thisB.geneFilters[this.value.facet].splice(indexOfValue, 1);
+                                                }
                                             }
                                         }
                                     }
@@ -1154,6 +1166,10 @@ function (
          * @return {boolean} is the facet selected
          */
         isChecked: function(facet, term, filters) {
+            if (facet === 'is_cancer_gene_census') {
+                var booleanValue = term === '1' ? true : false;
+                return filters[facet] && filters[facet].indexOf(booleanValue) > -1
+            }
             return filters[facet] && filters[facet].indexOf(term) > -1;
         },
 
