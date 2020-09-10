@@ -121,9 +121,9 @@ describe('Explore GDC', function() {
         })
 
         checkAllResultsTab(
-            ['Showing 1 to 20 of 3,111', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
-            ['Showing 1 to 20 of 21,169', 'TP53', 'TTN'],
-            ['Showing 1 to 20 of 120,896', 'chr2:g.208248388C>T', 'chr17:g.7673803G>A']
+            ['Showing 1 to 20 of 3,127', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
+            ['Showing 1 to 20 of 21,316', 'TTN', 'TP53'],
+            ['Showing 1 to 20 of 132,784', 'chr7:g.140753336A>T', 'chr2:g.208248388C>T']
         )
 
         // Select is cancer gene census - 1
@@ -132,9 +132,9 @@ describe('Explore GDC', function() {
         })
 
         checkAllResultsTab(
-            ['Showing 1 to 20 of 365', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
-            ['Showing 1 to 20 of 575', 'TP53', 'PIK3CA'],
-            ['Showing 1 to 20 of 5,952', 'chr7:g.140753336A>T', 'chr2:g.208248388C>T']
+            ['Showing 1 to 20 of 457', 'TCGA-A5-A1OF', 'TCGA-AJ-A3EK'],
+            ['Showing 1 to 20 of 575', 'TP53', 'BRAF'],
+            ['Showing 1 to 20 of 6,580', 'chr7:g.140753336A>T', 'chr2:g.208248388C>T']
         )
 
         selectResultsTab(0)
