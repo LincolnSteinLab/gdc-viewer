@@ -4,7 +4,7 @@ const { BamFile } = cjsRequire('@gmod/bam')
 
 const bamIndexedFilesCache = new LRU({ maxSize: 5 })
 
-const BlobFilehandleWrapper = cjsRequire('../../Model/BlobFilehandleWrapper')
+const BlobFilehandleWrapper = cjsRequire('JBrowse/Model/BlobFilehandleWrapper')
 
 class BamSlightlyLazyFeature {
     _get_id() { this.record.id() }
