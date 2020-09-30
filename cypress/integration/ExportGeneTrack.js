@@ -5,7 +5,7 @@ describe('Gene track', function() {
 
         cy
             .server()
-        
+
         cy
             .route({
                 method: 'POST',
@@ -17,7 +17,7 @@ describe('Gene track', function() {
             .route({
                 method: 'POST',
                 url: 'v0/graphql/projectsTable',
-                response: 'fixture:ExportGenes/GeneProjects.json'
+                response: 'fixture:ExportGenes/ProjectTable.json'
             }).as('getProjectsTable')
 
         // Open track menu
@@ -79,7 +79,7 @@ describe('Gene track', function() {
         cy.fixture('ExportGenes/track-conf-export.conf').then((json) => {
             testExport(6, 'Track Config', [json])
         })
-        testExport(7, 'Track Config JSON', 
+        testExport(7, 'Track Config JSON',
         [
 `{
 \t"label": "GDC Genes",
