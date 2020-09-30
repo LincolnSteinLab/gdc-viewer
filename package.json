@@ -28,6 +28,6 @@
   },
   "homepage": "https://lincolnsteinlab.github.io/gdc-viewer/",
   "devDependencies": {
-    "cypress": "^4.7.0"
+    "cypress": "^4.11.0"
   }
 }
