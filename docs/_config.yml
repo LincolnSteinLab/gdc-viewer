@@ -21,10 +21,10 @@ url: "https://lincolnsteinlab.github.io/gdc-viewer" # the base hostname & protoc
 
 # Build settings
 markdown: kramdown
-theme: just-the-docs
-remote_theme: pmarsceill/just-the-docs
+remote_theme: pmarsceill/just-the-docs@v0.3.2
 plugins:
   - jekyll-feed
+  - jekyll-remote-theme
 
 aux_links:
   "GDC Viewer on GitHub":
