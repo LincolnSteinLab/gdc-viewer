@@ -16,12 +16,12 @@
 title: GDC Viewer
 description: >- # this means to ignore newlines until "baseurl:"
   A JBrowse plugin for interacting with the GDC portal
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://lincolnsteinlab.github.io/gdc-viewer" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/gdc-viewer" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
 markdown: kramdown
-remote_theme: pmarsceill/just-the-docs@v0.3.2
+remote_theme: pmarsceill/just-the-docs
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
