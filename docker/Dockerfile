@@ -4,7 +4,7 @@ LABEL maintainer="andrew.duncan@oicr.on.ca"
 
 ARG plugin_version=develop
 
-ENV JBROWSE_VERSION 1.16.6
+ENV JBROWSE_VERSION 1.16.10
 ENV PLUGIN_VERSION=$plugin_version
 
 # Install dependencies
