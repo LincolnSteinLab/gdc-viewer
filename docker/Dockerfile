@@ -1,6 +1,6 @@
 FROM node:latest
 
-LABEL maintainer="andrew.duncan@oicr.on.ca"
+LABEL maintainer="gregory.hogue@oicr.on.ca"
 
 ARG plugin_version=develop
 
@@ -27,7 +27,8 @@ RUN git clone https://github.com/LincolnSteinLab/gdc-viewer /gdc-viewer/ && \
     cat ./data/jbrowse.conf > /jbrowse/jbrowse.conf
 
 # Setup JBrowse
-RUN ./setup.sh
+RUN yarn install && \
+    yarn build
 
 # Expose port 3000
 EXPOSE 3000
