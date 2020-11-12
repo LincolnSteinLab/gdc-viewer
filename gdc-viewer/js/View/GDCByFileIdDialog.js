@@ -96,8 +96,8 @@ function (
 
         /**
          * Show callback for displaying dialog
-         * @param {*} browser 
-         * @param {*} callback 
+         * @param {*} browser
+         * @param {*} callback
          */
         show: function (browser, callback) {
             this.browser = browser;
@@ -111,7 +111,43 @@ function (
         fetchFileMetadata: function(fileId) {
             var thisB = this;
             // Create body for GraphQL query
-            var fileMetadataQuery = `query Queries($filters: FiltersArgument!) { repository { files { hits(filters: $filters) { total edges { node { file_id file_name file_size access data_category data_format data_type experimental_strategy md5sum state acl index_files { hits { total edges { node { file_id file_name file_size data_category data_format data_type md5sum state } } } } } } } } } } `;
+            var fileMetadataQuery = `
+                query Queries($filters: FiltersArgument!) {
+                  repository {
+                    files {
+                      hits(filters: $filters) {
+                        total
+                        edges {
+                          node {
+                            file_id
+                            file_name
+                            file_size
+                            access
+                            data_category
+                            data_format
+                            data_type
+                            experimental_strategy
+                            md5sum
+                            state
+                            acl
+                            index_files {
+                              hits {
+                                total
+                                edges {
+                                  node {
+                                    file_id
+                                    file_name
+                                    file_size
+                                    data_category
+                                    data_format
+                                    data_type
+                                    md5sum
+                                    state
+                            }}}}
+                    }}}}
+                  }
+                }
+            `;
             var bodyVal = {
                 query: fileMetadataQuery,
                 variables: {
@@ -196,49 +232,64 @@ function (
                 var indexFileName = dom.create('div', { innerHTML: "Index File Name: " + indexFile.file_name }, results);
                 var indexFileId = dom.create('div', { innerHTML: "Index File Id: " + indexFile.file_id }, results);
             }
-           
+
             var link = dom.create('a', { innerHTML: "View on the GDC", target: "_blank", href: "https://portal.gdc.cancer.gov/files/" + file.file_id }, results);
 
-            var addTrack = new Button({
-                label: 'Add Track',
-                onClick: function() {
-                    thisB.addTrack(file.file_id, indexFile.file_id)
-                }
-            }).placeAt(results);
+            var {storeConf, trackConf, missing} = this.getFileConf(file);
+
+            if (missing.length == 0) {
+                new Button({
+                    label: 'Add Track',
+                    onClick: () => {
+                        this.addTrack(storeConf, trackConf);
+                    }
+                }).placeAt(results);
+            }
 
         },
 
-        // For now assumes BAM track
-        addTrack: function(fileId, indexFileId) {
-            var randomId = Math.random().toString(36).substring(7);
-            console.log(this.browser)
+        getFileConf: function(file) {
+            const randomId = Math.random().toString(36).substring(7);
+
+            var missing = [];
 
             var storeConf = {
                 browser: this.browser,
                 refSeq: this.browser.refSeq,
-                type: 'gdc-viewer/Store/SeqFeature/BAM',
-                urlTemplate: this.baseGDCFileUrl + fileId,
-                baiUrlTemplate: this.baseGDCFileUrl + indexFileId
+                urlTemplate: this.baseGDCFileUrl + file.file_id
             };
-            var storeName = this.browser.addStoreConfig(null, storeConf);
-
-            var key = 'GDC_BAM';
-            var label = key;
-
-            key += '_' + fileId
-            label += '_' + fileId + '_' + randomId
 
             var trackConf = {
-                type: 'JBrowse/View/Track/Alignments2',
-                store: storeName,
-                label: label,
-                key: key,
-                urlTemplate: this.baseGDCFileUrl + fileId,
-                baiUrlTemplate: this.baseGDCFileUrl + indexFileId
+                key: "GDC_",
+                urlTemplate: storeConf['urlTemplate']
             };
 
-            console.log(trackConf)
-            trackConf.store = storeName;
+            var index_files = file.index_files.hits.edges;
+
+            if (file.data_format == "BAM") {
+                trackConf['key'] += "BAM_";
+                storeConf['type'] = 'gdc-viewer/Store/SeqFeature/BAM';
+                trackConf['type'] = 'JBrowse/View/Track/Alignments2';
+                // Must have index file (bai)
+                if (file.index_files.hits.total > 0) {
+                    storeConf['baiUrlTemplate'] = this.baseGDCFileUrl + index_files[0].node.file_id;
+                    trackConf['baiUrlTemplate'] = storeConf['baiUrlTemplate'];
+                } else {
+                    missing.push('bai');
+                }
+
+            }
+
+            trackConf['store'] = this.browser.addStoreConfig(null, storeConf);
+
+            trackConf['key'] += file.file_id;
+            trackConf['label'] = trackConf['key'] + '_' + randomId;
+
+            return {storeConf, trackConf, missing};
+        },
+
+        addTrack: function(storeConf, trackConf) {
+            console.log(storeConf, trackConf);
             this.browser.publish('/jbrowse/v1/v/tracks/new', [trackConf]);
             this.browser.publish('/jbrowse/v1/v/tracks/show', [trackConf]);
         },
@@ -256,7 +307,7 @@ function (
 
         /**
          * Creates an error message for search results and places at location
-         * @param {*} location 
+         * @param {*} location
          */
         createErrorResult: function (location) {
             var results = dom.create('div', { className: 'flexColumnHolder', style: { border: '1px solid #ccc', 'flex': '1 0 0', 'margin-top': '10px', 'padding': '5px' } }, location);

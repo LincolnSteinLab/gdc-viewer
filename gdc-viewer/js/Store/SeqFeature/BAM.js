@@ -13,7 +13,8 @@ define( [
             'JBrowse/Store/SeqFeature/_PairCache',
             'JBrowse/Store/SeqFeature/_SpanCache',
             'JBrowse/Store/SeqFeature/_InsertSizeCache',
-            'gdc-viewer/Model/XHRBlob'
+            'gdc-viewer/Model/XHRBlob',
+            'gdc-viewer/Util/SkipLastCtor'
         ],
         function(
             declare,
@@ -21,21 +22,14 @@ define( [
             PairCache,
             SpanCache,
             InsertSizeCache,
-            XHRBlob
+            XHRBlob,
+            SkipLastCtor
         ) {
 
-return declare(BAM, {
-    // Don't call BAM constructor, we replace it here
-    '-chains-': {
-      constructor: 'manual'
-    },
+return declare(SkipLastCtor(BAM), {
 
     constructor( args ) {
-        // Manually call BAM superclass constructors
-        const bases = this.constructor._meta.parents._meta.bases;
-        for (var idx = bases.length - 1; idx > 0; idx--) {
-            bases[idx]._meta.ctor.apply(this, arguments);
-        }
+        this.inherited(arguments);
 
         let dataBlob
         if (args.bam)
