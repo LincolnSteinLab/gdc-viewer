@@ -278,6 +278,23 @@ function (
                     missing.push('bai');
                 }
 
+            } else if (file.data_format == "VCF") {
+                trackConf['key'] += "VCF_";
+                storeConf['type'] = 'gdc-viewer/Store/SeqFeature/VCFTabix';
+                trackConf['type'] = 'JBrowse/View/Track/HTMLVariants';
+                // Must have index file (tbi)
+                if (file.index_files.hits.total > 0) {
+                    storeConf['tbiUrlTemplate'] = this.baseGDCFileUrl + index_files[0].node.file_id;
+                    trackConf['tbiUrlTemplate'] = storeConf['tbiUrlTemplate'];
+                } else {
+                    missing.push('tbi');
+                }
+                // Must be gzipped
+                if (!file.file_name.endsWith(".gz")) {
+                    delete storeConf['urlTemplate'];
+                    delete trackConf['urlTemplate'];
+                    missing.push('file');
+                }
             }
 
             trackConf['store'] = this.browser.addStoreConfig(null, storeConf);
