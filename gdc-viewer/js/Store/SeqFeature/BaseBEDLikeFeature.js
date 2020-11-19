@@ -8,7 +8,7 @@ define([
     'JBrowse/Store/SeqFeature/BED',
     './BedLikeParser',
     'JBrowse/Store/SeqFeature',
-    'JBrowse/Model/XHRBlob',
+    'gdc-viewer/Model/XHRBlob',
     'JBrowse/Model/BlobFilehandleWrapper'
 ],
 function(
@@ -24,7 +24,7 @@ function(
     return declare([ SeqFeatureStore, BED ], {
         /**
          * Constructor
-         * @param {*} args 
+         * @param {*} args
          */
         constructor: function (args) {
             this.data = new BlobFilehandleWrapper(

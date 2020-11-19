@@ -278,6 +278,38 @@ function (
                     missing.push('bai');
                 }
 
+            } else if (file.data_format == "TSV") {
+                trackConf['key'] += "TSV_";
+                if (file.data_category == "Transcriptome Profiling") {
+                    if (file.data_type == "Isoform Expression Quantification") {
+                        storeConf['type'] = 'gdc-viewer/Store/SeqFeature/IsoformExpressionQuantification';
+                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
+                    }
+                }
+
+            } else if (file.data_format == "TXT") {
+                trackConf['key'] += "TXT_";
+                if (file.data_category == "Copy number variation") {
+                    if ([
+                        "Copy number Segment",
+                        "Masked copy number Segment",
+                        "Allele-specific copy number Segment"
+                    ].indexOf(file.data_type) >= 0) {
+                        storeConf['type'] = 'gdc-viewer/Store/SeqFeature/SEG';
+                        trackConf['type'] = 'JBrowse/View/Track/Wiggle/XYPlot';
+
+                    } else if (file.data_type == "Gene Level Copy Number") {
+                        storeConf['type'] = 'gdc-viewer/Store/SeqFeature/GeneLevelCopyNumber';
+                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
+                    }
+
+                } else if (file.data_category == "DNA Methylation") {
+                    if (file.data_type == "Methylation Beta Value") {
+                        storeConf['type'] = 'gdc-viewer/Store/SeqFeature/MethylationBetaValue';
+                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';  // TODO: compare with XYPlot
+                    }
+                }
+
             } else if (file.data_format == "VCF") {
                 trackConf['key'] += "VCF_";
                 storeConf['type'] = 'gdc-viewer/Store/SeqFeature/VCFTabix';

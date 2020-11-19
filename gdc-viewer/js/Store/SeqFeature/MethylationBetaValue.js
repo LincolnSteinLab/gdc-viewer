@@ -1,7 +1,7 @@
 /**
  * MethylationBetaValue store class
  * Supports (Data format, Data category, Data Type)
- * * TXT, DNA Methlyation, Methylation Beta Value
+ * * TXT, DNA Methylation, Methylation Beta Value
  */
 define([
     'dojo/_base/declare',
