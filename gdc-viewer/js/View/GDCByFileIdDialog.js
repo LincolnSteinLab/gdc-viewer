@@ -235,7 +235,13 @@ function (
 
             var link = dom.create('a', { innerHTML: "View on the GDC", target: "_blank", href: "https://portal.gdc.cancer.gov/files/" + file.file_id }, results);
 
-            var {storeConf, trackConf, missing} = this.getFileConf(file);
+            fileConf = this.getFileConf(file);
+            if (fileConf == null) {
+                return;
+            }
+            var {storeConf, trackConf, missing} = fileConf;
+
+            var missingProps = dom.create('div', { innerHTML: "Missing Properties: " + missing }, results);
 
             if (missing.length == 0) {
                 new Button({
@@ -285,15 +291,21 @@ function (
                         storeConf['type'] = 'gdc-viewer/Store/SeqFeature/IsoformExpressionQuantification';
                         trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
                     }
+
+                } else if (file.data_category == "Copy Number Variation") {
+                    if (file.data_type == "Gene Level Copy Number") {
+                        storeConf['type'] = 'gdc-viewer/Store/SeqFeature/GeneLevelCopyNumber';
+                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
+                    }
                 }
 
             } else if (file.data_format == "TXT") {
                 trackConf['key'] += "TXT_";
-                if (file.data_category == "Copy number variation") {
+                if (file.data_category == "Copy Number Variation") {
                     if ([
-                        "Copy number Segment",
-                        "Masked copy number Segment",
-                        "Allele-specific copy number Segment"
+                        "Copy Number Segment",
+                        "Masked Copy Number Segment",
+                        "Allele-specific Copy Number Segment"
                     ].indexOf(file.data_type) >= 0) {
                         storeConf['type'] = 'gdc-viewer/Store/SeqFeature/SEG';
                         trackConf['type'] = 'JBrowse/View/Track/Wiggle/XYPlot';
@@ -306,7 +318,13 @@ function (
                 } else if (file.data_category == "DNA Methylation") {
                     if (file.data_type == "Methylation Beta Value") {
                         storeConf['type'] = 'gdc-viewer/Store/SeqFeature/MethylationBetaValue';
-                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';  // TODO: compare with XYPlot
+                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
+                    }
+
+                } else if (file.data_category == "Transcriptome Profiling") {
+                    if (file.data_type == "Isoform Expression Quantification") {
+                        storeConf['type'] = 'gdc-viewer/Store/SeqFeature/IsoformExpressionQuantification';
+                        trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
                     }
                 }
 
@@ -327,6 +345,11 @@ function (
                     delete trackConf['urlTemplate'];
                     missing.push('file');
                 }
+
+            }
+
+            if (!('type' in trackConf)) {
+                return null;
             }
 
             trackConf['store'] = this.browser.addStoreConfig(null, storeConf);
