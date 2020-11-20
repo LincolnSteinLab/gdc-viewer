@@ -1,6 +1,7 @@
 /**
  * GeneLevelCopyNumber store class
  * Supports (Data format, Data category, Data Type)
+ * * TSV, Copy Number Variation, Gene Level Copy Number
  * * TXT, Copy Number Variation, Gene Level Copy Number
  */
 define([

@@ -1,9 +1,9 @@
 /**
  * SEG store class for CopyNumberSegment files
  * Supports (Data format, Data category, Data Type)
- * * TXT, Copy number variation, Copy number Segment
- * * TXT, Copy number variation, Masked copy number Segment
- * * TXT, Copy number variation, Allele-specific copy number Segment
+ * * TXT, Copy Number Variation, Copy Number Segment
+ * * TXT, Copy Number Variation, Masked Copy Number Segment
+ * * TXT, Copy Number Variation, Allele-specific Copy Number Segment
  */
 define([
     'dojo/_base/declare',
