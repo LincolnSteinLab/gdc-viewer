@@ -8,7 +8,7 @@ define( [
 // Creates a subclass of T that skips T's constructor, but none of T's parents'.
 // This effectively allows rewriting T's constructor without code duplication.
 // Useful for tweaking classes from base JBrowse.
-return function(T) {
+return function(T, nSkip=1) {
     return declare('SkipLastCtor', T, {
         '-chains-': {
             constructor: 'manual'
@@ -22,7 +22,7 @@ return function(T) {
                 ctor = ctor._meta.parents;
             }
             const bases = ctor._meta.bases;
-            for (var idx = bases.length - 1; idx > 0; idx--) {
+            for (var idx = bases.length - 1; idx >= nSkip; idx--) {
                 bases[idx]._meta.ctor.apply(this, arguments);
             }
         }

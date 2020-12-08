@@ -241,7 +241,9 @@ function (
             }
             var {storeConf, trackConf, missing} = fileConf;
 
-            var missingProps = dom.create('div', { innerHTML: "Missing Properties: " + missing }, results);
+            if (missing.length > 0) {
+                dom.create('div', { innerHTML: "Missing Properties: " + missing }, results);
+            }
 
             if (missing.length == 0) {
                 new Button({
@@ -283,6 +285,11 @@ function (
                 } else {
                     missing.push('bai');
                 }
+
+            } else if (file.data_format == "MAF") {
+                trackConf['key'] += "MAF_";
+                storeConf['type'] = 'gdc-viewer/Store/SeqFeature/MAF';
+                trackConf['type'] = 'JBrowse/View/Track/HTMLFeatures';
 
             } else if (file.data_format == "TSV") {
                 trackConf['key'] += "TSV_";
