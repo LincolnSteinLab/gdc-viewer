@@ -26,7 +26,7 @@ function(
     return declare(SkipLastCtor(BaseBEDLikeFeature, 2), {
 
         constructor: function(args) {
-            this.inherited(arguments);
+            this.inherited(arguments);  // super()
 
             if (args.maf) {
                 this.data = new BlobFilehandleWrapper(args.maf);
@@ -42,11 +42,6 @@ function(
                 throw new Error('must provide either `maf` or `urlTemplate`');
             }
 
-            this.features = [];
-            this._loadFeatures();
-        },
-
-        _loadFeatures: function() {
             // Override fetchLines() from JBrowse/Model/FileBlob
             this.data.fetchLines = (lineCallback, endCallback, failCallback) => {
                 this.data.readFile().then(unzip).then((array) => {  // gunzip
@@ -56,7 +51,7 @@ function(
                     });
                     let line;
                     while (line = lineIterator.getline()) {
-                        if (line.length == 0 || line[0] == '#') {
+                        if (line.length == 0 || line[0] == '#') {  // skip header
                             continue;
                         }
                         lineCallback(line);
@@ -64,7 +59,9 @@ function(
                     endCallback();
                 }).catch(failCallback);
             };
-            this.inherited(arguments);
+
+            this.features = [];
+            this._loadFeatures();
         },
 
         convertLineToBED: function(line) {
