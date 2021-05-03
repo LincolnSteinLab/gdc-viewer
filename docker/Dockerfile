@@ -9,7 +9,7 @@ ENV PLUGIN_VERSION=$plugin_version
 
 # Install dependencies
 RUN apt-get -qq update --fix-missing
-RUN apt-get --no-install-recommends -y install git build-essential zlib1g-dev libxml2-dev libexpat-dev postgresql-client libpq-dev ca-certificates curl
+RUN apt-get --no-install-recommends -y install git build-essential zlib1g-dev libxml2-dev libexpat-dev postgresql-client=9.6 libpq-dev ca-certificates curl
 
 # Download JBrowse
 RUN mkdir -p /jbrowse/ && \
