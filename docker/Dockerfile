@@ -1,10 +1,10 @@
-FROM node:latest
+FROM node:14.16.1
 
 LABEL maintainer="gregory.hogue@oicr.on.ca"
 
 ARG plugin_version=develop
 
-ENV JBROWSE_VERSION 1.16.10
+ENV JBROWSE_VERSION 1.16.11
 ENV PLUGIN_VERSION=$plugin_version
 
 # Install dependencies
