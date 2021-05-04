@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:14.16.1
 
 LABEL maintainer="gregory.hogue@oicr.on.ca"
 
