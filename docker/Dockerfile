@@ -27,8 +27,7 @@ RUN git clone https://github.com/LincolnSteinLab/gdc-viewer /gdc-viewer/ && \
     cat ./data/jbrowse.conf > /jbrowse/jbrowse.conf
 
 # Setup JBrowse
-RUN yarn install && \
-    yarn build
+RUN ./setup.sh
 
 # Expose port 3000
 EXPOSE 3000
